@@ -15,14 +15,15 @@ Usage:
         [--fields-json <file>] [--attach <path> ...]
     atl.py publish-work read-adf --config <configPath> --key <KEY> --out <live.json>
     atl.py publish-work comment --config <configPath> --key <KEY> [--comment-id <id>] \
-        (--markdown <comment.md> | --adf <comment.json>) [--attach <path> ...]
+        (--markdown <comment.md> | --adf <comment.json>) [--page <url|id> ...] [--attach <path> ...]
 
 `update --key <KEY> --attach <path>` alone retries attachments on an existing item without
 touching its fields.
 
-`comment` posts a comment (or replaces comment `--comment-id`) and shows each `--attach` file inline:
-an image preview or a file card. A file that cannot be uploaded stops the command before the comment
-is posted, so the comment never claims a file that is missing.
+`comment` posts a comment (or replaces comment `--comment-id`), shows each `--page` Confluence page as a
+smart-link card, and each `--attach` file inline: an image preview or a file card. A page or file that
+cannot be resolved or uploaded stops the command before the comment is posted, so the comment never
+claims something that is missing.
 """
 from __future__ import annotations
 
@@ -34,6 +35,7 @@ from pathlib import Path
 from requests.exceptions import ConnectionError as RequestsConnectionError, HTTPError, RequestException, Timeout
 
 from .config import load_credentials, require_supported_library, site_url
+from .comment_links import PageResolver, page_resolver, with_page_cards
 from .comment_media import MediaResolver, Uploaded, media_resolver, uploaded_from_response, with_media
 from .jira_client import get_jira
 from .map_markdown import ConversionError, md_to_adf
@@ -123,14 +125,30 @@ def upload_for_comment(jira, key: str, paths: list[str], resolve: MediaResolver)
     return files
 
 
-def publish_comment(jira, key: str, adf: dict, *, comment_id: str | None, paths: list[str], resolve: MediaResolver, site: str) -> dict:
+def resolve_pages(references: list[str], resolve: PageResolver) -> list[str]:
+    urls = []
+    for reference in references:
+        try:
+            urls.append(resolve(reference))
+        except (ValueError, RequestException) as exception:
+            raise PublishError(f"cannot link page {reference}: {str(exception) or type(exception).__name__}") from None
+    return urls
+
+
+def publish_comment(
+    jira, key: str, adf: dict, *, comment_id: str | None, paths: list[str], resolve: MediaResolver, site: str,
+    pages: list[str] | None = None, resolve_page: PageResolver | None = None,
+) -> dict:
+    page_urls = resolve_pages(pages or [], resolve_page) if pages else []
     files = upload_for_comment(jira, key, paths, resolve)
-    body = with_media(adf, files)
+    body = with_media(with_page_cards(adf, page_urls), files)
     if comment_id:
         _call(lambda: jira.put(f"rest/api/3/issue/{key}/comment/{comment_id}", data={"body": body}))
     else:
         comment_id = str(_call(lambda: jira.post(f"rest/api/3/issue/{key}/comment", data={"body": body}))["id"])
     result: dict = {"key": key, "commentId": comment_id, "url": f"{site}/browse/{key}?focusedCommentId={comment_id}"}
+    if page_urls:
+        result["pages"] = page_urls
     if files:
         result["attached"] = [{"id": file.attachment_id, "filename": file.filename, "inline": "preview" if file.image else "card"} for file in files]
     return result
@@ -171,6 +189,7 @@ def build_arg_parser(prog: str | None = None) -> argparse.ArgumentParser:
     source = comment.add_mutually_exclusive_group(required=True)
     source.add_argument("--markdown", help="Markdown comment file; converted to ADF in-process")
     source.add_argument("--adf", help="ADF comment JSON file")
+    comment.add_argument("--page", action="append", default=[], metavar="URL|ID", help="Confluence page URL or id to show as a smart-link card; repeatable")
     comment.add_argument("--attach", action="append", default=[], metavar="PATH", help="File to upload and show inline; repeatable")
 
     for command in (create, update, read, comment):
@@ -186,10 +205,13 @@ def read_description_source(args: argparse.Namespace) -> dict | None:
     return None
 
 
-def run(args: argparse.Namespace, jira, site: str, resolve: MediaResolver | None = None) -> dict:
+def run(
+    args: argparse.Namespace, jira, site: str, resolve: MediaResolver | None = None, resolve_page: PageResolver | None = None
+) -> dict:
     if args.action == "comment":
         return publish_comment(
-            jira, args.key, read_description_source(args), comment_id=args.comment_id, paths=args.attach, resolve=resolve, site=site
+            jira, args.key, read_description_source(args), comment_id=args.comment_id, paths=args.attach, resolve=resolve,
+            site=site, pages=args.page, resolve_page=resolve_page,
         )
     if args.action == "read-adf":
         description = read_description(jira, args.key)
@@ -225,7 +247,7 @@ def main(argv: list[str] | None = None, *, prog: str | None = None) -> None:
         print("error: .atlassian.json.user needs cloudId, email, and apiToken to publish a work item", file=sys.stderr)
         raise SystemExit(1)
     try:
-        result = run(args, get_jira(credentials), site_url(credentials), media_resolver(credentials))
+        result = run(args, get_jira(credentials), site_url(credentials), media_resolver(credentials), page_resolver(credentials))
     except ConversionError as exception:
         print(f"error: Markdown conversion failed: {exception}", file=sys.stderr)
         raise SystemExit(1)

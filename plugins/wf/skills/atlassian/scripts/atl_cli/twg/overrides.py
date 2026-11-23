@@ -373,22 +373,22 @@ def jira_workitem_update(args: list[str], context: Context) -> Delegate | None:
 COMMENT_COMMANDS = {("jira", "workitem", "comment", "create"), ("jira", "workitem", "comment", "update")}
 
 
-def _comment_with_attachments(action: str, args: list[str], context: Context) -> Delegate:
-    parsed = parse(args, values={"--issue-id", "--id", "--body", "--body-file", "--body-format", "--attach", "--output", "--output-file"})
-    _positionals(parsed, "post the comment without --attach to use it")
+def _comment_via_adf(action: str, args: list[str], context: Context) -> Delegate:
+    parsed = parse(args, values={"--issue-id", "--id", "--body", "--body-file", "--body-format", "--attach", "--page", "--output", "--output-file"})
+    _positionals(parsed, "post the comment without --attach/--page to use it")
     if parsed.rest:
-        raise OverrideError(f"unexpected argument {parsed.rest[0]!r} on a comment with attachments")
+        raise OverrideError(f"unexpected argument {parsed.rest[0]!r} on a comment with files or pages")
     if parsed.get("--body-format") not in ("md", "markdown"):
-        raise OverrideError("--attach needs --body-format markdown; the comment is built as Markdown with the files shown inline")
+        raise OverrideError("--attach, --page, and page-card markers need --body-format markdown; the comment is built as Markdown with files and pages shown inline")
     if parsed.get("--output") not in (None, "json"):
-        raise OverrideError("a comment with attachments prints JSON; drop --output or use -o json")
+        raise OverrideError("a comment with files or pages prints JSON; drop --output or use -o json")
     if parsed.get("--body") is not None and parsed.get("--body-file") is not None:
         raise OverrideError("use either --body or --body-file, not both")
     md_path = _body_file(parsed, "--body", "--body-file", context, "comment.md")
     if md_path is None:
-        raise OverrideError("--body or --body-file is required with --attach")
+        raise OverrideError("--body or --body-file is required with --attach or --page")
     if not parsed.get("--issue-id"):
-        raise OverrideError("--issue-id <KEY> is required with --attach")
+        raise OverrideError("--issue-id <KEY> is required with --attach or --page")
     key, _ = _issue_ref(parsed.get("--issue-id"))
     comment_id = parsed.get("--id")
     if action == "update" and not comment_id:
@@ -399,18 +399,37 @@ def _comment_with_attachments(action: str, args: list[str], context: Context) ->
         "publish-work",
         ["comment", "--key", key, "--markdown", md_path]
         + _optional("--comment-id", comment_id)
+        + [token for page in parsed.all("--page") for token in ("--page", page)]
         + [token for path in parsed.all("--attach") for token in ("--attach", path)],
         publishes=True,
         output_file=parsed.get("--output-file"),
     )
 
 
+PAGE_CARD_MARKER = "<!-- adf:inline-card"
+
+
+def _has_page_card_marker(args: list[str]) -> bool:
+    """A Markdown comment body holding an `adf:inline-card` marker; twg would drop the marker."""
+    parsed = parse(args, values={"--body", "--body-file", "--body-format"})
+    if parsed.get("--body-format") not in ("md", "markdown"):
+        return False
+    body = parsed.get("--body")
+    if body is None and parsed.get("--body-file"):
+        try:
+            body = Path(parsed.get("--body-file")).read_text(encoding="utf-8")
+        except (OSError, UnicodeDecodeError):
+            return False
+    return PAGE_CARD_MARKER in (body or "")
+
+
 def jira_comment_write(command: list[str], args: list[str], context: Context) -> Delegate | TwgCall | None:
     """twg takes comment Markdown only through `--body` plus `--body-format markdown`; `--body-file`
-    is read here and forwarded inline. Other `--body` formats run on twg unchanged. `--attach` is not
-    a twg flag: it publishes through `publish-work comment`, which shows each file inline."""
-    if _has_option(args, {"--attach"}):
-        return _comment_with_attachments(command[3], args, context)
+    is read here and forwarded inline. Other `--body` formats run on twg unchanged. `--attach`, `--page`,
+    and a body with an `adf:inline-card` marker are not twg features: they publish through
+    `publish-work comment`, which builds the ADF with files and page cards inline."""
+    if _has_option(args, {"--attach", "--page"}) or _has_page_card_marker(args):
+        return _comment_via_adf(command[3], args, context)
     parsed = parse(args, values={"--body", "--body-file", "--body-format"})
     body_file, body, body_format = parsed.get("--body-file"), parsed.get("--body"), parsed.get("--body-format")
     is_markdown = body_format in ("md", "markdown")

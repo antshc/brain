@@ -126,7 +126,7 @@ Markdown is the default body format; these twg commands are routed to the comman
   jira workitem get <KEY> --output-file <work.md>                        -> fetch-work
   jira workitem create|update --description[-file] ...                   -> publish-work
   jira workitem comment create|update --body[-file] ... --body-format markdown -> twg, body inline
-  jira workitem comment create|update ... --attach <path>                -> publish-work comment
+  jira workitem comment create|update ... --attach <path> | --page <url|id>  -> publish-work comment
 An explicit html/plain format, --edits, or structured output (-o json, --select, --fields,
 --comments, --full) runs on twg unchanged. --native always runs raw twg."""
 

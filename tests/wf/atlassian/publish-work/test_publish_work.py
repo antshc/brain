@@ -295,3 +295,45 @@ def test_comment_is_not_posted_when_a_media_id_cannot_be_resolved(comment_jira, 
 
     comment_jira.post.assert_not_called()
     assert "cannot be shown inline" in capsys.readouterr().err
+
+
+def test_comment_shows_page_cards_before_the_files_and_lists_the_resolved_urls(comment_jira, monkeypatch, tmp_path, capsys):
+    image, _ = _files(tmp_path)
+    source = tmp_path / "comment.md"
+    source.write_text("Text\n")
+    monkeypatch.setattr(publish_work, "page_resolver", lambda credentials: lambda reference: f"https://org.atlassian.net/wiki/spaces/Z/pages/{reference}/T")
+
+    publish_work.main(["comment", "--config", "cfg", "--key", "ABC-7", "--markdown", str(source), "--page", "42", "--attach", str(image)])
+
+    body = comment_jira.post.call_args.kwargs["data"]["body"]
+    assert [node["type"] for node in body["content"]] == ["paragraph", "paragraph", "mediaSingle"]
+    assert body["content"][1]["content"] == [{"type": "inlineCard", "attrs": {"url": "https://org.atlassian.net/wiki/spaces/Z/pages/42/T"}}]
+    assert _out(capsys)["pages"] == ["https://org.atlassian.net/wiki/spaces/Z/pages/42/T"]
+
+
+def test_comment_with_an_unresolvable_page_posts_and_uploads_nothing(comment_jira, monkeypatch, tmp_path, capsys):
+    image, _ = _files(tmp_path)
+    source = tmp_path / "comment.md"
+    source.write_text("x\n")
+
+    def refuse(reference):
+        raise ValueError("page 9 not found (HTTP 404)")
+
+    monkeypatch.setattr(publish_work, "page_resolver", lambda credentials: refuse)
+
+    with pytest.raises(SystemExit):
+        publish_work.main(["comment", "--config", "cfg", "--key", "ABC-7", "--markdown", str(source), "--page", "9", "--attach", str(image)])
+
+    comment_jira.add_attachment.assert_not_called()
+    comment_jira.post.assert_not_called()
+    assert "cannot link page 9" in capsys.readouterr().err
+
+
+def test_comment_markdown_with_an_inline_card_marker_keeps_the_page_card(comment_jira, tmp_path):
+    source = tmp_path / "comment.md"
+    source.write_text('<!-- adf:inline-card -->[https://org.atlassian.net/wiki/spaces/Z/pages/1/T](https://org.atlassian.net/wiki/spaces/Z/pages/1/T)<!-- /adf:inline-card -->\n')
+
+    publish_work.main(["comment", "--config", "cfg", "--key", "ABC-7", "--markdown", str(source)])
+
+    paragraph = comment_jira.post.call_args.kwargs["data"]["body"]["content"][0]
+    assert paragraph["content"][0] == {"type": "inlineCard", "attrs": {"url": "https://org.atlassian.net/wiki/spaces/Z/pages/1/T"}}

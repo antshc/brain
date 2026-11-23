@@ -57,9 +57,9 @@ Stdout `{"key":..., "url":..., "attached":[...], "attachFailed":[{"file","error"
 
 **6 — Verify live issue.** Only when Step 2 found constructs: `<atl> publish-work read-adf --key <key> --out <source>.tmp/live.json`; confirm each construct is its ADF node (`expand`, `panel`, `status`) and combined marks merged, not literal `` ` ``. Missing → fix `description.md`, re-run Step 4 as update. Read-only: **MUST NOT** re-run `create`/`update` with probe or placeholder content; it overwrites the real publish.
 
-## Comment with attachments
+## Comment with pages and attachments
 
-`<atl> jira workitem comment create|update ... --body-format markdown --attach <path> ...` (see [Jira rich content](twg/jira/rich-content.md)) runs `<atl> publish-work comment --key <KEY> [--comment-id <id>] (--markdown <comment.md> | --adf <comment.json>) [--attach <path> ...]`. Unlike description attachments, a file that fails stops the command before the comment is posted. Exit `1` with `outcome unknown` → read the comments before retrying; a retry can post a duplicate.
+`<atl> jira workitem comment create|update ... --body-format markdown [--page <url|id> ...] [--attach <path> ...]` (see [Jira rich content](twg/jira/rich-content.md)) runs `<atl> publish-work comment --key <KEY> [--comment-id <id>] (--markdown <comment.md> | --adf <comment.json>) [--page <url|id> ...] [--attach <path> ...]`. Unlike description attachments, a page or file that fails stops the command before the comment is posted. Exit `1` with `outcome unknown` → read the comments before retrying; a retry can post a duplicate.
 
 ## Rules
 

@@ -46,7 +46,7 @@ For other tasks or unclear syntax, follow Plan First.
 | `confluence content create --content-type page` | `--body`/`--body-file`, `--format` absent or `md` | `publish-page run`; numeric `--space-id` |
 | `confluence content update <ref>` | `--body`/`--body-file`, `--format` absent or `md` | `publish-page run` |
 | `jira workitem get <KEY>` | no `-o`, `--fields`, `--field`, `--full`, `--comments`, `--remote-links` | `fetch-work`; `--output-file` = Markdown path (required) |
-| `jira workitem comment create` / `update` | `--body-file`, or `--body`, with `--body-format markdown` (`md` accepted) | twg, body sent inline as Markdown; other flags unchanged; `--body-file` with another or no format exits 2. With `--attach <path>` (repeatable): `publish-work comment`, files shown inline (preview or card) |
+| `jira workitem comment create` / `update` | `--body-file`, or `--body`, with `--body-format markdown` (`md` accepted) | twg, body sent inline as Markdown; other flags unchanged; `--body-file` with another or no format exits 2. With `--attach <path>` or `--page <url|id>` (repeatable), or an `adf:inline-card` marker in the body: `publish-work comment`, files shown inline (preview or card) and pages as smart-link cards |
 | `jira workitem create` / `update` | `--description`/`--description-file`, `--description-format` absent or `markdown` | `publish-work`; remaining flags then run on twg |
 
 - Anything else (other format, `--edits*`, structured output) runs on twg unchanged. `--native` forces raw twg.

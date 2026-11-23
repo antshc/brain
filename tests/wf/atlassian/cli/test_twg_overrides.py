@@ -238,3 +238,28 @@ def test_comment_update_with_attachments_keeps_the_comment_id(tmp_path):
 def test_comment_with_attachments_rejects_what_it_cannot_honour(tmp_path, args, message):
     with pytest.raises(OverrideError, match=message):
         plan(["jira", "workitem", "comment", *args], _context(tmp_path))
+
+
+def test_comment_with_pages_publishes_through_publish_work_comment(tmp_path):
+    delegate = plan(
+        ["jira", "workitem", "comment", "create", "--issue-id", "ABC-7", "--body", "See", "--body-format", "markdown", "--page", "42", "--page", "https://org.atlassian.net/wiki/x/AbC"],
+        _context(tmp_path),
+    )
+
+    assert delegate.command == "publish-work"
+    assert delegate.argv == ["comment", "--key", "ABC-7", "--markdown", str(tmp_path / "comment.md"), "--page", "42", "--page", "https://org.atlassian.net/wiki/x/AbC"]
+
+
+@pytest.mark.parametrize("inline", [True, False])
+def test_comment_body_with_an_inline_card_marker_routes_to_the_adf_path(tmp_path, inline):
+    marker = "<!-- adf:inline-card -->[u](u)<!-- /adf:inline-card -->"
+    body_args = ["--body", marker] if inline else ["--body-file", str(tmp_path / "c.md")]
+    (tmp_path / "c.md").write_text(marker)
+
+    delegate = plan(["jira", "workitem", "comment", "create", "--issue-id", "ABC-7", *body_args, "--body-format", "markdown"], _context(tmp_path))
+
+    assert delegate.command == "publish-work" and delegate.argv[:3] == ["comment", "--key", "ABC-7"]
+
+
+def test_inline_card_marker_without_markdown_format_is_left_to_twg(tmp_path):
+    assert plan(["jira", "workitem", "comment", "create", "--issue-id", "ABC-7", "--body", "<!-- adf:inline-card -->"], _context(tmp_path)) is None
