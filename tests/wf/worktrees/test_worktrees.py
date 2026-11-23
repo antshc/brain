@@ -44,7 +44,7 @@ def create(
 ) -> dict:
     mode = ("--new-branch", branch) if branch else ("--detach",)
     return run(source, "create", "--repo-name", "code", "--name", name,
-               "--commit", git(source, "rev-parse", "HEAD"), "--owner", "run-1", *mode,
+               "--commit", git(source, "rev-parse", "HEAD"), *mode,
                harness=harness)
 
 
@@ -105,11 +105,11 @@ def test_remove_discard_ignored_still_preserves_dirty_worktree(repository: Path,
     assert file.read_text() == "preserve me"
 
 
-def test_remove_does_not_use_creation_metadata_to_distinguish_replacement(repository: Path, tmp_path: Path):
+def test_remove_replacement_by_recorded_worktree_identity(repository: Path, tmp_path: Path):
     first = create(repository)["record"]
     assert remove(repository, tmp_path, first)["status"] == "removed"
     second = create(repository)["record"]
-    assert second["token"] != first["token"]
+    assert second == first
     assert remove(repository, tmp_path, first)["status"] == "removed"
     assert not Path(second["path"]).exists()
 

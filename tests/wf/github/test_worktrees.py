@@ -16,7 +16,7 @@ def head(repo: Path) -> str:
 def create(run, repo, head, name="slice", branch="feat/slice", repo_name="work", **overrides):
     mode = ["--new-branch", branch] if branch else ["--detach"]
     values = {"--harness": repo, "--source": repo, "--repo-name": repo_name, "--name": name, "--commit": head,
-              "--owner": "run-1", **overrides}
+              **overrides}
     return run("worktree", "create", *[f"{key}={value}" for key, value in values.items()], *mode)
 
 
@@ -26,13 +26,13 @@ def record_file(tmp_path: Path, result) -> Path:
     return path
 
 
-def test_create_makes_a_clean_owned_worktree_on_a_new_branch(run, repo, head):
+def test_create_makes_a_clean_worktree_on_a_new_branch(run, repo, head):
     result = create(run, repo, head)
     path = repo / ".worktrees/work/slice"
     assert result.code == 0 and result.data["status"] == "created" and result.data["path"] == str(path.resolve())
     assert git(path, "rev-parse", "--abbrev-ref", "HEAD") == "feat/slice"
     assert git(path, "status", "--porcelain") == ""
-    assert result.data["record"]["owner"] == "run-1" and len(result.data["record"]["token"]) == 32
+    assert set(result.data["record"]) == {"path", "commonDir", "gitDir", "branch", "head"}
     assert "/.worktrees/" in (repo / ".git/info/exclude").read_text()
     assert result.data["changedExcludeFiles"]
 
@@ -71,8 +71,7 @@ def test_create_demands_a_full_existing_local_commit(run, repo, commit):
     assert create(run, repo, commit).code == 1
 
 
-def test_create_demands_an_owner_and_an_absolute_checkout(run, repo, head):
-    assert create(run, repo, head, **{"--owner": "  "}).code == 1
+def test_create_demands_an_absolute_checkout(run, repo, head):
     assert create(run, repo, head, **{"--harness": "relative"}).code == 1
 
 
@@ -96,38 +95,18 @@ def test_inspect_reports_absent_clean_and_dirty(run, repo, head):
 
 def test_inspect_needs_a_record_or_the_managed_names(run, repo):
     result = run("worktree", "inspect", "--harness", repo, "--source", repo)
-    assert result.code == 1 and "ownership record" in result.err
+    assert result.code == 1 and "worktree record" in result.err
 
 
-def test_reuse_verifies_ownership_and_expected_head(run, repo, head, tmp_path):
+def test_reuse_verifies_record_and_expected_head(run, repo, head, tmp_path):
     record = record_file(tmp_path, create(run, repo, head))
     args = ["worktree", "reuse", "--harness", repo, "--source", repo, "--record", record]
     assert run(*args).code == 1  # no expected head
     reused = run(*args, "--expect-head", head)
-    assert reused.data["status"] == "reused" and reused.data["record"]["owner"] == "run-1"
+    assert reused.data["status"] == "reused" and reused.data["record"]["path"]
     assert run("worktree", "reconcile", "--harness", repo, "--source", repo, "--record", record,
                "--expect-head", head).data["status"] == "verified"
     assert run(*args, "--expect-head", "f" * 40).code == 1
-
-
-def test_reuse_does_not_validate_creation_metadata(run, repo, head, tmp_path):
-    result = create(run, repo, head)
-    metadata = Path(result.data["record"]["gitDir"]) / "brain-worktree.json"
-    metadata.unlink()
-    record = record_file(tmp_path, result)
-    reused = run("worktree", "reuse", "--harness", repo, "--source", repo, "--record", record,
-                 "--expect-head", head)
-    assert reused.code == 0 and reused.data["status"] == "reused"
-
-
-def test_remove_does_not_validate_creation_metadata(run, repo, head, tmp_path):
-    result = create(run, repo, head)
-    metadata = Path(result.data["record"]["gitDir"]) / "brain-worktree.json"
-    metadata.write_text("not the creation record")
-    record = record_file(tmp_path, result)
-    removed = run("worktree", "remove", "--harness", repo, "--source", repo, "--record", record,
-                  "--expect-head", head, "--recoverable")
-    assert removed.code == 0 and removed.data["status"] == "removed"
 
 
 def test_reuse_of_a_missing_worktree_is_blocked(run, repo, head, tmp_path):
@@ -142,7 +121,7 @@ def remove(run, repo, record, head, *extra):
     return run("worktree", "remove", "--harness", repo, "--source", repo, "--record", record, "--expect-head", head, *extra)
 
 
-def test_remove_requires_recoverability_ownership_and_a_clean_tree(run, repo, head, tmp_path, monkeypatch):
+def test_remove_requires_recoverability_and_a_clean_tree(run, repo, head, tmp_path, monkeypatch):
     created = create(run, repo, head)
     record = record_file(tmp_path, created)
     monkeypatch.chdir(tmp_path)
@@ -176,5 +155,5 @@ def test_remove_refuses_to_run_from_inside_the_target(run, repo, head, tmp_path,
 
 def test_remove_rejects_malformed_records(run, repo, head, tmp_path):
     path = tmp_path / "bad.json"
-    path.write_text(json.dumps({"owner": "x"}))
-    assert "Invalid worktree ownership record" in remove(run, repo, path, head, "--recoverable").err
+    path.write_text(json.dumps({"path": "x"}))
+    assert "Invalid worktree record" in remove(run, repo, path, head, "--recoverable").err

@@ -8,9 +8,7 @@ import subprocess
 import sys
 from pathlib import Path
 from typing import Any
-from uuid import uuid4
 
-OWNER_FILE = "brain-worktree.json"
 SHA = re.compile(r"(?:[0-9a-f]{40}|[0-9a-f]{64})")
 SEGMENT = re.compile(r"[A-Za-z0-9_.-]+")
 GIT_ENV = {
@@ -145,8 +143,6 @@ def create(
             if (sibling / ".git").exists() and git_path(sibling, "--git-common-dir") != common:
                 raise WorktreeError(f"Worktree namespace contains another repository: {sibling}")
     verify_commit(source, args.commit)
-    if not args.owner.strip():
-        raise WorktreeError("Worktree owner must be nonempty")
     mode = ["--detach"]
     if args.new_branch is not None:
         if output(source, "check-ref-format", "--branch", args.new_branch) != args.new_branch:
@@ -166,11 +162,9 @@ def create(
     admin = check_state(path, fields, common, args.new_branch, args.commit)
     check_clean(path, admin)
     record = {
-        "owner": args.owner, "token": uuid4().hex, "path": str(path), "commonDir": str(common),
+        "path": str(path), "commonDir": str(common),
         "gitDir": str(admin), "branch": args.new_branch, "head": args.commit,
     }
-    with (admin / OWNER_FILE).open("x", encoding="utf-8") as file:
-        json.dump(record, file)
     result.update(status="created", record=record)
 
 
@@ -178,13 +172,13 @@ def remove(
     args: argparse.Namespace, harness: Path, source: Path, common: Path, result: dict[str, Any]
 ) -> None:
     record = json.loads(args.record.read_text(encoding="utf-8"))
-    fields = ("owner", "token", "path", "commonDir", "gitDir", "head")
+    fields = ("path", "commonDir", "gitDir", "head")
     if (not isinstance(record, dict) or any(not isinstance(record.get(key), str) or not record[key] for key in fields)
             or "branch" not in record or not isinstance(record["branch"], (str, type(None)))):
-        raise WorktreeError("Invalid worktree ownership record")
+        raise WorktreeError("Invalid worktree record")
     path = Path(record["path"])
     if record["commonDir"] != str(common) or not path.is_relative_to(harness / ".worktrees"):
-        raise WorktreeError("Ownership record belongs to another repository or harness")
+        raise WorktreeError("Worktree record belongs to another repository or harness")
     relative = path.relative_to(harness / ".worktrees")
     if len(relative.parts) != 2 or managed_path(harness, *relative.parts) != path:
         raise WorktreeError(f"Invalid managed worktree path: {path}")
@@ -202,7 +196,7 @@ def remove(
         raise WorktreeError(f"Worktree path and registration disagree: {path}")
     admin = check_state(path, registered, common, record["branch"], args.expect_head)
     if str(admin) != record["gitDir"]:
-        raise WorktreeError(f"Worktree ownership could not be verified: {path}")
+        raise WorktreeError(f"Worktree identity could not be verified: {path}")
     check_clean(path, admin, discard_ignored=args.discard_ignored)
     index_entries = git(path, "ls-files", "-v", "-z").stdout.split(b"\0")
     if any(entry[:1].islower() or entry.startswith(b"S ") for entry in index_entries):
@@ -219,7 +213,7 @@ def register(actions: Any) -> None:
     for action_parser in (create_parser, remove_parser):
         action_parser.add_argument("--harness", type=Path, required=True)
         action_parser.add_argument("--source", type=Path, required=True)
-    for name in ("repo-name", "name", "commit", "owner"):
+    for name in ("repo-name", "name", "commit"):
         create_parser.add_argument(f"--{name}", required=True)
     mode = create_parser.add_mutually_exclusive_group(required=True)
     mode.add_argument("--new-branch")
@@ -268,17 +262,17 @@ def inspect(
     record = json.loads(args.record.read_text(encoding="utf-8")) if args.record else None
     if record is not None:
         if not isinstance(record, dict) or not isinstance(record.get("path"), str):
-            raise WorktreeError("Invalid ownership record")
+            raise WorktreeError("Invalid worktree record")
         path = Path(record["path"])
         if not path.is_relative_to(harness / ".worktrees"):
-            raise WorktreeError("Ownership record belongs to another harness")
+            raise WorktreeError("Worktree record belongs to another harness")
         parts = path.relative_to(harness / ".worktrees").parts
         if len(parts) != 2 or managed_path(harness, *parts) != path:
             raise WorktreeError("Invalid managed worktree path")
     elif args.repo_name and args.name and args.action != "reuse":
         path = managed_path(harness, args.repo_name, args.name)
     else:
-        raise WorktreeError("Supply an ownership record or the managed repo name and leaf")
+        raise WorktreeError("Supply a worktree record or the managed repo name and leaf")
 
     result["path"] = str(path)
     fields = registrations(source).get(path)
@@ -307,10 +301,9 @@ def inspect(
         result.update(status="present", gitDir=str(admin), commonDir=str(common))
         return
     if not record or not args.expect_head:
-        raise WorktreeError("Verify ownership and expected HEAD before reuse or reconciliation")
+        raise WorktreeError("Supply a worktree record and expected HEAD before reuse or reconciliation")
     admin = check_state(path, fields, common, record.get("branch"), args.expect_head)
-    if (not record.get("owner") or not record.get("token") or record.get("commonDir") != str(common)
-            or record.get("gitDir") != str(admin)):
-        raise WorktreeError(f"Worktree ownership could not be verified: {path}")
+    if record.get("commonDir") != str(common) or record.get("gitDir") != str(admin):
+        raise WorktreeError(f"Worktree identity could not be verified: {path}")
     check_clean(path, admin)
     result.update(status="reused" if args.action == "reuse" else "verified", record=record)
