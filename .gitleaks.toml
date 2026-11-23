@@ -1,0 +1,13 @@
+# Gitleaks config: default rules (AWS, GitHub/Copilot tokens, Atlassian, private keys, ...) plus repo allowlist.
+# Suppress single findings via .gitleaksignore (fingerprint) or an inline `gitleaks:allow` comment.
+[extend]
+useDefault = true
+
+[[allowlists]]
+description = "Excluded and non-source paths"
+paths = [
+  '''(^|/)_backup/''',
+  '''(^|/)_in-progress/''',
+  '''(^|/)node_modules/''',
+  '''(^|/)package-lock\.json$''',
+]

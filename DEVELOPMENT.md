@@ -10,7 +10,13 @@ git config core.hooksPath .githooks
 
 ### pre-commit
 
-Syncs `tools/src/modules/github/` → `plugins/ralph/skills/fix/github/` and stages the result before every commit.
+Runs [gitleaks](https://github.com/gitleaks/gitleaks) on staged changes and blocks commits containing secrets (AWS keys, GitHub/Copilot tokens, Atlassian tokens, private keys, etc.). Install gitleaks once:
+
+```bash
+v=8.30.1; curl -sSfL "https://github.com/gitleaks/gitleaks/releases/download/v$v/gitleaks_${v}_linux_x64.tar.gz" | tar -xz -C ~/.local/bin gitleaks
+```
+
+Rules live in `.gitleaks.toml` (default ruleset plus path allowlist). Suppress a confirmed false positive by adding its fingerprint to `.gitleaksignore` or a `gitleaks:allow` comment on the line. CI re-scans every push and pull request (`.github/workflows/gitleaks.yml`); GitHub push protection is also enabled.
 
 ## Markdown and skill checks
 

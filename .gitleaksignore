@@ -1,0 +1,2 @@
+# False positives in history (fingerprint = commit:file:rule:line)
+d1e2c2fd57f25bcba027d6ca1d19c7c128403e0a:plugins/atl/skills/fetch-page/SKILL.md:generic-api-key:61
