@@ -201,9 +201,7 @@ def remove(
     if registered is None or not path.is_dir():
         raise WorktreeError(f"Worktree path and registration disagree: {path}")
     admin = check_state(path, registered, common, record["branch"], args.expect_head)
-    marker = admin / OWNER_FILE
-    if (str(admin) != record["gitDir"] or marker.is_symlink() or not marker.is_file()
-            or json.loads(marker.read_text(encoding="utf-8")) != record):
+    if str(admin) != record["gitDir"]:
         raise WorktreeError(f"Worktree ownership could not be verified: {path}")
     check_clean(path, admin, discard_ignored=args.discard_ignored)
     index_entries = git(path, "ls-files", "-v", "-z").stdout.split(b"\0")
@@ -311,10 +309,8 @@ def inspect(
     if not record or not args.expect_head:
         raise WorktreeError("Verify ownership and expected HEAD before reuse or reconciliation")
     admin = check_state(path, fields, common, record.get("branch"), args.expect_head)
-    marker = admin / OWNER_FILE
     if (not record.get("owner") or not record.get("token") or record.get("commonDir") != str(common)
-            or record.get("gitDir") != str(admin) or marker.is_symlink() or not marker.is_file()
-            or json.loads(marker.read_text(encoding="utf-8")) != record):
+            or record.get("gitDir") != str(admin)):
         raise WorktreeError(f"Worktree ownership could not be verified: {path}")
     check_clean(path, admin)
     result.update(status="reused" if args.action == "reuse" else "verified", record=record)

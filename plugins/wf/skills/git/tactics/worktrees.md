@@ -12,7 +12,7 @@ Recheck tactics when the caller's goal or observed Git state changes.
 
 **Create** — when the caller needs isolation, use an unused managed path, pinned local commit and new branch or detached HEAD. Persist the verified creation's ownership record outside the worktree.
 
-**Reuse** — when the caller permits reuse, match the caller's record to `brain-worktree.json` in the linked Git directory. Verify exact path, linked Git directory, source common Git directory, owner, ownership token, expected branch or detached state and expected HEAD. Reuse only a clean, unlocked match. Report blockers.
+**Reuse** — when the caller permits reuse, verify the caller's record against the managed path, linked Git directory, source common Git directory, expected branch or detached state and expected HEAD. Reuse only a clean, unlocked match. Report blockers.
 
 **Remove** — when cleanup is authorized, wait for writers to exit and verify the work is recoverable. Use the ownership record and expected current HEAD. Confirm both path and registration are absent or report what remains.
 
@@ -26,7 +26,7 @@ Pass repository name, single-segment worktree name, pinned local commit and `--n
 GIT_TOOL worktree create --harness ROOT --source CHECKOUT --repo-name NAME --name LEAF --commit SHA --owner RUN_ID --new-branch BRANCH
 ```
 
-Persist `record` as standalone JSON outside the worktree. The linked Git directory records the same ownership token.
+Persist `record` as standalone JSON outside the worktree. The helper also writes creation metadata to the linked Git directory; validation does not read it.
 
 ## Remove
 
@@ -57,4 +57,4 @@ The helper emits one JSON object on stdout.
 
 A blocked operation exits nonzero and reports the reason on stderr. Interruptions or partial results can leave a new path or branch. Use Reconcile before retrying.
 
-Use `worktree inspect` with `--repo-name` and `--name`, or with `--record`. For `worktree reuse` or `worktree reconcile` of an existing checkout, supply `--record` and `--expect-head`. A blocked reconciliation leaves ownership and files untouched.
+Use `worktree inspect` with `--repo-name` and `--name`, or with `--record`. For `worktree reuse` or `worktree reconcile` of an existing checkout, supply `--record` and `--expect-head`. A blocked reconciliation leaves the worktree record and files untouched.

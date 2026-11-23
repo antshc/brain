@@ -105,13 +105,13 @@ def test_remove_discard_ignored_still_preserves_dirty_worktree(repository: Path,
     assert file.read_text() == "preserve me"
 
 
-def test_remove_rejects_replacement_at_same_path(repository: Path, tmp_path: Path):
+def test_remove_does_not_use_creation_metadata_to_distinguish_replacement(repository: Path, tmp_path: Path):
     first = create(repository)["record"]
     assert remove(repository, tmp_path, first)["status"] == "removed"
     second = create(repository)["record"]
     assert second["token"] != first["token"]
-    assert remove(repository, tmp_path, first)["status"] == "blocked"
-    assert Path(second["path"]).exists()
+    assert remove(repository, tmp_path, first)["status"] == "removed"
+    assert not Path(second["path"]).exists()
 
 
 def test_remove_rejects_locked_checkout_and_changed_head(repository: Path, tmp_path: Path):

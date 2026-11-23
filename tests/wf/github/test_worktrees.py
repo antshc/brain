@@ -110,13 +110,24 @@ def test_reuse_verifies_ownership_and_expected_head(run, repo, head, tmp_path):
     assert run(*args, "--expect-head", "f" * 40).code == 1
 
 
-def test_reuse_rejects_a_forged_ownership_record(run, repo, head, tmp_path):
+def test_reuse_does_not_validate_creation_metadata(run, repo, head, tmp_path):
     result = create(run, repo, head)
-    forged = dict(result.data["record"], token="0" * 32)
-    path = tmp_path / "forged.json"
-    path.write_text(json.dumps(forged))
-    blocked = run("worktree", "reuse", "--harness", repo, "--source", repo, "--record", path, "--expect-head", head)
-    assert blocked.code == 1 and "ownership could not be verified" in blocked.err
+    metadata = Path(result.data["record"]["gitDir"]) / "brain-worktree.json"
+    metadata.unlink()
+    record = record_file(tmp_path, result)
+    reused = run("worktree", "reuse", "--harness", repo, "--source", repo, "--record", record,
+                 "--expect-head", head)
+    assert reused.code == 0 and reused.data["status"] == "reused"
+
+
+def test_remove_does_not_validate_creation_metadata(run, repo, head, tmp_path):
+    result = create(run, repo, head)
+    metadata = Path(result.data["record"]["gitDir"]) / "brain-worktree.json"
+    metadata.write_text("not the creation record")
+    record = record_file(tmp_path, result)
+    removed = run("worktree", "remove", "--harness", repo, "--source", repo, "--record", record,
+                  "--expect-head", head, "--recoverable")
+    assert removed.code == 0 and removed.data["status"] == "removed"
 
 
 def test_reuse_of_a_missing_worktree_is_blocked(run, repo, head, tmp_path):
