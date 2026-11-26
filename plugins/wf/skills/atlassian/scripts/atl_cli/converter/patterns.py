@@ -25,16 +25,24 @@ def marker_number(value: str) -> int | float | str:
 
 
 def table_marker_attrs(line: str) -> dict | None:
-    """Table `attrs` (`layout`, `width`) a table marker line sets, or None for any other line."""
+    """Table attributes and width metadata from a marker, or None for any other line."""
     if WIDE_TABLE_MARKER_RE.match(line):
         return {"layout": "wide"}
     match = TABLE_MARKER_RE.match(line)
     if not match:
         return None
-    attrs = dict(_MARKER_ATTR_RE.findall(match.group(1)))
-    result: dict = {"layout": attrs.get("layout", "default")}
+    pairs = [(key.lower(), value) for key, value in _MARKER_ATTR_RE.findall(match.group(1))]
+    if len({key for key, _ in pairs}) != len(pairs):
+        raise ValueError("duplicate table marker attribute")
+    attrs = dict(pairs)
+    result: dict = {}
+    if "layout" in attrs:
+        result["layout"] = attrs["layout"]
     if "width" in attrs:
         result["width"] = marker_number(attrs["width"])
+    for key in ("colwidths", "cell-widths", "header-hash", "rows-hash"):
+        if key in attrs:
+            result[key] = attrs[key]
     return result
 
 

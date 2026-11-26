@@ -14,8 +14,11 @@ import sys
 from contextlib import redirect_stdout
 from pathlib import Path
 
+from atlassian.errors import ApiError
+from requests.exceptions import RequestException
+
 from .adf import replace_markers, substitute_media
-from ..confluence_client import get_confluence
+from ..confluence_client import error_category, get_confluence
 from ..conversion_guard import GuardError, guard_adf, lint_markdown
 from ..converter.adf_to_md import adf_to_markdown
 from .env import load_credentials, load_renderer
@@ -261,6 +264,9 @@ def _run_run(args: argparse.Namespace) -> None:
             file=sys.stderr,
         )
         raise SystemExit(1)
+    except (RequestException, ApiError) as exception:
+        print(f"error: Confluence request failed ({error_category(exception)})", file=sys.stderr)
+        raise SystemExit(1) from None
     except (ValueError, RuntimeError) as e:
         print(f"error: {e}", file=sys.stderr)
         raise SystemExit(1)

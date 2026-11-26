@@ -115,12 +115,13 @@ def _excerpt(storage: str) -> str:
     return text if len(text) <= _EXCERPT_CHARS else text[: _EXCERPT_CHARS - 1] + "…"
 
 
-def plan(confluence: Any, page_id: str, final_adf: dict) -> dict:
+def plan(confluence: Any, page_id: str, final_adf: dict, live_adf: dict | None = None) -> dict:
     """`orphaned`: open comments anchored now but absent from `final_adf`.
     `unknownIds`: ids in `final_adf` that match no comment on the page (typo or foreign page).
     `partial`: ids `final_adf` keeps on fewer blocks than the live body (see `partial_removals`)."""
     final_ids = comment_ids(final_adf)
-    live_adf = _live_adf(confluence, page_id)
+    if live_adf is None:
+        live_adf = _live_adf(confluence, page_id)
     live_ids = comment_ids(live_adf)
     comments = _inline_comments(confluence, page_id)
     known = {c.get("properties", {}).get("inlineMarkerRef", "") for c in comments}

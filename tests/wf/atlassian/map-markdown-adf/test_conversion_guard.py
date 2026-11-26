@@ -69,6 +69,183 @@ def test_pipe_inside_table_cell_remains_one_cell():
     assert len(converted["content"][0]["content"][0]["content"]) == 1
 
 
+@pytest.mark.parametrize("matrix", [
+    [[[155], [355]], [[155], [355]], [[155], [355]]],
+    [[[155], None], [None, [355]], [[160], []]],
+    [[[155], {}], [None, [355]], [[160], []]],
+    [[None, None], [None, None], [None, None]],
+])
+def test_table_widths_round_trip_without_changing_absent_or_row_specific_values(matrix):
+    source = "| # | Source |\n| --- | --- |\n| one | two |\n| three | four |\n"
+    doc = md_to_adf(source)
+    for row, widths in zip(doc["content"][0]["content"], matrix):
+        for cell, width in zip(row["content"], widths):
+            cell["attrs"] = {"colspan": 1, "rowspan": 1}
+            if width is not None:
+                cell["attrs"]["colwidth"] = None if width == {} else width
+
+    markdown = adf_to_md(doc, guarded=True)
+    assert "colwidths=" in markdown or "cell-widths=" in markdown
+    result = md_to_adf(markdown, guarded=True)
+    guard.compare_documents(doc, result)
+
+
+@pytest.mark.parametrize("container", ["blockquote", "panel", "nested-blockquote"])
+def test_table_widths_round_trip_in_quoted_containers(container):
+    table = md_to_adf("| A | B |\n| --- | --- |\n| one | two |\n")["content"][0]
+    for row in table["content"]:
+        for cell, width in zip(row["content"], (155, 355)):
+            cell["attrs"] = {"colwidth": [width]}
+    if container == "nested-blockquote":
+        node = {"type": "blockquote", "content": [{"type": "blockquote", "content": [table]}]}
+    elif container == "panel":
+        node = {"type": "panel", "attrs": {"panelType": "note"}, "content": [table]}
+    else:
+        node = {"type": "blockquote", "content": [table]}
+    doc = document(node)
+    rendered = adf_to_md(doc, guarded=True)
+    assert "colwidths=" in rendered
+    guard.compare_documents(doc, md_to_adf(rendered, guarded=True))
+
+
+@pytest.mark.parametrize("source", [
+    '<!-- adf:table colwidths="[[155]]" -->\n> | A |\n> | --- |\n',
+    '> <!-- adf:table colwidths="[[155]]" -->\n| A |\n| --- |\n',
+    '> <!-- adf:table colwidths="[[155]]" -->\n\n> | A |\n> | --- |\n',
+])
+def test_table_marker_cannot_cross_quote_boundaries(source):
+    with pytest.raises(guard.GuardError, match="table marker must precede a table"):
+        guard.validate_markdown(source)
+
+
+def test_widths_are_part_of_fidelity_comparison():
+    original = md_to_adf("| A | B |\n| --- | --- |\n| 1 | 2 |\n")
+    changed = copy.deepcopy(original)
+    changed["content"][0]["content"][0]["content"][0]["attrs"] = {"colwidth": [155]}
+    with pytest.raises(guard.GuardError, match="semantic content"):
+        guard.compare_documents(original, changed)
+
+
+def test_row_specific_widths_round_trip_with_formatted_content():
+    source = (
+        "| Name | Details |\n| --- | --- |\n"
+        "| **one** | [link](https://example.com) \\| escaped |\n"
+        "| *two* | first<br>second |\n"
+    )
+    doc = md_to_adf(source)
+    for row, values in zip(doc["content"][0]["content"], [
+        [[155], [355]], [[160], [350]], [[165], [345]],
+    ]):
+        for cell, value in zip(row["content"], values):
+            cell["attrs"] = {"colwidth": value}
+    markdown = adf_to_md(doc, guarded=True)
+    guard.compare_documents(doc, md_to_adf(markdown, guarded=True))
+
+
+def test_stale_width_metadata_warns_and_defaults_instead_of_moving_columns(run_cli):
+    doc = md_to_adf("| # | Source |\n| --- | --- |\n| one | two |\n")
+    markdown = adf_to_md(doc, guarded=True).replace("| # | Source |", "| Source | # |")
+    result = run_cli("md-to-adf", markdown)
+    assert result.returncode == 0
+    assert "column headers changed; using default column widths" in result.stderr
+    table = json.loads(result.stdout)["content"][0]
+    assert [cell["attrs"]["colwidth"] for cell in table["content"][0]["content"]] == [[110], [60]]
+
+
+def test_added_column_invalidates_existing_width_metadata(run_cli):
+    doc = md_to_adf("| # | Source |\n| --- | --- |\n| one | two |\n")
+    markdown = adf_to_md(doc, guarded=True).replace(
+        "| # | Source |\n| --- | --- |\n| one | two |",
+        "| # | Source | Extra |\n| --- | --- | --- |\n| one | two | three |",
+    )
+    result = run_cli("md-to-adf", markdown)
+    assert result.returncode == 0
+    assert "column headers changed; using default column widths" in result.stderr
+    table = json.loads(result.stdout)["content"][0]
+    assert [cell["attrs"]["colwidth"] for cell in table["content"][0]["content"]] == [[60], [110], [1230]]
+
+
+def test_consistent_sparse_widths_survive_row_edits(run_cli):
+    doc = md_to_adf("| A | B |\n| --- | --- |\n| one | two |\n")
+    doc["content"][0]["content"][0]["content"][0]["attrs"] = {"colwidth": [155]}
+    markdown = adf_to_md(doc, guarded=True).replace("| one | two |", "| changed | two |")
+    result = run_cli("md-to-adf", markdown)
+    assert result.returncode == 0
+    assert "table rows changed; applied consistent column widths" in result.stderr
+    rows = json.loads(result.stdout)["content"][0]["content"]
+    assert [row["content"][0]["attrs"]["colwidth"] for row in rows] == [[155], [155]]
+
+
+def test_stale_conflicting_row_specific_widths_warn_and_default(run_cli):
+    doc = md_to_adf("| A | B |\n| --- | --- |\n| one | two |\n")
+    doc["content"][0]["content"][0]["content"][0]["attrs"] = {"colwidth": [155]}
+    doc["content"][0]["content"][1]["content"][0]["attrs"] = {"colwidth": [160]}
+    markdown = adf_to_md(doc, guarded=True).replace("| one | two |", "| changed | two |")
+    result = run_cli("md-to-adf", markdown)
+    assert result.returncode == 0
+    assert "table rows changed; using default column widths" in result.stderr
+    rows = json.loads(result.stdout)["content"][0]["content"]
+    assert all("colwidth" not in row["content"][0].get("attrs", {}) for row in rows)
+
+
+def test_row_specific_widths_do_not_follow_reordered_rows_with_same_text_and_different_marks(run_cli):
+    source = "| A |\n| --- |\n| **same** |\n| *same* |\n"
+    doc = md_to_adf(source)
+    doc["content"][0]["content"][1]["content"][0]["attrs"] = {"colwidth": [155]}
+    doc["content"][0]["content"][2]["content"][0]["attrs"] = {"colwidth": [160]}
+    markdown = adf_to_md(doc, guarded=True).replace(
+        "| **same** |\n| *same* |", "| *same* |\n| **same** |"
+    )
+    result = run_cli("md-to-adf", markdown)
+    assert result.returncode == 0
+    assert "table rows changed; using default column widths" in result.stderr
+    assert all("colwidth" not in row["content"][0].get("attrs", {}) for row in json.loads(result.stdout)["content"][0]["content"])
+
+
+def test_row_specific_widths_do_not_guess_when_comment_removal_makes_rows_identical(run_cli):
+    source = (
+        '| A |\n| --- |\n| <!-- adf:comment id="c1" -->same<!-- /adf:comment --> |\n'
+        '| <!-- adf:comment id="c2" -->same<!-- /adf:comment --> |\n'
+    )
+    doc = md_to_adf(source, guarded=True)
+    doc["content"][0]["content"][1]["content"][0]["attrs"] = {"colwidth": [155]}
+    doc["content"][0]["content"][2]["content"][0]["attrs"] = {"colwidth": [160]}
+    markdown = adf_to_md(doc, guarded=True)
+    from atl_cli.copy_page import strip_comment_anchors
+
+    result = run_cli("md-to-adf", strip_comment_anchors(markdown))
+    assert result.returncode == 0
+    assert "table rows changed; using default column widths" in result.stderr
+    assert all("colwidth" not in row["content"][0].get("attrs", {}) for row in json.loads(result.stdout)["content"][0]["content"])
+
+
+def test_row_specific_width_identity_keeps_literal_comment_tags_in_code(run_cli):
+    source = '| A |\n| --- |\n| `<!-- adf:comment id="c1" -->` |\n'
+    doc = md_to_adf(source, guarded=True)
+    doc["content"][0]["content"][0]["content"][0]["attrs"] = {"colwidth": [155]}
+    doc["content"][0]["content"][1]["content"][0]["attrs"] = {"colwidth": [160]}
+    markdown = adf_to_md(doc, guarded=True).replace('id="c1"', 'id="c2"')
+    result = run_cli("md-to-adf", markdown)
+    assert result.returncode == 0
+    assert "table rows changed; using default column widths" in result.stderr
+
+
+@pytest.mark.parametrize("marker", [
+    '<!-- adf:table colwidths="not-json" -->',
+    '<!-- adf:table colwidths="[true]" -->',
+    '<!-- adf:table colwidths="[[-1]]" -->',
+    '<!-- adf:table colwidths="[null]" cell-widths="[[null]]" -->',
+    '<!-- adf:table header-hash="not-a-hash" colwidths="[null]" -->',
+    '<!-- adf:table colwidths="[[155]]" colwidths="[[355]]" -->',
+    '<!-- adf:table colwidths="[[155]]" COLWIDTHS="[[355]]" -->',
+])
+def test_invalid_width_markers_are_rejected(marker, run_cli):
+    result = run_cli("md-to-adf", marker + "\n| A |\n| --- |\n")
+    assert result.returncode != 0
+    assert "table marker" in result.stderr
+    assert result.stdout == ""
+
+
 def test_mismatched_table_separator_rejected_without_stdout(run_cli):
     result = run_cli("md-to-adf", "| a | b |\n| --- |\n")
     assert result.returncode == 1

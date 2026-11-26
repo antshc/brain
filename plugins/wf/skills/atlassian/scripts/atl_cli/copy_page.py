@@ -104,6 +104,7 @@ def copy_page(
         title=resolved_title,
         assets_dir=str(publish_dir),
         out_path=str(output_path),
+        preserve_existing_table_widths=False,
     )
 
     verification_output = io.StringIO()

@@ -38,6 +38,52 @@ def test_main_writes_markdown_to_md_path_with_default_assets_dir(confluence, tmp
     confluence.get.assert_called_once_with("/api/v2/pages/123", params={"body-format": "atlas_doc_format"})
 
 
+def test_fetch_preserves_custom_table_widths_without_conversion_errors(confluence, tmp_path, capsys):
+    from atl_cli.conversion_guard import compare_documents
+    from atl_cli.map_markdown import md_to_adf
+
+    body = md_to_adf("| # | Name |\n| --- | --- |\n| one | two |\n")
+    table = body["content"][0]
+    table["attrs"]["width"] = 960
+    table["content"][0]["content"][0]["attrs"]["colwidth"] = [155]
+    table["content"][0]["content"][1]["attrs"]["colwidth"] = [355]
+    table["content"][1]["content"][0]["attrs"].pop("colwidth")
+    table["content"][1]["content"][1]["attrs"].pop("colwidth")
+    confluence.get.return_value = _page("Widths", body)
+
+    _main(tmp_path)
+
+    markdown = (tmp_path / "page.md").read_text()
+    assert "cell-widths=" in markdown
+    assert "adf:error" not in markdown
+    assert capsys.readouterr().err == ""
+    restored = md_to_adf(markdown, guarded=True)
+    restored["content"] = restored["content"][1:]
+    compare_documents(body, restored)
+
+
+@pytest.mark.parametrize("row_index", [0, 1])
+def test_unknown_table_cell_still_keeps_the_rest_of_a_width_bearing_table(confluence, tmp_path, capsys, row_index):
+    from atl_cli.map_markdown import md_to_adf
+
+    body = md_to_adf("| A | B |\n| --- | --- |\n| one | two |\n")
+    table = body["content"][0]
+    table["content"][0]["content"][0]["attrs"] = {"colwidth": [155]}
+    table["content"][row_index]["content"][1]["content"][0]["content"] = [
+        {"type": "mention", "attrs": {"id": "someone"}}
+    ]
+    confluence.get.return_value = _page("Widths", body)
+
+    _main(tmp_path)
+
+    markdown = (tmp_path / "page.md").read_text()
+    assert "| A | " in markdown
+    assert "one" in markdown
+    assert 'node="mention"' in markdown
+    assert "### e2" not in markdown
+    assert "1 conversion error(s)" in capsys.readouterr().err
+
+
 @pytest.mark.parametrize(
     ("reference", "page_id", "site"),
     [

@@ -1,9 +1,14 @@
+import copy
 import json
 import subprocess
 from unittest.mock import MagicMock, patch
 
 import pytest
+from atlassian.errors import ApiError
+from requests import HTTPError, Response
+from requests.exceptions import ConnectionError as RequestsConnectionError
 
+from atl_cli.converter.adf_to_md import adf_to_markdown
 from atl_cli.page_diagrams.pipeline import (
     convert_markdown_to_adf,
     publish,
@@ -145,6 +150,509 @@ def _publish(md_path, tmp_path):
         assets_dir=str(tmp_path / "assets"),
         out_path=str(tmp_path / "final.json"),
     )
+
+
+def _width_doc(markdown, widths):
+    doc = strip_title_heading(convert_markdown_to_adf(markdown))
+    tables = [node for node in doc["content"] if node["type"] == "table"]
+    for table, matrix in zip(tables, widths):
+        table["attrs"].update({"layout": "wide", "width": 960})
+        for row, values in zip(table["content"], matrix):
+            for cell, value in zip(row["content"], values):
+                cell.setdefault("attrs", {}).pop("colwidth", None)
+                if value is not None:
+                    cell["attrs"]["colwidth"] = None if value == {} else value
+    return doc
+
+
+def _snapshot(doc, version=7):
+    return {"version": {"number": version}, "body": {"atlas_doc_format": {"value": json.dumps(doc)}}}
+
+
+def _table_widths(table):
+    return [[cell.get("attrs", {}).get("colwidth", "absent") for cell in row["content"]] for row in table["content"]]
+
+
+def _table_config(tmp_path, markdown):
+    path = tmp_path / "page.md"
+    path.write_text(markdown)
+    write_config(tmp_path, {"cloudId": "example.atlassian.net", "email": "me@example.com", "apiToken": "secret"})
+    return path
+
+
+def test_plain_markdown_preserves_widths_by_heading_and_uses_snapshot_version(tmp_path, capsys):
+    old = (
+        "# Title\n\n## East\n\n| # | Priority |\n| --- | --- |\n| old-east | A |\n\n"
+        "## West\n\n| # | Priority |\n| --- | --- |\n| old-west | B |\n"
+    )
+    live = _width_doc(old, [
+        [[[155], [355]], [[155], [355]]],
+        [[[45], [600]], [[45], [600]]],
+    ])
+    new = (
+        "# Title\n\n## West\n\n| # | Priority |\n| --- | --- |\n| new-west | B |\n\n"
+        "## East\n\n| # | Priority |\n| --- | --- |\n| new-east | A |\n| extra | C |\n"
+    )
+    md_path = _table_config(tmp_path, new)
+    confluence = MagicMock()
+    confluence.get.return_value = _snapshot(live)
+    with patch("atl_cli.page_diagrams.pipeline.get_confluence", return_value=confluence), patch(
+        "atl_cli.page_diagrams.pipeline.get_page_version"
+    ) as version, patch("atl_cli.page_diagrams.pipeline.update_page_adf") as update:
+        result = _publish(md_path, tmp_path)
+
+    version.assert_not_called()
+    assert update.call_args.args[4] == 7
+    final = update.call_args.args[3]
+    west, east = [node for node in final["content"] if node["type"] == "table"]
+    assert _table_widths(west) == [[[45], [600]], [[45], [600]]]
+    assert _table_widths(east) == [[[155], [355]], [[155], [355]], [[155], [355]]]
+    assert west["attrs"]["width"] == east["attrs"]["width"] == 960
+    assert west["attrs"]["layout"] == east["attrs"]["layout"] == "wide"
+    assert json.loads((tmp_path / "final.json").read_text()) == final
+    manifest = json.loads((tmp_path / "final.manifest.json").read_text())
+    assert manifest == {"title": "Title", "adf": final}
+    assert all(field not in json.dumps(final) for field in ("header-hash", "rows-hash", "cell-widths", "colwidths"))
+    assert "tableWidthWarnings" not in result
+    assert "warning:" not in capsys.readouterr().err
+
+    from atl_cli.verify_publish import main as verify
+
+    argv = [
+        "--page-id", "123", "--config", "unused", "--expect-anchors", "0",
+        "--expected-manifest", result["manifestPath"], "--verify-dir", str(tmp_path / "verify"),
+    ]
+    assert verify(argv, fetch=lambda *_: new, fetch_raw=lambda *_: ("Title", final)) == 0
+    changed = copy.deepcopy(final)
+    next(node for node in changed["content"] if node["type"] == "table")["content"][0]["content"][0]["attrs"]["colwidth"] = [999]
+    assert verify(argv, fetch=lambda *_: new, fetch_raw=lambda *_: ("Title", changed)) == 1
+
+
+@pytest.mark.parametrize(("marker", "expected_width", "expected_layout", "expected_columns"), [
+    ('colwidths="[[240],[320]]"', 960, "wide", [[240], [320]]),
+    ('colwidths="[null,null]"', 960, "wide", ["absent", "absent"]),
+    ('layout="full-width" width="700"', 700, "full-width", [[155], [355]]),
+    ('layout="full-width" width="700" colwidths="[[240],[320]]"', 700, "full-width", [[240], [320]]),
+])
+def test_explicit_markdown_width_fields_override_live_fields(tmp_path, marker, expected_width, expected_layout, expected_columns):
+    plain = "# Title\n\n| # | Priority |\n| --- | --- |\n| one | two |\n"
+    live = _width_doc(plain, [[[[155], [355]], [[155], [355]]]])
+    md_path = _table_config(tmp_path, plain.replace("| # | Priority |", f"<!-- adf:table {marker} -->\n\n| # | Priority |"))
+    confluence = MagicMock()
+    confluence.get.return_value = _snapshot(live)
+    with patch("atl_cli.page_diagrams.pipeline.get_confluence", return_value=confluence), patch(
+        "atl_cli.page_diagrams.pipeline.get_page_version"
+    ), patch("atl_cli.page_diagrams.pipeline.update_page_adf") as update:
+        _publish(md_path, tmp_path)
+    table = next(node for node in update.call_args.args[3]["content"] if node["type"] == "table")
+    assert table["attrs"]["width"] == expected_width
+    assert table["attrs"]["layout"] == expected_layout
+    assert _table_widths(table) == [expected_columns, expected_columns]
+
+
+def test_create_uses_explicit_widths_without_reading_a_live_page(tmp_path):
+    markdown = '# Title\n\n<!-- adf:table colwidths="[[155],[355]]" -->\n\n| A | B |\n| --- | --- |\n| one | two |\n'
+    md_path = _table_config(tmp_path, markdown)
+    confluence = MagicMock()
+    with patch("atl_cli.page_diagrams.pipeline.get_confluence", return_value=confluence), patch(
+        "atl_cli.page_diagrams.pipeline.create_page_adf", return_value={"id": "456"}
+    ) as create:
+        result = publish(
+            md_path=str(md_path), config_path=str(tmp_path / ".atlassian.json.user"), page_id=None,
+            space_id="SPACE", title=None, assets_dir=str(tmp_path / "assets"), out_path=str(tmp_path / "final.json"),
+        )
+    confluence.get.assert_not_called()
+    assert _table_widths(create.call_args.args[3]["content"][0]) == [[[155], [355]], [[155], [355]]]
+    assert "tableWidthWarnings" not in result
+
+
+def test_unmarked_update_respects_live_absent_widths_over_inferred_defaults(tmp_path):
+    plain = "# Title\n\n| # | Priority |\n| --- | --- |\n| one | two |\n"
+    live = _width_doc(plain, [[[None, None], [None, None]]])
+    live["content"][0]["attrs"]["unrelated"] = "do not copy"
+    live["content"][0]["content"][0]["content"][0]["attrs"]["background"] = "#ffffff"
+    md_path = _table_config(tmp_path, plain)
+    confluence = MagicMock()
+    confluence.get.return_value = _snapshot(live)
+    with patch("atl_cli.page_diagrams.pipeline.get_confluence", return_value=confluence), patch(
+        "atl_cli.page_diagrams.pipeline.update_page_adf"
+    ) as update:
+        _publish(md_path, tmp_path)
+    table = update.call_args.args[3]["content"][0]
+    assert _table_widths(table) == [["absent", "absent"], ["absent", "absent"]]
+    assert "unrelated" not in table["attrs"]
+    assert "background" not in table["content"][0]["content"][0].get("attrs", {})
+
+
+def test_sparse_row_specific_widths_and_explicit_null_are_preserved(tmp_path):
+    plain = "# Title\n\n| # | Priority |\n| --- | --- |\n| one | two |\n"
+    live = _width_doc(plain, [[[[155], {}], [None, [355]]]])
+    md_path = _table_config(tmp_path, plain)
+    confluence = MagicMock()
+    confluence.get.return_value = _snapshot(live)
+    with patch("atl_cli.page_diagrams.pipeline.get_confluence", return_value=confluence), patch(
+        "atl_cli.page_diagrams.pipeline.update_page_adf"
+    ) as update:
+        _publish(md_path, tmp_path)
+    table = next(node for node in update.call_args.args[3]["content"] if node["type"] == "table")
+    assert _table_widths(table) == [[[155], None], ["absent", [355]]]
+
+
+def test_sparse_consistent_widths_follow_changed_rows_and_new_rows(tmp_path, capsys):
+    plain = "# Title\n\n| A | B |\n| --- | --- |\n| one | two |\n"
+    live = _width_doc(plain, [[[[155], [355]], [None, None]]])
+    md_path = _table_config(tmp_path, plain.replace("| one | two |", "| changed | two |\n| another | row |"))
+    confluence = MagicMock()
+    confluence.get.return_value = _snapshot(live)
+    with patch("atl_cli.page_diagrams.pipeline.get_confluence", return_value=confluence), patch(
+        "atl_cli.page_diagrams.pipeline.update_page_adf"
+    ) as update:
+        result = _publish(md_path, tmp_path)
+    table = next(node for node in update.call_args.args[3]["content"] if node["type"] == "table")
+    assert _table_widths(table) == [[[155], [355]], [[155], [355]], [[155], [355]]]
+    assert "applied consistent column widths" in result["tableWidthWarnings"][0]
+    assert result["tableWidthWarnings"][0] in capsys.readouterr().err
+
+
+def test_tables_in_named_expands_match_by_context_not_position(tmp_path):
+    def expand(name, value):
+        return f"<details>\n<summary>{name}</summary>\n\n| A | B |\n| --- | --- |\n| {value} | two |\n</details>\n"
+
+    old = "# Title\n\n" + expand("East", "one") + "\n" + expand("West", "three")
+    live = strip_title_heading(convert_markdown_to_adf(old))
+    for container, values in zip(live["content"], ([[155], [355]], [[45], [600]])):
+        table = next(node for node in container["content"] if node["type"] == "table")
+        for row in table["content"]:
+            for cell, value in zip(row["content"], values):
+                cell["attrs"] = {"colwidth": value}
+    new = "# Title\n\n" + expand("West", "changed") + "\n" + expand("East", "edited")
+    md_path = _table_config(tmp_path, new)
+    confluence = MagicMock()
+    confluence.get.return_value = _snapshot(live)
+    with patch("atl_cli.page_diagrams.pipeline.get_confluence", return_value=confluence), patch(
+        "atl_cli.page_diagrams.pipeline.update_page_adf"
+    ) as update:
+        _publish(md_path, tmp_path)
+    west, east = update.call_args.args[3]["content"]
+    assert _table_widths(west["content"][0]) == [[[45], [600]], [[45], [600]]]
+    assert _table_widths(east["content"][0]) == [[[155], [355]], [[155], [355]]]
+
+
+def test_plain_markdown_preserves_widths_in_a_blockquote(tmp_path):
+    source = "# Title\n\n> | A | B |\n> | --- | --- |\n> | one | two |\n"
+    live = strip_title_heading(convert_markdown_to_adf(source))
+    for row in live["content"][0]["content"][0]["content"]:
+        for cell, width in zip(row["content"], (155, 355)):
+            cell["attrs"] = {"colwidth": [width]}
+    md_path = _table_config(tmp_path, source.replace("one", "changed"))
+    confluence = MagicMock()
+    confluence.get.return_value = _snapshot(live)
+    with patch("atl_cli.page_diagrams.pipeline.get_confluence", return_value=confluence), patch(
+        "atl_cli.page_diagrams.pipeline.update_page_adf"
+    ) as update:
+        result = _publish(md_path, tmp_path)
+    table = update.call_args.args[3]["content"][0]["content"][0]
+    assert _table_widths(table) == [[[155], [355]], [[155], [355]]]
+    assert "tableWidthWarnings" not in result
+
+
+def test_conflicting_row_specific_widths_default_when_rows_change(tmp_path, capsys):
+    plain = "# Title\n\n| # | Priority |\n| --- | --- |\n| one | two |\n"
+    live = _width_doc(plain, [[[[155], [355]], [[160], [355]]]])
+    md_path = _table_config(tmp_path, plain.replace("| one | two |", "| edited | two |"))
+    confluence = MagicMock()
+    confluence.get.return_value = _snapshot(live)
+    with patch("atl_cli.page_diagrams.pipeline.get_confluence", return_value=confluence), patch(
+        "atl_cli.page_diagrams.pipeline.update_page_adf"
+    ) as update:
+        result = _publish(md_path, tmp_path)
+    table = next(node for node in update.call_args.args[3]["content"] if node["type"] == "table")
+    assert _table_widths(table) == [[[60], [110]], [[60], [110]]]
+    assert "row-specific widths" in result["tableWidthWarnings"][0]
+    assert result["tableWidthWarnings"][0] in capsys.readouterr().err
+
+
+@pytest.mark.parametrize(("old_count", "new_count"), [(2, 1), (1, 2)])
+def test_ambiguous_table_matches_warn_and_keep_defaults(tmp_path, capsys, old_count, new_count):
+    table = "| # | Priority |\n| --- | --- |\n| one | two |\n"
+    old = "# Title\n\n" + "\n".join([table] * old_count)
+    live = _width_doc(old, [[[[155], [355]], [[155], [355]]]] * old_count)
+    md_path = _table_config(tmp_path, "# Title\n\n" + "\n".join([table] * new_count))
+    confluence = MagicMock()
+    confluence.get.return_value = _snapshot(live)
+    with patch("atl_cli.page_diagrams.pipeline.get_confluence", return_value=confluence), patch(
+        "atl_cli.page_diagrams.pipeline.update_page_adf"
+    ) as update:
+        result = _publish(md_path, tmp_path)
+    tables = [node for node in update.call_args.args[3]["content"] if node["type"] == "table"]
+    assert all(_table_widths(node) == [[[60], [110]], [[60], [110]]] for node in tables)
+    assert len(result["tableWidthWarnings"]) == new_count
+    assert all("ambiguous" in warning for warning in result["tableWidthWarnings"])
+    assert "ambiguous existing table match" in capsys.readouterr().err
+
+
+def test_duplicate_column_headers_warn_instead_of_guessing(tmp_path, capsys):
+    plain = "# Title\n\n| A | A |\n| --- | --- |\n| one | two |\n"
+    live = _width_doc(plain, [[[[155], [355]], [[155], [355]]]])
+    md_path = _table_config(tmp_path, plain)
+    confluence = MagicMock()
+    confluence.get.return_value = _snapshot(live)
+    with patch("atl_cli.page_diagrams.pipeline.get_confluence", return_value=confluence), patch(
+        "atl_cli.page_diagrams.pipeline.update_page_adf"
+    ) as update:
+        result = _publish(md_path, tmp_path)
+    table = update.call_args.args[3]["content"][0]
+    assert _table_widths(table) == [["absent", "absent"], ["absent", "absent"]]
+    assert "duplicate or empty column headers" in result["tableWidthWarnings"][0]
+    assert result["tableWidthWarnings"][0] in capsys.readouterr().err
+
+
+def test_unmatched_and_invalid_live_widths_warn_and_keep_defaults(tmp_path, capsys):
+    old = "# Title\n\n| # | Priority |\n| --- | --- |\n| one | two |\n"
+    live = _width_doc(old, [[[[155], [355]], [[155], [355]]]])
+    live["content"][0]["content"][0]["content"][0]["attrs"]["colwidth"] = "invalid"
+    md_path = _table_config(tmp_path, old)
+    confluence = MagicMock()
+    confluence.get.return_value = _snapshot(live)
+    with patch("atl_cli.page_diagrams.pipeline.get_confluence", return_value=confluence), patch(
+        "atl_cli.page_diagrams.pipeline.update_page_adf"
+    ) as update:
+        result = _publish(md_path, tmp_path)
+        assert "invalid existing column widths" in result["tableWidthWarnings"][0]
+        assert _table_widths(update.call_args.args[3]["content"][0]) == [[[60], [110]], [[60], [110]]]
+
+        md_path.write_text(old.replace("Priority", "Other"))
+        result = _publish(md_path, tmp_path)
+        assert "no compatible existing table" in result["tableWidthWarnings"][0]
+    assert "no compatible existing table" in capsys.readouterr().err
+
+
+@pytest.mark.parametrize("attrs", [None, {}, {"level": "1"}, {"level": True}])
+def test_invalid_live_heading_cannot_cause_a_width_match(tmp_path, capsys, attrs):
+    plain = "# Title\n\n# Section\n\n| A | B |\n| --- | --- |\n| one | two |\n"
+    live = _width_doc(plain, [[[[155], [355]], [[155], [355]]]])
+    live["content"][0]["attrs"] = attrs
+    md_path = _table_config(tmp_path, plain)
+    confluence = MagicMock()
+    confluence.get.return_value = _snapshot(live)
+    with patch("atl_cli.page_diagrams.pipeline.get_confluence", return_value=confluence), patch(
+        "atl_cli.page_diagrams.pipeline.update_page_adf"
+    ) as update:
+        result = _publish(md_path, tmp_path)
+    assert _table_widths(update.call_args.args[3]["content"][1]) == [["absent", "absent"], ["absent", "absent"]]
+    assert "no compatible existing table" in result["tableWidthWarnings"][0]
+    assert "no compatible existing table" in capsys.readouterr().err
+
+
+def test_invalid_live_row_content_cannot_cause_a_row_specific_width_match(tmp_path, capsys):
+    plain = "# Title\n\n| A | B |\n| --- | --- |\n| one | two |\n"
+    live = _width_doc(plain, [[[[155], [355]], [[160], [355]]]])
+    live["content"][0]["content"][1]["content"][0]["content"] = ["invalid"]
+    md_path = _table_config(tmp_path, plain)
+    confluence = MagicMock()
+    confluence.get.return_value = _snapshot(live)
+    with patch("atl_cli.page_diagrams.pipeline.get_confluence", return_value=confluence), patch(
+        "atl_cli.page_diagrams.pipeline.update_page_adf"
+    ) as update:
+        result = _publish(md_path, tmp_path)
+    table = update.call_args.args[3]["content"][0]
+    assert _table_widths(table) == [["absent", "absent"], ["absent", "absent"]]
+    assert "row-specific widths cannot be matched safely" in result["tableWidthWarnings"][0]
+    assert result["tableWidthWarnings"][0] in capsys.readouterr().err
+
+
+def test_stale_explicit_column_marker_warns_and_does_not_copy_live_columns(tmp_path, capsys):
+    original = "# Title\n\n| # | Priority |\n| --- | --- |\n| one | two |\n"
+    saved = _width_doc(original, [[[[155], [355]], [[155], [355]]]])
+    markdown = "# Title\n\n" + adf_to_markdown(saved).replace("| # | Priority |", "| Priority | # |") + "\n"
+    live = _width_doc(markdown.replace(next(line for line in markdown.splitlines() if line.startswith("<!-- adf:table")), ""),
+                      [[[[333], [444]], [[333], [444]]]])
+    md_path = _table_config(tmp_path, markdown)
+    confluence = MagicMock()
+    confluence.get.return_value = _snapshot(live)
+    with patch("atl_cli.page_diagrams.pipeline.get_confluence", return_value=confluence), patch(
+        "atl_cli.page_diagrams.pipeline.update_page_adf"
+    ) as update:
+        result = _publish(md_path, tmp_path)
+    table = next(node for node in update.call_args.args[3]["content"] if node["type"] == "table")
+    assert _table_widths(table) == [[[110], [60]], [[110], [60]]]
+    assert "column headers changed" in result["tableWidthWarnings"][0]
+    assert result["tableWidthWarnings"][0] in capsys.readouterr().err
+
+
+@pytest.mark.parametrize("status", [401, 403])
+def test_snapshot_auth_failure_blocks_update(tmp_path, status):
+    md_path = _table_config(tmp_path, "# Title\n\n| A |\n| --- |\n| one |\n")
+    response = Response()
+    response.status_code = status
+    confluence = MagicMock()
+    confluence.get.side_effect = HTTPError("secret", response=response)
+    with patch("atl_cli.page_diagrams.pipeline.get_confluence", return_value=confluence), patch(
+        "atl_cli.page_diagrams.pipeline.get_page_version"
+    ) as version, patch("atl_cli.page_diagrams.pipeline.update_page_adf") as update:
+        with pytest.raises(RuntimeError, match=f"HTTPError {status}") as error:
+            _publish(md_path, tmp_path)
+    assert "secret" not in str(error.value)
+    update.assert_not_called()
+    version.assert_not_called()
+
+
+def test_unknown_auth_api_failure_blocks_update(tmp_path):
+    md_path = _table_config(tmp_path, "# Title\n\n| A |\n| --- |\n| one |\n")
+    confluence = MagicMock()
+    confluence.get.side_effect = ApiError(reason="secret")
+    with patch("atl_cli.page_diagrams.pipeline.get_confluence", return_value=confluence), patch(
+        "atl_cli.page_diagrams.pipeline.update_page_adf"
+    ) as update:
+        with pytest.raises(RuntimeError, match="ApiError") as error:
+            _publish(md_path, tmp_path)
+    assert "secret" not in str(error.value)
+    update.assert_not_called()
+
+
+def test_non_auth_snapshot_failure_warns_and_reads_a_fresh_version(tmp_path, capsys):
+    md_path = _table_config(tmp_path, "# Title\n\n| # | Priority |\n| --- | --- |\n| one | two |\n")
+    confluence = MagicMock()
+    confluence.get.side_effect = RequestsConnectionError("https://example.com/?token=secret")
+    with patch("atl_cli.page_diagrams.pipeline.get_confluence", return_value=confluence), patch(
+        "atl_cli.page_diagrams.pipeline.get_page_version", return_value=12
+    ) as version, patch("atl_cli.page_diagrams.pipeline.update_page_adf") as update:
+        result = _publish(md_path, tmp_path)
+    version.assert_called_once_with(confluence, "123")
+    assert update.call_args.args[4] == 12
+    assert "ConnectionError" in result["tableWidthWarnings"][0]
+    assert "secret" not in capsys.readouterr().err
+
+
+def test_non_auth_http_snapshot_failure_reports_status_and_defaults(tmp_path, capsys):
+    md_path = _table_config(tmp_path, "# Title\n\n| A |\n| --- |\n| one |\n")
+    response = Response()
+    response.status_code = 503
+    confluence = MagicMock()
+    confluence.get.side_effect = HTTPError("secret", response=response)
+    with patch("atl_cli.page_diagrams.pipeline.get_confluence", return_value=confluence), patch(
+        "atl_cli.page_diagrams.pipeline.get_page_version", return_value=12
+    ), patch("atl_cli.page_diagrams.pipeline.update_page_adf") as update:
+        result = _publish(md_path, tmp_path)
+    assert "HTTPError 503" in result["tableWidthWarnings"][0]
+    assert update.call_args.args[4] == 12
+    assert "secret" not in capsys.readouterr().err
+
+
+def test_cli_exposes_width_warnings_in_json_and_stderr(tmp_path, capsys):
+    from atl_cli.page_diagrams.cli import main
+
+    md_path = _table_config(tmp_path, "# Title\n\n| A |\n| --- |\n| one |\n")
+    confluence = MagicMock()
+    confluence.get.side_effect = RequestsConnectionError("offline")
+    with patch("atl_cli.page_diagrams.pipeline.get_confluence", return_value=confluence), patch(
+        "atl_cli.page_diagrams.pipeline.get_page_version", return_value=3
+    ), patch("atl_cli.page_diagrams.pipeline.update_page_adf"):
+        main(["run", "--md-path", str(md_path), "--page-id", "123", "--config", str(tmp_path / ".atlassian.json.user")])
+    output = capsys.readouterr()
+    result = json.loads(output.out)
+    assert result["tableWidthWarnings"] == [
+        "cannot read existing table widths (ConnectionError); using Markdown/default widths"
+    ]
+    assert result["tableWidthWarnings"][0] in output.err
+
+
+def test_version_read_failure_after_snapshot_failure_still_blocks_update(tmp_path):
+    md_path = _table_config(tmp_path, "# Title\n\n| A |\n| --- |\n| one |\n")
+    confluence = MagicMock()
+    confluence.get.side_effect = RequestsConnectionError("snapshot failed")
+    with patch("atl_cli.page_diagrams.pipeline.get_confluence", return_value=confluence), patch(
+        "atl_cli.page_diagrams.pipeline.get_page_version", side_effect=RequestsConnectionError("version failed")
+    ), patch("atl_cli.page_diagrams.pipeline.update_page_adf") as update:
+        with pytest.raises(RequestsConnectionError):
+            _publish(md_path, tmp_path)
+    update.assert_not_called()
+
+
+def test_cli_sanitizes_version_read_failure_after_snapshot_failure(tmp_path, capsys):
+    from atl_cli.page_diagrams.cli import main
+
+    md_path = _table_config(tmp_path, "# Title\n\n| A |\n| --- |\n| one |\n")
+    confluence = MagicMock()
+    confluence.get.side_effect = RequestsConnectionError("https://example.com/?token=secret")
+    with patch("atl_cli.page_diagrams.pipeline.get_confluence", return_value=confluence), patch(
+        "atl_cli.page_diagrams.pipeline.get_page_version",
+        side_effect=RequestsConnectionError("https://example.com/?token=secret"),
+    ), patch("atl_cli.page_diagrams.pipeline.update_page_adf") as update:
+        with pytest.raises(SystemExit) as error:
+            main(["run", "--md-path", str(md_path), "--page-id", "123", "--config", str(tmp_path / ".atlassian.json.user")])
+    assert error.value.code == 1
+    update.assert_not_called()
+    stderr = capsys.readouterr().err
+    assert "cannot read existing table widths" in stderr
+    assert "Confluence request failed (ConnectionError)" in stderr
+    assert "secret" not in stderr
+
+
+def test_snapshot_conflict_is_reported_without_retry(tmp_path):
+    plain = "# Title\n\n| A | B |\n| --- | --- |\n| one | two |\n"
+    md_path = _table_config(tmp_path, plain)
+    confluence = MagicMock()
+    confluence.get.return_value = _snapshot(_width_doc(plain, [[[[155], [355]], [[155], [355]]]]))
+    response = Response()
+    response.status_code = 409
+    with patch("atl_cli.page_diagrams.pipeline.get_confluence", return_value=confluence), patch(
+        "atl_cli.page_diagrams.pipeline.get_page_version"
+    ) as version, patch(
+        "atl_cli.page_diagrams.pipeline.update_page_adf", side_effect=HTTPError("conflict", response=response)
+    ) as update:
+        with pytest.raises(RuntimeError, match="page changed after the table width snapshot"):
+            _publish(md_path, tmp_path)
+    version.assert_not_called()
+    update.assert_called_once()
+    assert update.call_args.args[4] == 7
+
+
+def test_attachment_publish_uses_snapshot_version_and_final_width_manifest(tmp_path):
+    plain = "# Title\n\n| A | B |\n| --- | --- |\n| one | two |\n"
+    live = _width_doc(plain, [[[[155], [355]], [[155], [355]]]])
+    (tmp_path / "screenshot.png").write_bytes(b"png-bytes")
+    md_path = _table_config(tmp_path, plain + "\n![screenshot](screenshot.png)\n")
+    confluence = MagicMock()
+    confluence.get.return_value = _snapshot(live)
+    with patch("atl_cli.page_diagrams.pipeline.get_confluence", return_value=confluence), patch(
+        "atl_cli.page_diagrams.pipeline.get_page_version"
+    ) as version, patch("atl_cli.page_diagrams.pipeline.upload_files", return_value={"screenshot.png": "file-1"}), patch(
+        "atl_cli.page_diagrams.pipeline.update_page_adf"
+    ) as update:
+        result = _publish(md_path, tmp_path)
+    version.assert_not_called()
+    assert update.call_args.args[4] == 7
+    final = update.call_args.args[3]
+    table = next(node for node in final["content"] if node["type"] == "table")
+    assert _table_widths(table) == [[[155], [355]], [[155], [355]]]
+    assert any(node["type"] == "mediaSingle" for node in final["content"])
+    assert json.loads((tmp_path / "final.manifest.json").read_text())["adf"] == final
+    assert result["attachments"] == 1
+
+
+def test_attachment_publish_does_not_retry_a_snapshot_conflict(tmp_path):
+    plain = "# Title\n\n| A | B |\n| --- | --- |\n| one | two |\n"
+    live = _width_doc(plain, [[[[155], [355]], [[155], [355]]]])
+    (tmp_path / "screenshot.png").write_bytes(b"png-bytes")
+    md_path = _table_config(tmp_path, plain + "\n![screenshot](screenshot.png)\n")
+    confluence = MagicMock()
+    confluence.get.return_value = _snapshot(live)
+    response = Response()
+    response.status_code = 409
+    with patch("atl_cli.page_diagrams.pipeline.get_confluence", return_value=confluence), patch(
+        "atl_cli.page_diagrams.pipeline.get_page_version"
+    ) as version, patch(
+        "atl_cli.page_diagrams.pipeline.upload_files", return_value={"screenshot.png": "file-1"}
+    ) as upload, patch(
+        "atl_cli.page_diagrams.pipeline.update_page_adf", side_effect=HTTPError("conflict", response=response)
+    ) as update:
+        with pytest.raises(RuntimeError, match="page changed after the table width snapshot"):
+            _publish(md_path, tmp_path)
+    upload.assert_called_once()
+    update.assert_called_once()
+    assert update.call_args.args[4] == 7
+    version.assert_not_called()
 
 
 def test_publish_png_branch_passes_the_selected_renderer_through(tmp_path):

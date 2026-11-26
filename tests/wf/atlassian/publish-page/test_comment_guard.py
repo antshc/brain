@@ -43,7 +43,7 @@ class _FakeConfluence:
 
     def get(self, path: str, params: dict | None = None) -> dict:
         if path == "/api/v2/pages/1":
-            return {"body": {"atlas_doc_format": {"value": json.dumps(self.live)}}}
+            return {"version": {"number": 3}, "body": {"atlas_doc_format": {"value": json.dumps(self.live)}}}
         if path == "/api/v2/pages/1/inline-comments":
             return {"results": self.comments[:1], "_links": {"next": "/wiki/api/v2/pages/1/inline-comments?cursor=2"}}
         if path == "/api/v2/pages/1/inline-comments?cursor=2":
@@ -140,6 +140,32 @@ def test_update_keeping_every_anchor_posts_nothing(tmp_path):
         "atl_cli.page_diagrams.pipeline.get_confluence", return_value=confluence
     ), patch("atl_cli.page_diagrams.pipeline.get_page_version", return_value=3), patch("atl_cli.page_diagrams.pipeline.update_page_adf"):
         result = _publish(tmp_path, md)
+    assert "orphanedComments" not in result
+    assert confluence.posted == []
+
+
+@pytest.mark.real_comment_guard
+def test_width_snapshot_is_reused_by_comment_guard(tmp_path):
+    from atl_cli.page_diagrams.pipeline import convert_markdown_to_adf
+
+    body = '<!-- adf:comment id="kept" -->a<!-- /adf:comment -->\n\n| A | B |\n| --- | --- |\n| one | two |'
+    confluence = _FakeConfluence((), [_comment("10", "kept")])
+    confluence.live = convert_markdown_to_adf(body)
+    for row in confluence.live["content"][1]["content"]:
+        row["content"][0]["attrs"] = {"colwidth": [155]}
+        row["content"][1]["attrs"] = {"colwidth": [355]}
+    md = _write_md(tmp_path, body)
+    with patch.object(confluence, "get", wraps=confluence.get) as read, patch(
+        "atl_cli.page_diagrams.pipeline.load_credentials", return_value=CREDS
+    ), patch("atl_cli.page_diagrams.pipeline.get_confluence", return_value=confluence), patch(
+        "atl_cli.page_diagrams.pipeline.get_page_version"
+    ) as version, patch("atl_cli.page_diagrams.pipeline.update_page_adf") as update:
+        result = _publish(tmp_path, md)
+
+    assert len([call for call in read.call_args_list if call.args[0] == "/api/v2/pages/1"]) == 1
+    version.assert_not_called()
+    assert update.call_args.args[4] == 3
+    assert "commentGuard" not in result
     assert "orphanedComments" not in result
     assert confluence.posted == []
 
