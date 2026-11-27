@@ -52,13 +52,26 @@ def test_targets_cover_deployables_multi_repo_and_missing_checkouts():
     assert 'unresolved' in targets and 'Never substitute' in targets
 
 
+def test_contracts_reuse_revision_matched_docs_and_resolve_without_a_frame():
+    targets = section('Targets and repos')
+    for detail in (
+        'same docs checkout and revision', 'unverified dirty excerpts', 'read missing or stale sections',
+        'harness docs root', '`GLOSSARY.md`', '`DEPLOYMENT.md`', 'name or trigger',
+        'table or match is absent', 'local startup or deployment evidence',
+    ):
+        assert detail in targets, detail
+
+
 def test_terminal_search_and_nuget_rules():
     search = section('Search Strategy')
     gotchas = section('Gotchas')
     assert 'rg -uu' in search and 'exit `1` = no match' in gotchas
     assert 'Prefer native ripgrep-backed' in search and '`rg --files`' in search
-    assert 'usages (LSP)' in search and 'fall back to text search' in search
-    assert 'fixed-string search' in search and 'every searched root' in search
+    assert all(tool in search for tool in ('go-to-definition', 'find-references', 'call hierarchy'))
+    assert 'text search' in search and 'config wiring' in search
+    assert '`rg -F`' in search and 'Cite every in-scope hit' in search
+    assert 'no fixed-string mode or truncated results' in search and 'incomplete coverage' in search
+    assert 'every searched root' in search
     assert '**MUST NOT** use recursive shell grep' in search and 'rg … || grep …' in search
     assert 'Install required missing `rg` or `ilspycmd`' in gotchas
     assert '## Shell search' not in BODY and '## Task prefixes' not in BODY

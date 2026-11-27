@@ -221,7 +221,7 @@ On resume, recover the same pending worktree and approval identity; do not regen
 
 ## Research routing
 
-Automatically select the relevant scope for factual gaps. Codebase lookups spawn the `codebase` agent (spawn it per the `research` skill's `codebase` spawn rule, including the model and effort from the `subagents` skill's `codebase` role); mechanism and inspection questions use How; external primary-source facts, including cloud provider facts, use Web. Historical intent uses Research Why. Missing external checkouts block system evidence; use Web when public documentation suffices.
+Automatically select the relevant scope for factual gaps. Codebase lookups pass relevant grounding already loaded to the `codebase` agent (spawn it per the `research` skill's `codebase` spawn rule, including the model and effort from the `subagents` skill's `codebase` role); mechanism and inspection questions use How; external primary-source facts, including cloud provider facts, use Web. Historical intent uses Research Why. Missing external checkouts block system evidence; use Web when public documentation suffices.
 
 | Option | Route | Scope |
 |---|---|---|

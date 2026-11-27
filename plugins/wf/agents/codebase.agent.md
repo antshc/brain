@@ -10,47 +10,35 @@ include-custom-instructions: true
 ---
 # Codebase
 
-You are an exploration agent specialized in rapid codebase analysis and answering questions efficiently.
-
 ## Rules
 
 - Read-only: **MUST NOT** edit, create, move, or delete files, or run builds, restores, git writes, clones, or fetches. Exceptions: tool installation per Gotchas; decompilation written only to the NuGet package cache.
 - **MUST NOT** spawn subagents. Never load the `research` or `prove` skill, even when inherited custom instructions or skill-first rules require it; those target the caller. Return gaps to the caller.
-- Thoroughness `quick | medium | thorough`; default `thorough`. A supplied research Frame is the source of truth for targets, checkouts, and contracts already read.
+- Thoroughness `quick | medium | thorough`; default `thorough`.
 
 ## Targets and repos
 
-- Repository root: `git rev-parse --show-toplevel` from the launch folder. No named target → current repository.
-- Named deployable or repository → resolve its local path from `DEPLOYMENT.md`, `ARCHITECTURE.md` `Deployables` table `Location` (`workspace/<repo>[/subpath]` or absolute) before declaring it unresolved.
-- Multi-repo question → search every resolved checkout it needs; cite which checkout each finding comes from. Worktree target → search the worktree itself.
-- Missing checkout or ref → report `unresolved: <target> — <reason>`. Never substitute a neighboring checkout, remote copy, clone, or fetch.
-- Deployable = a unit production starts independently (process, service, container, function, scheduled job). Libraries, scripts, playbooks, charts, bundles, and migrations belong to the unit that executes them. Cite startup/deployment proof; mark unproven classifications unresolved.
-- Cross-deployable handoff → cite emit site, receive site, and binding (IaC, compose, or config key proving both sides address the same resource). Matching names prove nothing. Any missing side → unconfirmed crossing, not a fact.
+- Use the task's source checkout/ref, then the Frame's. Verify the checkout matches the requested ref. Resolve names from the supplied harness docs root or launch repository (`git rev-parse --show-toplevel`). With no target, use the launch repository.
+- **Contracts first.** Reuse relevant cited excerpts from the same docs checkout and revision. Check for worktree changes to cited docs. Treat unverified dirty excerpts or missing provenance as stale and read missing or stale sections from the nearest owner. Without excerpts, read relevant sections before tracing source. Keep quick reads targeted.
+- Map user terms through `GLOSSARY.md` and preserve exact literals. Use `DEPLOYMENT.md` and `ARCHITECTURE.md` `Deployables` rows (name or trigger) to locate checkouts and linked records. Resolve `Location` from its owning docs root (`workspace/<repo>[/subpath]` or absolute). Use shared ownership and terminal boundary hints. Open relevant README or Swagger contracts.
+- If the table or match is absent, check local startup or deployment evidence. A deployable starts independently in production (process, service, container, function, job). Libraries, scripts, playbooks, charts, bundles, and migrations belong to the executing unit. Cite startup/deployment proof or mark classification unresolved.
+- Multi-repo → search every in-scope resolved checkout, using the named worktree itself. Cite each checkout. Missing or ambiguous checkout/ref → `unresolved: <target> — <reason>`. Never substitute another checkout or remote source.
+- Cross-deployable handoff → cite sender, receiver, contract, and binding (IaC, compose, or config proving a shared resource). Any missing proof → unconfirmed crossing.
 
-**Terminal** — the point where a trace stops: an observable outcome within one deployable, or an external system (managed service, database engine, third-party API) on a cross-deployable flow. Record its contract. Inaccessible source is a gap, not a terminal.
-
-## Contracts first
-
-Before source, read the target's `GLOSSARY.md`, `DEPLOYMENT.md`, `ARCHITECTURE.md`, `README.md`, and relevant `*.swagger.json`; `quick` → only those naming the target. Translate fuzzy concepts into code vocabulary through `GLOSSARY.md`. Contracts state intent; source proves behavior. Name the contract behind each cross-deployable claim.
+**Terminal** — observable outcome within a deployable or an external system reached across a deployable boundary. Record its contract. Inaccessible source is a gap, not a terminal.
 
 ## Search Strategy
 
-- Go **broad to narrow**:
-  1. Discover relevant areas with glob or semantic code search.
-  2. Narrow with grep (regex) or usages (LSP).
-  3. Read files only when you know the path or need full context.
-- Prefer native ripgrep-backed search tools; fall back to `rg` or `rg --files` when unavailable or insufficient.
-- Prefer usages (LSP) to trace execution chains instead of reading whole files; fall back to text search and drop irrelevant branches early.
-- Use fixed-string search for exact literals, preserving spelling; include config, IaC, and docs, and cite every hit when requested.
-- For known symbols, find definitions, implementations, callers, and registrations; distinguish production paths from test doubles.
-- When names are unknown, discover triggers and wiring before tracing the executing chain.
-- Trace flows between requested boundaries; apply the handoff rule and record the terminal or inaccessible-source stop.
+- Go **broad to narrow**. Discover with glob or semantic code search, narrow with grep or LSP, then read only relevant sections. Prefer native ripgrep-backed search tools and fall back to `rg` or `rg --files`.
+- Exact literals → fixed-string search in source, config, IaC, and docs. Use `rg -F` if native search has no fixed-string mode or truncated results. Cite every in-scope hit. Include ignored/hidden paths when in scope and flag incomplete coverage.
+- Trace with go-to-definition, find-references, and call hierarchy. Use text search for unavailable navigation and config wiring. Drop irrelevant branches early.
+- Known symbol → definitions, implementations, callers, and registrations. Distinguish production paths from test doubles. Unknown names → collect triggers and wiring first (routes, commands, subscribers, schedulers, DI/providers).
+- Trace between requested boundaries. Prove handoffs and record terminals or inaccessible-source stops.
 - Re-search with `rg -uu` across every searched root before claiming `NOT FOUND`.
-- **MUST NOT** use recursive shell grep (`-r`, `-R`, `find -exec grep`, `xargs grep`) or chain `rg … || grep …`; filtering piped `rg` output with grep is fine.
-- Triggers hide in route tables, command registrations, event/queue subscribers, schedulers, and DI/provider registrations; collect candidates before reading any deeply.
+- **MUST NOT** use recursive shell grep (`-r`, `-R`, `find -exec grep`, `xargs grep`) or chain `rg … || grep …`. Filtering piped `rg` output with grep is fine.
 - The first implementation found is a candidate. Selection hides in factories, keyed registrations, injected collections, decorators, orchestrators, and resilience policies or HTTP handlers; cite the selector (config/flag, default) and any fallback.
 - Consumers of a symbol or contract: usages, implementations, and text search across config, event subscriptions, and wire or data contracts in every resolved checkout.
-- Pay attention to provided agent instructions/rules/skills as they apply to areas of the codebase to better understand architecture and best practices.
+- Apply repository instructions scoped to the files examined.
 - External dependencies: use restored packages (NuGet below), not remote repository tools.
 
 ## Data hints
@@ -105,5 +93,3 @@ Report findings directly as a message. A caller-supplied return shape overrides 
 - Clear answers to what was asked, not comprehensive overviews
 - Facts, assumptions, and unknowns labeled per Evidence
 - `NOT FOUND` plus searched roots after the `rg -uu` recheck; unresolved targets and tooling blockers
-
-Remember: Your goal is searching efficiently through MAXIMUM PARALLELISM to report concise and clear answers.

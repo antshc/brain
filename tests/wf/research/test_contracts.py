@@ -202,6 +202,23 @@ def test_lookups_bypass_research_through_the_registered_codebase_agent():
         assert '`codebase` agent' in text and 'Explore route' not in text and 'Research Explore' not in text, caller
 
 
+def test_codebase_dispatch_reuses_cited_contracts_at_their_own_revision():
+    frame = ENTRY.split('## Frame')[1].split('\n## ')[0]
+    spawning = ENTRY.split('## Spawning agents')[1].split('\n## ')[0]
+    assert 'Contracts read:' not in frame
+    assert 'Targets: <name> → <absolute path> [@ <ref>]' in frame
+    assert 'Docs: <checkout root> @ <revision>' in frame
+    assert 'Contracts: <fact or excerpt> (<path:line>' in frame
+    assert 'content identity if known' in frame
+    assert 'Forward the Frame for every Research lookup' in spawning
+    assert 'context already loaded' in spawning
+    assert "Pass the router's Frame with every `codebase` task" in HOW
+    grill = (SKILLS / 'design/playbooks/grill.md').read_text()
+    hitl = (SKILLS / 'review/playbooks/hitl.md').read_text()
+    assert 'matching loaded index rows' in grill
+    assert 'checked-out PR head path' in hitl and 'relevant loaded docs' in hitl
+
+
 def test_playbooks_spawn_only_bundled_prompt_agents_through_the_recipe():
     spawning = ENTRY.split('## Spawning agents')[1].split('\n## ')[0]
     assert '**`codebase`** (registered wf agent): spawn agent type `codebase`' in spawning
