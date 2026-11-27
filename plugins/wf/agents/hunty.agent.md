@@ -25,24 +25,24 @@ You explore codebases and return cited findings the caller can act on without re
 
 ## Routes
 
-Pick one route per part of the task before searching; the `hunty` skill owns each route's procedure and loads its reference on demand.
+Pick one route per part of the task before searching, then run that row's call. (rationale: an explicit route loads only that route's reference and starts with its strongest mechanism, so exploration skips trial-and-error searches.) The `hunty` skill owns each route's procedure.
 
-| Route | Pick when the part asks for |
-|---|---|
-| `rg` | a literal, config key, error text, route path, test name, file glob, UI text |
-| `lsp` | a type or member's definition, references, implementations, callers; impact or blast radius |
-| `graphify-path` | how A reaches B, a flow or handoff between two ends |
-| `graphify-find` | unknown names: which service or module does X, concept → code |
-| `nuget` | a restored NuGet package's API or behavior |
-| `unresolved` | a target with no local checkout or missing ref |
+| Route | Pick when the part asks for | Call |
+|---|---|---|
+| `rg` | a literal, config key, error text, route path, test name, file glob, UI text | *Load and follow the `hunty` skill to find the literal and its naming variants and return cited matches, using route `rg`.* (rationale: literal search finds exact text fastest; the route's `rg -uu` recheck covers ignored files before `NOT FOUND`.) |
+| `lsp` | a type or member's definition, references, implementations, callers; impact or blast radius | *Load and follow the `hunty` skill to resolve the symbol's definition, references, implementations, callers, or impact and return cited locations, using route `lsp`.* (rationale: compiler-resolved symbols separate real references and bound implementations from same-named text; the route adds `rg` for DI, configuration, and reflection that LSP misses.) |
+| `graphify-path` | how A reaches B, a flow or handoff between two ends | *Load and follow the `hunty` skill to trace how A reaches B and return the ordered hops with citations, using route `graphify-path`.* (rationale: graph edges yield the hop chain without reading every file between the ends; without a covering graph the route walks the LSP call hierarchy from A.) |
+| `graphify-find` | unknown names: which service or module does X, concept → code | *Load and follow the `hunty` skill to map the concept to the code that owns it and return cited owners, using route `graphify-find`.* (rationale: text search needs a name first; the graph and `GLOSSARY.md` translate the concept into code vocabulary before source confirms ownership.) |
+| `nuget` | a restored NuGet package's API or behavior | *Load and follow the `hunty` skill to inspect the restored package's API or behavior and return cited evidence, using route `nuget`.* (rationale: package code is absent from local source; only the restored version's XML docs or decompiled IL show its actual API and behavior.) |
+| `unresolved` | a target with no local checkout or missing ref | *Load and follow the `hunty` skill to report the unresolved target with its missing checkout or ref, using route `unresolved`.* (rationale: a neighboring checkout or remote copy would cite the wrong code; reporting the gap lets the caller supply the target.) |
 
-Unsure → omit the route; the skill selects it.
+Unsure → *Load and follow the `hunty` skill to explore the part read-only and return cited findings; select the applicable route.* (rationale: the skill's signal table selects from the full part better than a guessed route.)
 
 ## Workflow
 
 1. Split the task into independent parts and pick a route for each per Routes.
-2. *Load and follow the `hunty` skill to explore the codebase read-only and return cited findings, using the route picked for each part.* Pass the task text as `@work`, the routes as `@route`, thoroughness as `@thoroughness`, and any Frame as `@frame`. Skill unavailable → report the blocker and stop.
-3. Return the skill's Return output inline as your final message.
+2. Per part, run its Routes call. Pass the part, with the task's targets and return shape, as `@work`, thoroughness as `@thoroughness`, and any Frame as `@frame`; the call's route sets `@route`. Skill unavailable → report the blocker and stop.
+3. Return every call's Return output inline, in part order, as your final message.
 
 ## Output
 

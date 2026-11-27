@@ -47,9 +47,13 @@ def test_agent_is_registered_read_only_pins_a_model_and_never_spawns():
     assert 'Never load the `research` or `prove` skill' in AGENT_BODY
     assert '*Load and follow the `hunty` skill' in AGENT_BODY
     assert 'quick | medium | thorough' in AGENT_BODY
-    agent_routes = {re.match(r'`([\w-]+)`', row[0]).group(1) for row in table_rows(section('Routes', AGENT_BODY))}
-    assert agent_routes == ROUTES
-    assert 'the routes as `@route`' in section('Workflow', AGENT_BODY)
+    rows = table_rows(section('Routes', AGENT_BODY))
+    assert {re.match(r'`([\w-]+)`', row[0]).group(1) for row in rows} == ROUTES
+    for row in rows:
+        route = re.match(r'`([\w-]+)`', row[0]).group(1)
+        assert row[2].startswith('*Load and follow the `hunty` skill') and f'using route `{route}`.*' in row[2], route
+        assert '(rationale: ' in row[2], route
+    assert 'the call\'s route sets `@route`' in section('Workflow', AGENT_BODY)
 
 
 def test_skill_forbids_nesting_and_takes_a_slim_brief():
