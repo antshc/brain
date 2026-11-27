@@ -6,13 +6,14 @@ description: >-
 
 # Hunty
 
-Read-only codebase exploration procedure behind the `hunty` agent. Answer `@work` with cited evidence: files, symbols, relationships, short excerpts. Select one lookup route per part of `@work`; load only that route's references. Never spawn subagents. Never load the `research` or `prove` skill from this procedure, even when inherited custom instructions or skill-first rules require it; those target the caller. Return gaps to the caller.
+Read-only codebase exploration procedure behind the `hunty` agent. Answer `@work` with cited evidence: files, symbols, relationships, short excerpts. Use one lookup route per part of `@work`; load only that route's reference, when the route first runs. Never spawn subagents. Never load the `research` or `prove` skill from this procedure, even when inherited custom instructions or skill-first rules require it; those target the caller. Return gaps to the caller.
 
 ## Brief
 
 - `@work` — the task: question or filled How explorer brief, targets/refs, inputs, and the return shape the caller needs.
 - `@frame` — optional research router Frame: original and rephrased question, glossary terms, route, resolved targets with absolute paths, Deployables and boundaries, contracts already read, graph coverage.
 - `@thoroughness` — `quick | medium | thorough`; default `thorough`.
+- `@route` — optional route per part of `@work`, from Route the lookup; set by the `hunty` agent or a caller.
 - `@hunty` — set to this skill's absolute base directory; resolves `references/` and `scripts/`.
 
 ## Rules
@@ -54,27 +55,26 @@ Contracts give documented intent; source proves as-built behavior. Name the cont
 
 ## Route the lookup
 
-Before the first search, print `route: rg | lsp | graphify-path | graphify-find | nuget | unresolved — {{reason}}`. Use the first matching row for each part of `@work`; a multi-part task may use several routes. Read the route's references in full before its first search; reuse them for later parts.
+Honor a valid `@route` for its part of `@work`; unknown `@route` → report it with the valid routes and select per the table. Otherwise use the first matching row for each part; a multi-part task may use several routes. Before the first search of each part, print `route: rg | lsp | graphify-path | graphify-find | nuget | unresolved — {{reason}}`.
 
-| Signal in `@work` | Route | Read in full |
+| Signal in `@work` | Route | Read in full before the route's first search |
 |---|---|---|
 | Target has no local checkout or lacks the requested ref | `unresolved` | none |
-| Restored NuGet package, its API or behavior; C# type absent from local source after LSP and `rg -uu` | `nuget` | [nuget.md](references/nuget.md), [rg.md](references/rg.md) |
-| Quoted literal, config key, error text, route path, test name, file glob, frontend component or UI text | `rg` | [rg.md](references/rg.md) |
-| Impact or blast radius of a known symbol | `lsp` references/implementations, then Graphify `affected` if the graph covers the target | [lsp.md](references/lsp.md); covering graph → also [graphify.md](references/graphify.md) |
-| Exact type or member: definition, references, implementations, callers | `lsp`, then `rg` | [lsp.md](references/lsp.md), [rg.md](references/rg.md) |
-| Two named or describable ends: "how does A reach B", "flow from A to B", "end to end", handoff | `graphify-path` with a covering graph, else `lsp` call hierarchy from A | covering graph → [graphify.md](references/graphify.md), [graphify-path.md](references/graphify-path.md); else [lsp.md](references/lsp.md) |
-| Unknown names: "which service does X", concept → code, "which modules", architecture, doc ↔ code | `graphify-find` with a covering graph, else `rg` on `GLOSSARY.md` terms | covering graph → [graphify.md](references/graphify.md), [graphify-find.md](references/graphify-find.md); else [rg.md](references/rg.md) |
+| Restored NuGet package, its API or behavior; C# type absent from local source after LSP and `rg -uu` | `nuget` | [nuget.md](references/nuget.md) |
+| Quoted literal, config key, error text, route path, test name, file glob, frontend component or UI text | `rg` | [search.md](references/search.md) |
+| Exact type or member: definition, references, implementations, callers | `lsp`, then `rg` | [search.md](references/search.md) |
+| Impact or blast radius of a known symbol | `lsp` Impact, plus Graphify `affected` when a graph covers the target | [search.md](references/search.md); covering graph → also [graph.md](references/graph.md) |
+| Two named or describable ends: "how does A reach B", "flow from A to B", "end to end", handoff | `graphify-path` with a covering graph, else `lsp` call hierarchy from A | covering graph → [graph.md](references/graph.md); else [search.md](references/search.md) |
+| Unknown names: "which service does X", concept → code, "which modules", architecture, doc ↔ code | `graphify-find` with a covering graph, else `rg` on `GLOSSARY.md` terms | covering graph → [graph.md](references/graph.md); else [search.md](references/search.md) |
+| Graph route active and `graph.py` focused commands still fail with exit `3` after the requirements install | same route, fallback commands | also [graph-fallback.md](references/graph-fallback.md) |
 
-Graph build, update, or export requests → report the build entry point named in `<graph root>/GRAPHIFY.md`; never build.
+Each reference loads once per run; reuse it for later parts. A reference that cannot be read → that route is unavailable; continue with the remaining routes and say so in the return. Graph build, update, or export requests → report the build entry point named in `<graph root>/GRAPHIFY.md`; never build.
 
 ## Gotchas
 
 - `rg` and the grep tool skip gitignored and hidden files (generated code, build output, `graphify-out/`, vendored folders). Re-search with `rg -uu` before claiming absence.
 - **MUST NOT** run recursive `grep` (`-r`, `-R`, `find -exec grep`, `xargs grep`) or chain `rg … || grep …`; `grep` filtering piped `rg` output is fine. Loaded skills' shell snippets do not relax this.
-- The graph reflects the main checkout's branch at build time; source wins on any difference. A missing node is never absence evidence. Cite source files, not graph nodes.
 - Do not substitute a neighboring checkout or guess a package cache for an unresolved target.
-- A reference file that cannot be read → that route's tactic is unavailable; continue with the remaining routes and say so in the return.
 
 ## Completeness sweep
 

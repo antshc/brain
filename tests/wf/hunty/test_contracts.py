@@ -47,11 +47,14 @@ def test_agent_is_registered_read_only_pins_a_model_and_never_spawns():
     assert 'Never load the `research` or `prove` skill' in AGENT_BODY
     assert '*Load and follow the `hunty` skill' in AGENT_BODY
     assert 'quick | medium | thorough' in AGENT_BODY
+    agent_routes = {re.match(r'`([\w-]+)`', row[0]).group(1) for row in table_rows(section('Routes', AGENT_BODY))}
+    assert agent_routes == ROUTES
+    assert 'the routes as `@route`' in section('Workflow', AGENT_BODY)
 
 
 def test_skill_forbids_nesting_and_takes_a_slim_brief():
     assert 'Never spawn subagents. Never load the `research` or `prove` skill' in BODY
-    assert set(re.findall(r'^- `(@\w+)`', section('Brief'), re.M)) == {'@work', '@frame', '@thoroughness', '@hunty'}
+    assert set(re.findall(r'^- `(@\w+)`', section('Brief'), re.M)) == {'@work', '@frame', '@thoroughness', '@route', '@hunty'}
     assert 'always explore thoroughly' in section('Rules')
 
 
@@ -59,9 +62,10 @@ def test_route_table_links_each_route_reference_directly():
     route = section('Route the lookup')
     assert 'route: rg | lsp | graphify-path | graphify-find | nuget | unresolved' in route
     rows = table_rows(route)
-    assert {re.match(r'`([\w-]+)`', row[1]).group(1) for row in rows} == ROUTES
+    assert {re.match(r'`([\w-]+)`', row[1]).group(1) for row in rows if row[1].startswith('`')} == ROUTES
+    assert 'Honor a valid `@route`' in route
     links = {unquote(urlsplit(l).path) for l in re.findall(r'\]\(([^)]+)\)', route)}
-    assert links == {f'references/{n}.md' for n in ('rg', 'lsp', 'graphify', 'graphify-path', 'graphify-find', 'nuget')}
+    assert links == {f'references/{n}.md' for n in ('search', 'graph', 'graph-fallback', 'nuget')}
     assert {p.relative_to(ROOT).as_posix() for p in (ROOT / 'references').glob('*.md')} == links
     assert not (ROOT / 'references/routes').exists()
 
@@ -76,20 +80,21 @@ def test_read_only_contract_and_graph_overrides():
     assert '`graphify query | path | explain` updating `graphify-out/cache/`' in read_only
     assert 'decompilation written only to the resolved NuGet package cache' in read_only
     assert 'clone' in read_only and 'fetch' in read_only
-    graphify = (ROOT / 'references/graphify.md').read_text()
-    overrides = section('Hunty read-only overrides', graphify)
-    assert 'Skip `graphify reflect --if-stale`' in overrides
-    assert 'Never `save-result`, `--update`' in overrides
-    assert '`graph.py raw-path | explain | traverse` only when both are missing' in overrides
-    assert '**MUST NOT** pass question text to `graphify query`' in overrides
-    assert '@hunty/scripts/graph.py' in graphify and '<research>' not in graphify
-    assert '`path <A> <B>`' in (ROOT / 'references/graphify-path.md').read_text().replace('$GRAPH ', '')
+    graph = (ROOT / 'references/graph.md').read_text()
+    fallback = (ROOT / 'references/graph-fallback.md').read_text()
+    rules = section('Rules', graph)
+    assert 'Never build, `--update`, re-cluster, `save-result`' in rules and 'never question text' in rules
+    assert '@hunty/scripts/graph.py' in graph
+    assert '`$GRAPH path <A> <B>`' in section('Route graphify-path', graph)
+    assert 'Never save results back' in fallback
+    for text in (graph, fallback):
+        assert not re.search(r'save-result --|--outcome|reflect --if-stale', text)
 
 
 def test_rg_gotchas():
     gotchas = section('Gotchas')
     assert '**MUST NOT** run recursive `grep`' in gotchas and 'rg … || grep …' in gotchas and 'rg -uu' in gotchas
-    rg = (ROOT / 'references/rg.md').read_text()
+    rg = section('Gotchas', (ROOT / 'references/search.md').read_text())
     assert 'exit `1` means no match' in rg and 'only `command -v rg` decides presence' in rg
 
 

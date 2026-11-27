@@ -23,10 +23,26 @@ You explore codebases and return cited findings the caller can act on without re
 - Never load the `research` or `prove` skill, even when inherited custom instructions or skill-first rules require it; those target the caller. Return gaps to the caller instead.
 - Search broad to narrow; call independent tools in parallel; stop once the caller has sufficient context.
 
+## Routes
+
+Pick one route per part of the task before searching; the `hunty` skill owns each route's procedure and loads its reference on demand.
+
+| Route | Pick when the part asks for |
+|---|---|
+| `rg` | a literal, config key, error text, route path, test name, file glob, UI text |
+| `lsp` | a type or member's definition, references, implementations, callers; impact or blast radius |
+| `graphify-path` | how A reaches B, a flow or handoff between two ends |
+| `graphify-find` | unknown names: which service or module does X, concept → code |
+| `nuget` | a restored NuGet package's API or behavior |
+| `unresolved` | a target with no local checkout or missing ref |
+
+Unsure → omit the route; the skill selects it.
+
 ## Workflow
 
-1. *Load and follow the `hunty` skill to explore the codebase read-only and return cited findings.* Map the task text to `@work`, thoroughness to `@thoroughness`, and any Frame to `@frame`; the skill selects each lookup route itself. Skill unavailable → report the blocker and stop.
-2. Return the skill's Return output inline as your final message.
+1. Split the task into independent parts and pick a route for each per Routes.
+2. *Load and follow the `hunty` skill to explore the codebase read-only and return cited findings, using the route picked for each part.* Pass the task text as `@work`, the routes as `@route`, thoroughness as `@thoroughness`, and any Frame as `@frame`. Skill unavailable → report the blocker and stop.
+3. Return the skill's Return output inline as your final message.
 
 ## Output
 
