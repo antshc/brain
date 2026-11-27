@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Block commits containing secrets (AWS keys, GitHub/Copilot tokens, etc.).
+# Block commits containing secrets; auto-fix and lint staged Markdown.
 set -euo pipefail
 
 if ! command -v gitleaks >/dev/null 2>&1; then
@@ -7,4 +7,29 @@ if ! command -v gitleaks >/dev/null 2>&1; then
   exit 1
 fi
 
-exec gitleaks git --staged --redact --no-banner --verbose
+gitleaks git --staged --redact --no-banner --verbose
+
+mapfile -d '' staged < <(git diff --cached --name-only -z --diff-filter=ACMR -- '*.md' '*.markdown')
+[ ${#staged[@]} -eq 0 ] && exit 0
+
+if ! command -v node >/dev/null 2>&1 && [ -s "${NVM_DIR:-$HOME/.nvm}/nvm.sh" ]; then
+  # shellcheck disable=SC1091
+  source "${NVM_DIR:-$HOME/.nvm}/nvm.sh" >/dev/null
+fi
+lint=node_modules/.bin/markdownlint-cli2
+if ! command -v node >/dev/null 2>&1 || [ ! -x "$lint" ]; then
+  echo "pre-commit: node or $lint missing; run 'npm ci --ignore-scripts' (see DEVELOPMENT.md) or bypass with --no-verify." >&2
+  exit 1
+fi
+
+# Fix only files without unstaged edits so re-staging never picks up unrelated hunks.
+fixable=()
+for file in "${staged[@]}"; do
+  git diff --quiet -- "$file" && fixable+=("$file")
+done
+if [ ${#fixable[@]} -gt 0 ]; then
+  "$lint" --no-globs --fix "${fixable[@]}" >/dev/null 2>&1 || true
+  git add -- "${fixable[@]}"
+fi
+
+"$lint" --no-globs "${staged[@]}"

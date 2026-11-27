@@ -10,7 +10,7 @@ git config core.hooksPath .githooks
 
 ### pre-commit
 
-Runs [gitleaks](https://github.com/gitleaks/gitleaks) on staged changes and blocks commits containing secrets (AWS keys, GitHub/Copilot tokens, Atlassian tokens, private keys, etc.). Install gitleaks once:
+Runs [gitleaks](https://github.com/gitleaks/gitleaks) on staged changes and blocks commits containing secrets (AWS keys, GitHub/Copilot tokens, Atlassian tokens, private keys, etc.). Then runs `markdownlint-cli2 --fix` on staged Markdown, re-stages the fixes, and blocks the commit on remaining errors; files that also have unstaged edits are linted but not auto-fixed. Requires `npm ci --ignore-scripts` (Node via `PATH` or nvm). Install gitleaks once:
 
 ```bash
 v=8.30.1; curl -sSfL "https://github.com/gitleaks/gitleaks/releases/download/v$v/gitleaks_${v}_linux_x64.tar.gz" | tar -xz -C ~/.local/bin gitleaks

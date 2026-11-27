@@ -51,7 +51,7 @@ def test_targets_cover_deployables_multi_repo_and_missing_checkouts():
 
 
 def test_terminal_search_and_nuget_rules():
-    search = section('Terminal search')
+    search = section('Shell search')
     assert 'rg -uu' in search and 'exit `1` = no match' in search
     assert '**MUST NOT** run recursive `grep`' in search and 'rg … || grep …' in search
     nuget = section('NuGet')

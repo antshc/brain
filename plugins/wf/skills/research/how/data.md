@@ -13,8 +13,8 @@ How report Visualize chooses the view. Supply access-order, ownership, shape, an
 1. **Frame** — name the decision the data has to support. "Can two checkouts reserve the same seat?" beats "how is the booking table modeled?".
 2. **Inventory the stores** — read the table/collection/schema definitions out of IaC, migrations, and config: keys, indexes, streams, expiry settings, and the binding naming the real resource, account, and region.
 3. **Collect access patterns before judging keys** — enumerate every read and every write from their call sites, each with its filter, sort, and expected result count, pagination, and serving key or index. Keys are judged against this list; a key justified by nothing on it is dead weight, and a pattern served by no key is served by a scan.
-4. **Attribute every write to its writer** — find-references on the store binding and the grant that permits the write, across every repo that could hold one.
-5. **Read the shape off the write path** — the persisted attribute set is whatever the serializer emits, which drifts from what the model class declares: ignored members, custom converters, nulls dropped on write, and older items written by older code.
+4. **Attribute every write to its writer** — call sites and grants per the `codebase` agent's Data hints.
+5. **Read the shape off the write path** — the serializer's output per the `codebase` agent's Data hints, not the model class.
 6. **Settle each dimension** — Schemas, Ownership, Consistency, Migrations, Concurrency, Retention. Each section below names what to establish and the failure it catches.
 7. **Run a runtime check when static reading leaves a material claim open** — use Inspection evidence runtime rules. Read a real item or inspect a query plan when authorized. Use a safe test target for concurrent writes.
 
@@ -30,7 +30,7 @@ Establish, per store: **single-table** (several item types in one store, told ap
 
 A key design is only ever right relative to the access patterns, so record the patterns beside it. **A pattern served by a full scan or a post-fetch filter is a finding, not a design** — say which pattern, how much it reads, and what key or index would serve it.
 
-*Where it hides:* IaC key/index definitions and migration files · entity or item classes and their serialization attributes · query call sites, which reveal the pattern the keys were shaped for · the ORM or mapper configuration.
+*Where it hides:* the `codebase` agent's Data hints.
 
 ## Ownership
 

@@ -9,6 +9,8 @@ Spawn the `codebase` agent for every codebase lookup; if the spawn fails, record
 - Task — the filled explorer prompt, or a bounded question starting with the lookup's prefix below (`Exact literal X` / `Symbol Type.Member` when applicable). Name the deployable or repository targets as stated and the return shape: the explorer prompt's Evidence return, or cited `file:line` findings and gaps for a bounded follow-up. A Flow request names both ends in user or code words. Preserve literal and symbol spelling.
 - Thoroughness — `thorough` for explorer prompts; `medium` for bounded follow-ups unless the gap needs variants.
 
+The `codebase` agent's Task prefixes define how each prefix is searched; pick it here.
+
 | Lookup | Task prefix |
 |---|---|
 | Flow: handoffs, next handler, deployables a message crosses | `Flow from <A> to <B>:` |
@@ -22,10 +24,10 @@ For restored package evidence, name the package, version, and type or member in 
 
 ## Evidence checks
 
-- Trace the executing path and its selected provider or binding. A test exercising that path supports its own setup and outcome. Repo docs, comments, and PR descriptions establish intent. Record mismatches. Inspect IaC and migrations for deployed bindings and storage behavior. Use serializers and mappers to establish the written shape.
-- Distinguish **facts** with decisive citations, **assumptions** with a way to verify them, and **unknowns** with exact next checks. Derive the answer from confirmed facts and state what unresolved evidence could change it.
-- Trace the real implementation when a flag, profile, or environment substitutes a mock, stub, emulator, or recorded response. Identify the actual environment before making consistency, lag, or expiry claims.
+- The `codebase` agent applies its Evidence rules (executing source vs intent, test scope, doubles, fact/assumption/unknown labels). Trace the executing path and its selected provider or binding.
+- Derive the answer from confirmed facts and state what unresolved evidence could change it.
+- Identify the actual environment before making consistency, lag, or expiry claims.
 
 ## Runtime checks
 
-Static source establishes possible behavior; runtime selection, ordering, binding, or a live value can change the answer. Delegated `codebase` evidence follows explorer prompt's read-only runtime rules. An instrumented or state-changing probe stays outside `codebase` and runs only when the request authorizes it on a safe target; otherwise record claim, blocker, and exact next check. For a distributed trace, record the correlation ID and observed handoffs. Keep runtime results separate from code-derived possibilities in the report.
+Static source establishes possible behavior; runtime selection, ordering, binding, or a live value can change the answer. Delegated `codebase` evidence follows the agent's read-only runtime rule; the brief states whether runtime checks are authorized and on which target. An instrumented or state-changing probe stays outside `codebase` and runs only when the request authorizes it on a safe target; otherwise record claim, blocker, and exact next check. For a distributed trace, record the correlation ID and observed handoffs. Keep runtime results separate from code-derived possibilities in the report.

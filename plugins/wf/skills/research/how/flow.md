@@ -12,11 +12,7 @@ How report Visualize chooses the view. A flow crossing two or more deployables �
 
 ## Deployable eligibility
 
-A lane is a **deployable**: a unit independently runnable or deployed in production — a process, service, container, function, host workload, or scheduled job that the platform starts on its own.
-
-**Eligibility test** — does production start this unit independently? Yes → it earns a lane. No → it is an artifact, and it belongs inside the lane of whatever executes it.
-
-Upgrade bundles, installers, shell and Python scripts, Ansible playbooks, Helm charts, Terraform modules, SQL migrations, and libraries are **artifacts** unless independently started/deployed; verify the executing unit. Name the executing deployable as the lane and record the artifact as what that lane *does*. A bundle executed by a privileged host agent is one lane — the agent — not two.
+A lane is a **deployable**, classified per the `codebase` agent's deployable rule (Targets and repos). An artifact earns no lane: name the executing deployable as the lane and record the artifact as what that lane *does*. A bundle executed by a privileged host agent is one lane — the agent — not two.
 
 ## Workflow
 
@@ -59,7 +55,7 @@ For internal boundaries, cite both sides. For external boundaries, cite the call
 
 ## Handoff evidence
 
-**Every handoff carries three citations — the emit site, receive site, and binding.** A producer publishing to a topic proves nothing about who consumes it, a consumer subscribing proves nothing about who fills it, and matching names do not prove the same account or region. Until all three are confirmed, record the claimed crossing as an Assumption with the missing evidence named under `What would verify it`. The binding may be Terraform, Bicep, a compose file, or a config key proving both sides address the same real resource.
+**Every handoff carries three citations — emit site, receive site, and binding** — per the `codebase` agent's handoff rule. Until all three are confirmed, record the claimed crossing as an Assumption with the missing evidence named under `What would verify it`.
 
 Guessed topology is the default failure of cross-service tracing, and this rule is what makes it falsifiable.
 
@@ -71,5 +67,5 @@ Correlate an existing request across logs or distributed traces, or issue a requ
 
 - **A lane that appears twice is one lane revisited, not two** — a chain that returns to an earlier deployable is a cycle; record the second crossing as a handoff back to the existing lane number and stop, or the walk never terminates.
 - **An artifact given its own lane invents a deployable that production never starts** — a bundle, script, playbook, or chart shows up in logs and file trees like a participant, so apply the eligibility test before drawing a lane for anything you cannot point at a process for.
-- **A missing sibling in a search index is a gap, not a terminal** — index tools cover only the repositories they were built over, so search the repository directly before classifying the crossing. When emit or receive evidence suggests the sibling exists but the other side or binding remains missing, record an Assumption; when that gap could change chain completeness or the framed answer, also record the consequence as an Unknown.
+- **A missing sibling is a gap, not a terminal** — when emit or receive evidence suggests the sibling exists but the other side or binding remains missing, record an Assumption; when that gap could change chain completeness or the framed answer, also record the consequence as an Unknown.
 - **Too many steps in a chain lane hide an unfinished chain** — one deployable's mechanism can consume the run before downstream boundaries are proved, so keep only 1–5 boundary-relevant major steps and offer a Behavior follow-up after the chain closes.

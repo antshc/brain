@@ -15,10 +15,10 @@ How report Visualize chooses the view from the question. Supply confirmed conver
 1. **Frame** — name the capability, feature, functional slice, actor, action, object, trigger(s), and exact behavior in domain language. "When does the system reject an expired session?" beats "how does auth work?".
 2. **Scope** — name the capability, feature, functional slice, actor, object, outcome, and external systems in scope, plus what is explicitly out; keep paths and implementation layers in the technical sections.
 3. **Map surface** — enumerate both ends before tracing either (see Surface map), and say which the question covers.
-4. **Map broad** — grep/semantic-search route tables, command registrations, event subscribers, schedulers, and container/provider registrations for candidate triggers. Collect candidates before reading any of them deeply.
+4. **Map broad** — collect candidate triggers per the `codebase` agent's Search Strategy before reading any of them deeply.
 5. **Hypothesize** — write the mechanism as a testable chain (`OrderController.Create` → `OrderService.Place` → `OrdersRepository.Insert`). Each hypothesis names the next thing to confirm.
 6. **Rank by risk** — confirm in this order: does this path actually execute for the framed case (vs. a dead or superseded lookalike) → which triggers reach it, and what each does differently before they converge → which provider actually serves it and what it falls back to (see Providers and fallback) → config/feature-flag branching → error and edge cases → async ordering → performance → naming.
-7. **Trace deep, narrow** — go-to-definition, find-references, call hierarchy along that one chain instead of reading whole files. Drop a branch the moment it is irrelevant.
+7. **Trace deep, narrow** — follow that one chain; drop a branch the moment it is irrelevant.
 8. **Run a runtime check** when static reading can't settle a claim — which branch fires, runtime-computed config, async ordering.
 9. **Record on confirmation** — write each Fact with its citation immediately, and prune the branches it rules out.
 
@@ -36,7 +36,7 @@ A behavior can have many triggers and observable outcomes; tracing one of each a
 
 A behavior may have several providers behind one outcome — picked by config, flag, or tenant tweak, and swapped again when the first fails or answers badly. The first implementation you find is a candidate, not the answer; the provider stays unresolved until selection and fallback both carry citations. Record the outbound call under Observable outcomes and explain why that provider serves it here.
 
-Where the wiring hides: implementations of one interface resolved by factory, keyed registration, or injected collection · separate clients chained by an orchestrator or decorator · fallback in a resilience policy, HTTP handler, or gateway, leaving the call site a single call.
+Where the wiring hides: see the `codebase` agent's Search Strategy. Fallback often leaves the call site a single call.
 
 Cite each finding in place using the How citation format:
 
