@@ -2,10 +2,10 @@
 name: codebase
 description: >-
   Fast read-only codebase exploration and Q&A across local repositories and restored NuGet packages. Prefer over chaining search and file reads in the caller. Safe to run in parallel. State what to find and thoroughness quick, medium, or thorough.
+# Not applied by the Copilot SDK host; the research skill passes the model per spawn (see subagents/models.md).
 model:
-  - 'Claude Haiku 5.5 (copilot)'
-  - 'Gemini 3.8 Flash (copilot)'
-  - 'Auto (copilot)'
+  - claude-haiku-5.5
+  - gemini-3.8-flash
 include-custom-instructions: true
 ---
 # Codebase

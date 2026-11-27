@@ -78,7 +78,7 @@ Wayfinder selects evidence routes internally through Frame, Routing and Spawning
 
 ## Spawning agents
 
-**`codebase`** (registered wf agent): spawn agent type `codebase` (namespaced, e.g. `wf:codebase`, where the runtime requires) with the lookup task, the question's Frame, and thoroughness as its task; `codebase` as `name`; a concise description without a `codebase:` prefix. Skip model selection and the guard line. Spawn unavailable → report the blocked lookup with its consequence; continue independent work.
+**`codebase`** (registered wf agent): spawn agent type `codebase` (namespaced, e.g. `wf:codebase`, where the runtime requires) with the lookup task, the question's Frame, and thoroughness as its task; `codebase` as `name`; a concise description without a `codebase:` prefix. *Load and follow the `subagents` skill to select the model and effort for a named subagent role* with role `codebase`, and pass the result as `model` and `reasoning_effort`: the runtime does not apply the agent's frontmatter model, so omitting them runs it on the parent model. Skip the guard line. Spawn unavailable → report the blocked lookup with its consequence; continue independent work.
 
 Other route workers are roles prompted by a playbook section; playbook text *spawn `<name>`* means this recipe; use `<name>` only as the role and display name, never as agent type or `agentName`.
 

@@ -2,7 +2,7 @@
 
 Model per subagent role. Value format: `<model> <effort>`; pass the model as `model` and the effort as `reasoning_effort`. A value of `inherit-parent` or `auto` runs the role on the parent chat model (omit `model` and `reasoning_effort`); alias entries in a panel list still count toward its fan-out. Use **Fallback** when **Value** is empty or rejected. Edit **Value** to retune.
 
-For `architect runners`, the ordered list is a model pool; Arena selects seats per its Frame procedure. Other roles keep their existing fan-out. `whyy` and `weby` are research route roles; only the `research` skill spawns them. The registered `codebase` agent declares its model preference in its frontmatter; it has no role here. `prover` is the prove worker; only the `prove` skill spawns it.
+For `architect runners`, the ordered list is a model pool; Arena selects seats per its Frame procedure. Other roles keep their existing fan-out. `whyy` and `weby` are research route roles; only the `research` skill spawns them. The registered `codebase` agent's frontmatter `model` is not applied by the runtime (it inherits the parent model), so it has the `codebase` role below. `prover` is the prove worker; only the `prove` skill spawns it.
 
 | Role | Value | Fallback |
 |---|---|---|
@@ -12,3 +12,4 @@ For `architect runners`, the ordered list is a model pool; Arena selects seats p
 | prover | claude-opus-5.5 medium | gpt-6-sol medium |
 | whyy | claude-sonnet-5.5 high | claude-sonnet-5 high |
 | weby | gpt-6-luna low | claude-haiku-5.5 high |
+| codebase | claude-haiku-5.5 medium | gemini-3.8-flash medium |
