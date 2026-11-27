@@ -6,19 +6,8 @@ Apply proof checks relevant to the assigned angle at How’s selected depth. Beh
 
 Spawn the `codebase` agent for every codebase lookup; if the spawn fails, record the blocked evidence request and continue independent work. Sequence dependent lookups. Use the filled explorer prompt for system evidence and bounded requests for gaps. Fill the `codebase` task:
 
-- Task — the filled explorer prompt, or a bounded question starting with the lookup's prefix below (`Exact literal X` / `Symbol Type.Member` when applicable). Name the deployable or repository targets as stated and the return shape: the explorer prompt's Evidence return, or cited `file:line` findings and gaps for a bounded follow-up. A Flow request names both ends in user or code words. Preserve literal and symbol spelling.
+- Task — the filled explorer prompt, or a bounded natural-language question. Name targets, known symbols or exact literals, flow boundaries, and expected evidence: the explorer prompt's Evidence return, or cited `file:line` findings and gaps for a bounded follow-up. Preserve original spelling; name both flow ends in user or code words.
 - Thoroughness — `thorough` for explorer prompts; `medium` for bounded follow-ups unless the gap needs variants.
-
-The `codebase` agent's Task prefixes define how each prefix is searched; pick it here.
-
-| Lookup | Task prefix |
-|---|---|
-| Flow: handoffs, next handler, deployables a message crosses | `Flow from <A> to <B>:` |
-| Behavior: trigger → executing symbol chain, names unknown | `Names unknown:` |
-| Behavior: known symbol's callers, implementations, double vs real | `Symbol Type.Member:` |
-| Data: writers and readers of an item or store | `Names unknown:` |
-| Isolated symbol or package call site | `Symbol Type.Member:` |
-| Citation line, config key, route path, table or queue name | `Exact literal X:` |
 
 For restored package evidence, name the package, version, and type or member in the task. Confirm the resolved package ID, version, type or member, and the deciding XML or decompiled source. Record missing package evidence as unknown.
 
