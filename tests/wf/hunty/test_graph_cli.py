@@ -6,7 +6,7 @@ from pathlib import Path
 
 import pytest
 
-SCRIPTS = Path(__file__).resolve().parents[3] / 'plugins/wf/skills/research/scripts'
+SCRIPTS = Path(__file__).resolve().parents[3] / 'plugins/wf/skills/hunty/scripts'
 sys.path.insert(0, str(SCRIPTS))
 
 import graph  # noqa: E402

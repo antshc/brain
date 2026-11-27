@@ -4,7 +4,7 @@ Everyday workflow automation skills that carry an Initiative from an open-ended 
 
 [Design](skills/design/SKILL.md) keeps Spec, Task, and Wayfinder operations in separate sections of a shared [GitHub reference](skills/design/references/github.md). [The WF installer](install/install.md) sets up baseline labels, including a labels-only repair mode. Spec and task publishing can explicitly fall back to local Markdown, reporting offline or partial publication rather than GitHub success. [research](skills/research/SKILL.md) and [architecture-records](skills/architecture-records/SKILL.md) initialization remain local-document workflows. Other skills' Jira metadata and workflows are unchanged.
 
-[subagents](skills/subagents/SKILL.md) selects the model and effort for named roles and ordered panels, and runs Arena comparisons. [research](skills/research/SKILL.md) is a router: Wayfinder (chart/resume research maps; `/research wayfinder <prompt-or-map-path>`), Explore (lookups; `hunty` verdicts inline), How (discovery, tracing, explanation; `hunty`, `explainy`), Why (`whyy`, `composy`), Cloud (`cloudy`), and Web (`weby`). Route agents are prompt files only Research spawns. The request is the only input; reports save to the session workspace with links, or to a location the request names.
+[subagents](skills/subagents/SKILL.md) selects the model and effort for named roles and ordered panels, and runs Arena comparisons. [research](skills/research/SKILL.md) is a router: Wayfinder (chart/resume research maps; `/research wayfinder <prompt-or-map-path>`), How (discovery, tracing, explanation; `hunty`, `explainy`), Why (`whyy`, `composy`), Cloud (`cloudy`), and Web (`weby`). Route agents are prompt files only Research spawns, except `hunty`. [hunty](skills/hunty/SKILL.md) is the read-only codebase exploration skill behind the registered [`hunty` agent](agents/hunty.agent.md): it auto-selects lookup routes `rg`, `lsp`, `graphify-path`, `graphify-find`, and `nuget` and returns cited verdicts inline; spawn it for pure lookups. The request is the only input; reports save to the session workspace with links, or to a location the request names.
 
 [`/design grill`](skills/design/SKILL.md) owns session-ledger operations through its [track-ledger reference](skills/design/references/track-ledger.md), including ownership, resumable questions, and pending writes. It loads closing, verification, and external-source procedures on demand from its bundled references. To configure a `grill!` shortcut, point it to `/design grill`.
 
@@ -198,7 +198,7 @@ Diagram examples: [architecture](skills/doc-diagram/examples/architecture.md), [
 
 | Group | Skills |
 |---|---|
-| Discovery and research | `architecture-records` (`define-concept`), `prove`, `challenge-this`, `research` (route agents `hunty`, `explainy`, `whyy`, `composy`, `cloudy`, `weby`) |
+| Discovery and research | `architecture-records` (`define-concept`), `prove`, `challenge-this`, `hunty` (agent `hunty`), `research` (route agents `explainy`, `whyy`, `composy`, `cloudy`, `weby`; spawns `hunty`) |
 | Design and backlog | `design` (`architect`, `sketch`, `deep-module`, `grill`, `hld`, `publish-hld`, `spec`, `tasks`, `wayfinder`, `review`); `factory-mode` Stories playbook (repo-level) |
 | Documentation and drafting | `doc-contracts`, `doc-diagram`, `write`, `architecture-records`, `suggest` |
 | Implementation and tooling | `diagnosing-bugs`, `github`, `implement`, `principles`, `show-me-your-work`, `subagents` |

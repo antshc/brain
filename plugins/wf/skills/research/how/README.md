@@ -22,7 +22,7 @@ Include the details that materially change the investigation:
 - Reports save to the session workspace by default; name a path in the instruction to save elsewhere.
 - Keep one inspection unit per instruction. Split unrelated behaviors, flows, or data boundaries into separate requests.
 
-Research selects depth from the question. An explicit inspection requests full coverage. A supplied Behavior, Flow, or Data axis selects the primary lens. A narrow lookup with no requested document returns `hunty`’s verdict inline. Keep outcome-relevant lens findings in the same answer.
+Research selects depth from the question. An explicit inspection requests full coverage. A supplied Behavior, Flow, or Data axis selects the primary lens. A narrow lookup with no requested document belongs to the `hunty` agent, which returns its verdict inline. Keep outcome-relevant lens findings in the same answer.
 
 ## Behavior instruction examples
 

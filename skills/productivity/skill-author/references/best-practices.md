@@ -242,7 +242,7 @@ When a skill depends on an external tool, API, or platform quirk, add `## Gotcha
 
 Run subagents through prose instructions describing task, scope, inputs, constraints, and expected output. Do not instruct agents to call `runSubagent` directly. Pass context pointers (paths, IDs) rather than duplicated content; pass absolute paths to bundled files.
 
-A brief requiring a skill **MUST** name a skill-capable agent type, `general-purpose`; forbid edits for read-only work. Codebase lookups use the `research` skill's Explore route in the caller's session. Never wrap a skill that spawns workers (`research`, `prove`, `challenge-this`) inside another subagent. Batch many claims into one `prove` call. Plain grep or LSP checks may use the built-in `explore` agent.
+A brief requiring a skill **MUST** name a skill-capable agent type, `general-purpose`; forbid edits for read-only work. Codebase lookups spawn the wf plugin's `hunty` agent; never wrap it in another worker. Never wrap a skill that spawns workers (`research`, `prove`, `challenge-this`) inside another subagent. Batch many claims into one `prove` call. Plain grep or LSP checks may use the built-in `explore` agent.
 
 ## Resources
 

@@ -194,8 +194,8 @@ Run each helper in the Wayfinder session with its default dispatch. **MUST NOT**
 | Prove | *Load and follow the `prove` skill to confirm or refute technical claims by executing tests, runnable prototypes, GUI E2E checks, or cloud experiments* | Prove-owned `prover` worker |
 | Challenge this | Per Risk verification, *Load and follow the `challenge-this` skill to adversarially test a design and report reproducible counterexamples* | Challenge-this-owned |
 | Deep Module | Read the Deep Module playbook registered in the router fully; run it | Design It Twice designers |
-| Code Sketch | Read the Sketch playbook registered in the router fully; run it in Wayfinder context | None; wide lookups via Research Explore |
-| Grill | Read the Grill playbook registered in the router fully; run it | None; lookups via Research Explore |
+| Code Sketch | Read the Sketch playbook registered in the router fully; run it in Wayfinder context | None; wide lookups via the `hunty` agent |
+| Grill | Read the Grill playbook registered in the router fully; run it | None; lookups via the `hunty` agent |
 
 Supply question/scope, pinned checkout/revision, unknown IDs, existing owner, prerequisites, limits, exact outputs and cleanup ownership. Run helpers sequentially. Dependent work waits for integrated prerequisites. Record returned artifacts, findings, coverage, actual worker type/model and new unknowns on the issue/root Result. Wayfinder owns commits/integration. Required worker unavailable → record the blocked request on the owner; continue independent work.
 
@@ -221,7 +221,7 @@ On resume, recover the same pending worktree and approval identity; do not regen
 
 ## Research routing
 
-Automatically select the relevant scope for factual gaps. Codebase lookups use Research Explore; mechanism and inspection questions use How; cloud provider facts use Cloud; external primary-source facts use Web. Historical intent uses Research Why. Missing external checkouts block system evidence; use Web when public documentation suffices.
+Automatically select the relevant scope for factual gaps. Codebase lookups spawn the `hunty` agent; mechanism and inspection questions use How; cloud provider facts use Cloud; external primary-source facts use Web. Historical intent uses Research Why. Missing external checkouts block system evidence; use Web when public documentation suffices.
 
 | Option | Route | Scope |
 |---|---|---|

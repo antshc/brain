@@ -4,10 +4,10 @@ Apply proof checks relevant to the assigned angle at How’s selected depth. Beh
 
 ## Codebase lookups
 
-Spawn `hunty` for every codebase lookup; if the spawn fails, record the blocked evidence request and continue independent work. Sequence dependent lookups. Use the filled explorer prompt for system evidence and bounded requests for gaps. Fill the `hunty` Brief:
+Spawn the `hunty` agent for every codebase lookup; if the spawn fails, record the blocked evidence request and continue independent work. Sequence dependent lookups. Use the filled explorer prompt for system evidence and bounded requests for gaps. Fill the `hunty` Brief:
 
 - `@work` — the filled explorer prompt, or a bounded question starting with the lookup's `@work` prefix below (`Exact literal X` / `Symbol Type.Member` when applicable). Name the deployable or repository targets as stated and the return shape: the explorer prompt's Evidence return, or cited `file:line` findings and gaps for a bounded follow-up. A Flow request names both ends in user or code words. Preserve literal and symbol spelling.
-- `@research` — this skill's absolute base directory.
+- Thoroughness — `thorough` for explorer prompts; `medium` for bounded follow-ups unless the gap needs variants.
 
 | Lookup | `@work` prefix |
 |---|---|
@@ -18,7 +18,7 @@ Spawn `hunty` for every codebase lookup; if the spawn fails, record the blocked 
 | Isolated symbol or package call site | `Symbol Type.Member:` |
 | Citation line, config key, route path, table or queue name | `Exact literal X:` |
 
-`hunty` handles Graphify. For restored package evidence, name the package, version, and type or member in `@work`. Confirm the resolved package ID, version, type or member, and the deciding XML or decompiled source. Record missing package evidence as unknown.
+The `hunty` skill handles Graphify. For restored package evidence, name the package, version, and type or member in `@work`. Confirm the resolved package ID, version, type or member, and the deciding XML or decompiled source. Record missing package evidence as unknown.
 
 ## Evidence checks
 

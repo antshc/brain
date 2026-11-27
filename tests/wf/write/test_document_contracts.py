@@ -1,4 +1,5 @@
 from pathlib import Path
+import re
 
 import pytest
 
@@ -94,6 +95,6 @@ def test_investigation_supplies_evidence_and_retains_delivery():
     living = (SKILLS / "research/wayfinder/living-document.md").read_text()
     assert "`write` skill to write research reports" in router
     assert "Only the router writes reports" in router
-    assert "Explore stays inline and bypasses report rendering" in router
+    assert not re.search(r"\bExplore\b", router)
     assert "`research update`" in living
     assert "`write` skill" in living

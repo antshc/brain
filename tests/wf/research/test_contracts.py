@@ -17,8 +17,9 @@ INSPECTION = (ROOT / 'how/inspection.md').read_text()
 REPORT = (ROOT / 'how/report.md').read_text()
 PROMPT = (ROOT / 'how/explorer-prompt.md').read_text()
 EXPLAINER = (ROOT / 'agents/explainy.md').read_text()
-AGENTS = ('hunty', 'explainy', 'whyy', 'composy', 'cloudy', 'weby')
-ROUTES = {'Wayfinder': ('wayfinder/wayfinder.md', ()), 'Explore': ('explore/explore.md', ('hunty',)), 'How': ('how/how.md', ('hunty', 'explainy')), 'Why': ('why/why.md', ('whyy', 'composy')),
+AGENTS = ('explainy', 'whyy', 'composy', 'cloudy', 'weby')
+HUNTY_AGENT = REPO / 'plugins/wf/agents/hunty.agent.md'
+ROUTES = {'Wayfinder': ('wayfinder/wayfinder.md', ()), 'How': ('how/how.md', ('hunty', 'explainy')), 'Why': ('why/why.md', ('whyy', 'composy')),
           'Cloud': ('cloud/cloud.md', ('cloudy',)), 'Web': ('web/web.md', ('weby',))}
 
 
@@ -34,13 +35,9 @@ def local_markdown_links(path: Path) -> set[Path]:
 def test_inspection_lookup_prefixes_and_slim_hunty_brief():
     table = INSPECTION.split('| Lookup | `@work` prefix |')[1].split('\n\n')[0]
     assert table.strip().splitlines()[1:]
-    hunty = (ROOT / 'agents/hunty.md').read_text()
-    assert set(re.findall(r'^- `(@\w+)`', hunty.split('## Brief')[1].split('\n## ')[0], re.M)) == {'@work', '@frame', '@research'}
-    for removed in ('@depth', '@shape', '@target', '@outputShape', '@inputs'):
-        assert removed not in hunty, removed
+    assert '@research' not in INSPECTION
     for path in ROOT.rglob('*.md'):
         assert '@shape' not in path.read_text(), path.relative_to(ROOT)
-    assert 'Always explore thoroughly' in hunty
 
 
 def test_report_is_separate_from_the_how_procedure():
@@ -71,7 +68,8 @@ def test_agent_prompts_never_nest_and_have_model_roles():
         assert not prompt.startswith('---'), agent
         assert 'Never spawn subagents or call the agent-launch tool. Never load the `research` or `prove` skill' in prompt, agent
         assert f'| {agent} |' in models, agent
-    assert 'Only this skill spawns research agents' in ENTRY
+    assert 'Only this skill spawns its prompt-file route agents' in ENTRY
+    assert '| hunty |' not in models
     assert '*Load and follow the `subagents` skill to select the model and effort for a named subagent role*' in ENTRY
 
 
@@ -113,7 +111,7 @@ def test_request_is_the_only_input_and_reports_default_to_the_session():
     assert '`<session>/files/research/<question-slug>.md`' in delivery
     assert 'Return only the report pointers, never the findings inline' in delivery
     assert 'read each in full before using its findings' in delivery
-    assert '- Explore → return `hunty` verdicts inline' in delivery
+    assert 'Explore' not in delivery
     assert 'Request names a location → save there instead' in delivery
 
 
@@ -167,25 +165,26 @@ def test_how_eval_cases_cover_evidence_and_delivery_failures():
     assert all(case['request'] and case['checks'] for case in cases)
 
 
-def test_explore_route_returns_hunty_verdicts_inline():
-    explore = (ROOT / 'explore/explore.md').read_text()
-    assert 'Spawn one `hunty` per lookup' in explore
-    assert 'No explanation report, no file' in explore
-    assert 'unabridged' in explore
-    assert 'Size follows the question, not a length limit' in (ROOT / 'agents/hunty.md').read_text()
-    assert '- Explore → return `hunty` verdicts inline to the requester; no file.' in ENTRY
-    assert 'using the Explore route' in (SKILLS / 'design/playbooks/grill.md').read_text()
+def test_lookups_bypass_research_through_the_registered_hunty_agent():
+    assert not (ROOT / 'explore').exists() and not (ROOT / 'agents/hunty.md').exists()
+    assert not re.search(r'\bExplore\b', ENTRY.split('## Routing')[1].split('\n## ')[0])
+    assert 'is not a Research route: spawn the `hunty` agent' in ENTRY
+    assert HUNTY_AGENT.is_file()
+    for caller in ('design/playbooks/grill.md', 'design/playbooks/sketch.md', 'design/playbooks/wayfinder.md', 'review/playbooks/hitl.md'):
+        text = (SKILLS / caller).read_text()
+        assert '`hunty` agent' in text and 'Explore route' not in text and 'Research Explore' not in text, caller
 
 
 def test_playbooks_spawn_only_bundled_prompt_agents_through_the_recipe():
     spawning = ENTRY.split('## Spawning agents')[1].split('\n## ')[0]
     assert 'never a registered agent' in spawning
+    assert '**`hunty`** is the wf plugin\'s registered agent' in spawning
     assert 'never an agent type or `agentName`; use it only as the spawn\'s display name' in spawning
     assert 'Read `agents/<name>.md` in full' in spawning
     for path in ROOT.rglob('*.md'):
         for name in re.findall(r'[Ss]pawn(?:s| one)? `([a-z]+)`', path.read_text()):
-            assert (ROOT / f'agents/{name}.md').is_file(), (path.relative_to(ROOT), name)
-    assert not list((REPO / 'plugins/wf/agents').glob('hunt*'))
+            assert name == 'hunty' or (ROOT / f'agents/{name}.md').is_file(), (path.relative_to(ROOT), name)
+    assert [p.name for p in (REPO / 'plugins/wf/agents').glob('hunt*')] == ['hunty.agent.md']
 
 
 def test_long_research_resources_open_with_contents():

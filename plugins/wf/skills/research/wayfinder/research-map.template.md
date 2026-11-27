@@ -66,7 +66,7 @@ Use `wayfinder:research` for a sharp factual question; `wayfinder:experiment` fo
 
 ## Research scope
 
-<research only: Explore | How | Why | Cloud | Web; target, version, lens where applicable>
+<research only: Lookup (hunty) | How | Why | Cloud | Web; target, version, lens where applicable>
 
 ## Blocked by
 

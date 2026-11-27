@@ -17,17 +17,17 @@ Fill the placeholders; pass the brief verbatim as `@work` in the `hunty` Brief; 
 
 ## Collect evidence
 
-Resolve targets/revisions and read contracts first using `hunty`'s procedure. Discover relevant deployables, functional slices, triggers, candidate paths, and boundaries before deep tracing when ownership is unknown. A deployable is independently started/deployed; a library, script, chart, or bundle belongs to its executing unit unless independently started. Cite startup/deployment proof; mark unresolved classifications.
+Resolve targets/revisions and read contracts first using the `hunty` skill's procedure. Discover relevant deployables, functional slices, triggers, candidate paths, and boundaries before deep tracing when ownership is unknown. A deployable is independently started/deployed; a library, script, chart, or bundle belongs to its executing unit unless independently started. Cite startup/deployment proof; mark unresolved classifications.
 
 Trace the actual executing path from trigger to observable outcome. Confirm registration, selected implementation, provider/fallback, configuration/flags, data transformations, and relevant failures/retries/async paths. Apply supplied proof checks only to steps needed to settle this question; deepen where the outcome depends on it, not through unrelated methods.
 
-For impact grounding, take the changed symbols or contracts, reviewed checkout/revision or dirty state, and any endpoint pairs from the assigned angle. Apply Hunty's impact and directed path tactics where applicable. Check source relationships the graph may omit, including configuration, event subscriptions, and wire or data contracts. Carry the dependency evidence below into the report draft.
+For impact grounding, take the changed symbols or contracts, reviewed checkout/revision or dirty state, and any endpoint pairs from the assigned angle. Use the impact and `graphify-path` tactics from the `hunty` skill where applicable. Check source relationships the graph may omit, including configuration, event subscriptions, and wire or data contracts. Carry the dependency evidence below into the report draft.
 
 For each internal handoff, establish sender, wire contract, receiver, and deployment/config binding. Matching names are insufficient. Continue into accessible source across repositories while its behavior affects the scoped outcome. Stop at a proven external terminal or explicit scope boundary with the integration contract and reason. Inaccessible source ends source coverage, not downstream behavior proof. A missing sender/receiver/binding remains an unconfirmed crossing. Record cycles as revisits, not new deployables.
 
-Resolve decisive C# dependency behavior through `hunty`'s NuGet tactic, including the restored package version, assembly/TFM, and exact member. XML documents intent; source or decompiled implementation establishes execution. Missing restore/source/tools → name the gap; do not guess version or behavior. Keep searches bounded to resolved targets and package cache.
+Resolve decisive C# dependency behavior through the `hunty` skill's `nuget` route, including the restored package version, assembly/TFM, and exact member. XML documents intent; source or decompiled implementation establishes execution. Missing restore/source/tools → name the gap; do not guess version or behavior. Keep searches bounded to resolved targets and package cache.
 
-Stay read-only under `hunty`'s rules. If static evidence leaves a deciding runtime claim open, use only authorized read-only checks on a safe target. Record command/query, environment, and observation. Mutation, unavailable access, or unsafe target → report claim, consequence, blocker, and exact next check.
+Stay read-only under the `hunty` skill's Read-only contract. If static evidence leaves a deciding runtime claim open, use only authorized read-only checks on a safe target. Record command/query, environment, and observation. Mutation, unavailable access, or unsafe target → report claim, consequence, blocker, and exact next check.
 
 Cite decisive source lines in place. Separate executing source, documented intent, runtime observations, assumptions, and unknowns. Support non-obvious behavior with evidence; historical motivation without evidence is a Why question. Return evidence inline, not a user-facing report or diagram.
 

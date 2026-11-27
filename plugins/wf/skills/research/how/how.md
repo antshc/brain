@@ -1,6 +1,6 @@
 # How
 
-Route procedure for current-system research: frame → discover → trace → verify → explain → deliver. Spawns `hunty` for evidence and `explainy` for Detailed/Full explanations. Graphify and NuGet are `hunty` tactics.
+Route procedure for current-system research: frame → discover → trace → verify → explain → deliver. Spawns the registered `hunty` agent for evidence and `explainy` for Detailed/Full explanations. Graphify and NuGet are `hunty` skill tactics.
 
 ## Conditional resources
 
@@ -13,8 +13,6 @@ Read triggered resources in full; pass the ones a worker needs as absolute paths
 | Checks one deployable's triggers, implementation, outcomes | `how/behavior.md` |
 | Checks cross-deployable handoffs/contracts/terminals | `how/flow.md` |
 | Checks data shape, keys, ownership, consistency, migration, concurrency, retention | `how/data.md` |
-| Restored NuGet API/implementation evidence | `how/nuget.md` (`hunty` loads it) |
-| Relationship, impact, or direct graph query/path/explain | `how/graphify.md` (`hunty` loads it) |
 | Caller needs system question examples | `how/README.md` |
 
 ## Workflow
@@ -30,7 +28,7 @@ Read triggered resources in full; pass the ones a worker needs as absolute paths
 
 ## Evidence rules
 
-The router's Frame owns target resolution, contract discovery, and graph coverage (including worktree → main checkout); pass it as `@frame` in every `hunty` Brief. `hunty` owns the target checkout's own contracts, Graphify, NuGet, and read-only enforcement; do not duplicate them in briefs. Repository evidence comes only from local checkouts; report missing checkouts/refs as blockers, without remote lookup, clone, or fetch. The router owns splitting; require neither multiple workers nor fixed models. Stop when the framed question is answered; leave unrelated branches unexplored.
+The router's Frame owns target resolution, contract discovery, and graph coverage (including worktree → main checkout); pass it as `@frame` in every `hunty` Brief. The `hunty` agent and skill own the target checkout's own contracts, Graphify, NuGet, and read-only enforcement; do not duplicate them in briefs. Repository evidence comes only from local checkouts; report missing checkouts/refs as blockers, without remote lookup, clone, or fetch. The router owns splitting; require neither multiple workers nor fixed models. Stop when the framed question is answered; leave unrelated branches unexplored.
 
 Graph build, update, or export requests → report the build entry point named in `<root>/GRAPHIFY.md`; never build.
 

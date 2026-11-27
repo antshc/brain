@@ -22,7 +22,7 @@ def test_subagents_owns_model_selection_and_arena():
 
 def test_research_preserves_why_and_routes_system_evidence_to_hunty():
     skill = (SKILLS / "research/SKILL.md").read_text()
-    for reference in ("how/how.md", "how/explorer-prompt.md", "agents/explainy.md", "agents/hunty.md",
+    for reference in ("how/how.md", "how/explorer-prompt.md", "agents/explainy.md",
                       "why/why.md", "why/sources/atlassian.md"):
         assert f"]({reference})" in skill
         assert (SKILLS / "research" / reference).is_file()

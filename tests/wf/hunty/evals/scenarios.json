@@ -10,7 +10,7 @@
     "{{packageMember}}": "member owned by a package restored in the local eval checkout"
   },
   "commonChecks": [
-    "runs the Brief in one hunty worker without loading research or spawning subagents",
+    "runs the Brief in one hunty agent without loading research or spawning subagents",
     "verdict first line matches routeLinePattern and equals expectedRoute",
     "no recursive grep (-r, -R, find -exec grep, xargs grep, rg ... || grep ...)",
     "no rg install while command -v rg resolves",
@@ -72,7 +72,7 @@
       "excludedTools": [],
       "expectedRoute": "nuget",
       "checks": [
-        "hunty loads the NuGet tactic",
+        "hunty reads references/nuget.md",
         "verdict cites restored package ID and version, assembly/TFM, and XML documentation or decompiled implementation",
         "decompilation, if needed, stays in the resolved NuGet package cache"
       ]

@@ -1,11 +1,12 @@
 # Graphify search: query, affected, path, explain
 
-How tactic (`hunty`) for searching an existing `graphify-out/` graph; searching only, never building. The graph root is always the harness root (`git rev-parse --show-toplevel` from the launch folder): the only graph is `<root>/graphify-out/`. Run from there, never from a `workspace/<repo>` checkout or a git worktree, and never probe those for their own `graphify-out/`; indexed repositories sit under `<root>/workspace/<repo>`. Default to the focused search script; the `graphify query` CLI and inline NetworkX traversal are fallbacks.
+Hunty graph reference for searching an existing `graphify-out/` graph; searching only, never building. The graph root is always the harness root (`git rev-parse --show-toplevel` from the launch folder): the only graph is `<root>/graphify-out/`. Run from there, never from a `workspace/<repo>` checkout or a git worktree, and never probe those for their own `graphify-out/`; indexed repositories sit under `<root>/workspace/<repo>`. Default to the focused search script; the `graphify query` CLI and inline NetworkX traversal are fallbacks.
 
 Building, updating, or exporting a graph is project-owned: `GRAPHIFY.md` names the build entry point. Never build, `--update`, or re-cluster from here.
 
 ## Contents
 
+- Hunty read-only overrides
 - Query health and intent preflight
 - Focused search (default)
 - Reverse dependencies
@@ -13,6 +14,19 @@ Building, updating, or exporting a graph is project-owned: `GRAPHIFY.md` names t
 - Path between two nodes
 - Explain one node
 - Gotchas
+
+## Hunty read-only overrides
+
+These override every later section:
+
+- Read `<graph root>/GRAPHIFY.md` in full when present before the first graph command.
+- Run `$GRAPH` commands from the graph root with the interpreter in `graphify-out/.graphify_python`, else `python3`.
+- Skip `graphify reflect --if-stale`; read `graphify-out/reflections/LESSONS.md` if present.
+- Never `save-result`, `--update`, add, watch, export, feedback, or rebuild; skip every save-back and work-memory step below.
+- Fallbacks: `graphify path | explain` CLI only when the focused commands cannot run; `graph.py raw-path | explain | traverse` only when both are missing.
+- Worktree target → translate graph paths from `@mainCheckout/…` to `@worktreeRoot/…` before reading source.
+- Record graph freshness and target coverage separately from the reviewed checkout's revision or dirty state. Stale or revision-mismatched graphs supply candidates only. Record material gaps and their consequences.
+- **MUST NOT** pass question text to `graphify query` or `$GRAPH query`; pass 1-2 identifier terms. `$GRAPH terms` takes the question.
 
 Two traversal modes - choose based on the question:
 
@@ -53,10 +67,10 @@ If it fails, report the missing graph and the build entry point named in `GRAPHI
 
 ## Focused search (default)
 
-`scripts/graph.py` (research skill base directory) is the single read-only entry point for every graph operation below; it writes nothing. Run it from the graph root with the graphify interpreter:
+`scripts/graph.py` (hunty skill base directory) is the single read-only entry point for every graph operation below; it writes nothing. Run it from the graph root with the graphify interpreter:
 
 ```bash
-GRAPH="$(cat graphify-out/.graphify_python 2>/dev/null || echo python3) <research>/scripts/graph.py"
+GRAPH="$(cat graphify-out/.graphify_python 2>/dev/null || echo python3) @hunty/scripts/graph.py"
 $GRAPH --help
 ```
 
@@ -95,7 +109,7 @@ Exit `5` lists ambiguous matches with IDs. Retry with a qualified symbol or exac
 $GRAPH slice OrderService --direction in --depth 1
 ```
 
-For a missing or stale graph, unresolved or empty results, or incomplete evidence, continue with LSP and targeted source searches. Record commands or skip reasons, source citations, and remaining coverage gaps. Keep review queries read-only under Hunty's rules.
+For a missing or stale graph, unresolved or empty results, or incomplete evidence, continue with LSP and targeted source searches. Record commands or skip reasons, source citations, and remaining coverage gaps. Keep review queries read-only under the Hunty read-only overrides.
 
 ## CLI fallback: constrained query expansion and traversal
 
@@ -251,6 +265,6 @@ $(cat graphify-out/.graphify_python) -m graphify save-result --question "Explain
 
 ## Gotchas
 
-- `graph.py` focused commands need `graphifyy` and `networkx`; fallback commands need neither. Before first run, read `scripts/requirements.txt` (research skill base directory) in full.
-- `ModuleNotFoundError` for `graphify`/`networkx` in the chosen interpreter → install with that interpreter: `<python> -m pip install -r <research>/scripts/requirements.txt`; rerun. Skip install when imports succeed.
+- `graph.py` focused commands need `graphifyy` and `networkx`; fallback commands need neither. Before first run, read `scripts/requirements.txt` (hunty skill base directory) in full.
+- `ModuleNotFoundError` for `graphify`/`networkx` in the chosen interpreter → install with that interpreter: `<python> -m pip install -r @hunty/scripts/requirements.txt`; rerun. Skip install when imports succeed.
 - Install only requirements.txt; **MUST NOT** upgrade or unpin versions.

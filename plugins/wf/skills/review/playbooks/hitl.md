@@ -143,7 +143,7 @@ On approval (1 or 2): follow [Posting](../references/posting.md#hitl), with `FIL
 Answers a code question; never drafts or posts.
 
 1. **Research:** check `@findingsFile` first; answer from matching facts. Otherwise pick the route below and *Load and follow the `research` skill to investigate technical questions across source code via codebase navigation and return cited findings* on the checked-out PR head. The request names the route (`Route: <route>`) and holds the question, `OWNER/REPO#PR_NUMBER`, `DIFF_DIR`, `MANIFEST`, and relevant architecture docs when loaded. Require `path:line` evidence per fact; list unverified items as unconfirmed.
-   - **Lookup** — where is X, who calls Y, what does Z return: `Route: Explore`; no document; `hunty` verdicts return inline.
+   - **Lookup** — where is X, who calls Y, what does Z return: instead of Research, spawn the wf plugin's `hunty` agent with the question, the checked-out PR head path, and `DIFF_DIR`; no document; its verdict returns inline.
    - **How** — flow, mechanism, or behavior across files or components: `Route: How`; ask in the request to save to `<checked-out repository root>/bin/review/{{OWNER}}-{{REPO}}-{{PR_NUMBER}}/inspect/{{slug}}.md` and state the content framing.
    - **Why** — design rationale or what led to the change: `Route: Why`, asking only for code, commit, and PR context; read the returned report; use full Why only when the user asks for rationale beyond code, commits, and PRs.
 
