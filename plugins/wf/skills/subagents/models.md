@@ -2,7 +2,7 @@
 
 Model per subagent role. Value format: `<model> <effort>`; pass the model as `model` and the effort as `reasoning_effort`. A value of `inherit-parent` or `auto` runs the role on the parent chat model (omit `model` and `reasoning_effort`); alias entries in a panel list still count toward its fan-out. Use **Fallback** when **Value** is empty or rejected. Edit **Value** to retune.
 
-For `architect runners`, the ordered list is a model pool; Arena selects seats per its Frame procedure. Other roles keep their existing fan-out. `explainy`, `whyy`, and `weby` are research route roles; only the `research` skill spawns them. The registered `codebase` agent runs on the default model; it has no role here. `prover` is the prove worker; only the `prove` skill spawns it.
+For `architect runners`, the ordered list is a model pool; Arena selects seats per its Frame procedure. Other roles keep their existing fan-out. `explainy`, `whyy`, and `weby` are research route roles; only the `research` skill spawns them. The registered `codebase` agent declares its model preference in its frontmatter; it has no role here. `prover` is the prove worker; only the `prove` skill spawns it.
 
 | Role | Value | Fallback |
 |---|---|---|

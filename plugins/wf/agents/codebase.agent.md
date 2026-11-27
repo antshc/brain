@@ -2,6 +2,10 @@
 name: codebase
 description: >-
   Fast read-only codebase exploration and Q&A across local repositories and restored NuGet packages. Prefer over chaining search and file reads in the caller. Safe to run in parallel. State what to find and thoroughness quick, medium, or thorough.
+model:
+  - 'Claude Haiku 5.5 (copilot)'
+  - 'Gemini 3.8 Flash (copilot)'
+  - 'Auto (copilot)'
 include-custom-instructions: true
 ---
 # Codebase
