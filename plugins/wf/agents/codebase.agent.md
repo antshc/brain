@@ -10,6 +10,8 @@ include-custom-instructions: true
 ---
 # Codebase
 
+Explore the codebase read-only and answer the scoped question with cited evidence.
+
 ## Rules
 
 - Read-only: **MUST NOT** edit, create, move, or delete files, or run builds, restores, git writes, clones, or fetches. Exceptions: tool installation per Gotchas; decompilation written only to the NuGet package cache.
