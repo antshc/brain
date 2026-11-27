@@ -18,10 +18,12 @@ def section(title: str) -> str:
     return BODY[start:end.start() if end else None]
 
 
-def test_agent_is_registered_unpinned_and_description_is_safe():
+def test_agent_is_registered_with_model_preferences_and_safe_description():
     meta = yaml.safe_load(META)
     assert meta['name'] == 'codebase'
-    assert 'model' not in meta and 'tools' not in meta
+    assert isinstance(meta['model'], list) and meta['model']
+    assert all(isinstance(model, str) and model for model in meta['model'])
+    assert 'tools' not in meta
     assert len(meta['description']) <= 1024
     for char in ('—', '–', ': ', ' #', '<', '>'):
         assert char not in meta['description'], char
@@ -51,9 +53,16 @@ def test_targets_cover_deployables_multi_repo_and_missing_checkouts():
 
 
 def test_terminal_search_and_nuget_rules():
-    search = section('Shell search')
-    assert 'rg -uu' in search and 'exit `1` = no match' in search
-    assert '**MUST NOT** run recursive `grep`' in search and 'rg … || grep …' in search
+    search = section('Search Strategy')
+    gotchas = section('Gotchas')
+    assert 'rg -uu' in search and 'exit `1` = no match' in gotchas
+    assert 'Prefer native ripgrep-backed' in search and '`rg --files`' in search
+    assert 'usages (LSP)' in search and 'fall back to text search' in search
+    assert 'fixed-string search' in search and 'every searched root' in search
+    assert '**MUST NOT** use recursive shell grep' in search and 'rg … || grep …' in search
+    assert 'Install required missing `rg` or `ilspycmd`' in gotchas
+    assert '## Shell search' not in BODY and '## Task prefixes' not in BODY
+    assert 'Inaccessible source is a gap, not a terminal' in BODY
     nuget = section('NuGet')
     assert 'project.assets.json' in nuget and 'ilspycmd' in nuget
     assert '**XML documentation**' in nuget and '**decompiled implementation**' in nuget
