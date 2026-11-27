@@ -79,7 +79,7 @@ Wayfinder selects evidence routes internally through Frame, Routing and Spawning
 
 ## Spawning agents
 
-**`codebase`** is the wf plugin's registered agent, not a prompt file: spawn agent type `codebase` (namespaced, e.g. `wf:codebase`, where the runtime requires) with the lookup task, the question's Frame, and thoroughness as its task; `codebase` as `name`; a description starting with `codebase:`. Skip model selection and the guard line; the agent owns its search, multi-repo, NuGet, and read-only rules. Spawn unavailable → report the blocked lookup with its consequence and continue independent work.
+**`codebase`** is the wf plugin's registered agent, not a prompt file: spawn agent type `codebase` (namespaced, e.g. `wf:codebase`, where the runtime requires) with the lookup task, the question's Frame, and thoroughness as its task; `codebase` as `name`; a concise task description without a `codebase:` prefix (the agent already has that name). Skip model selection and the guard line; the agent owns its search, multi-repo, NuGet, and read-only rules. Spawn unavailable → report the blocked lookup with its consequence and continue independent work.
 
 Every other route worker is a role whose prompt is a playbook section, discovered through this skill, never a registered agent. Playbook text *spawn `<name>`* means this recipe; `<name>` is never an agent type or `agentName`; use it only as the role and the spawn's display name.
 
