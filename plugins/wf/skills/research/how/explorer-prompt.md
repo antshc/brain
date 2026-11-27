@@ -10,7 +10,7 @@ Fill the placeholders; pass the brief verbatim as the `codebase` agent's task; i
 
 {EXPLORATION_ANGLE}
 
-- Flow ends — `Flow from {FROM} to {TO}` in user or code words; Flow angle only, else omit
+- Flow boundaries — {FROM} and {TO} in user or code words; Flow angle only, else omit
 - Targets or refs — {TARGETS_OR_REFS}
 - Research depth — {DEPTH}
 - Applicable lens and proof checks — {LENS_AND_CHECKS}
