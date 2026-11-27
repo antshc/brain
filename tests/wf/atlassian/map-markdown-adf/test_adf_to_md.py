@@ -281,7 +281,10 @@ def test_table_cell_preserves_italic_requirement_and_bullet_line_break(adf_to_md
         }
     )
 
-    assert adf_to_md(doc) == (
+    marker, table = adf_to_md(doc).split("\n\n")
+    assert marker.startswith('<!-- adf:table header-hash="')
+    assert 'colwidths="[null,null,null]"' in marker
+    assert table == (
         "| # | Requirement | Details |\n"
         "| --- | --- | --- |\n"
         "| 1.1 | *Required behavior* | • First rule<br>• Boundary case |"

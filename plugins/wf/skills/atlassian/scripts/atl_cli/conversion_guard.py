@@ -12,6 +12,7 @@ from .converter.adf_to_md import adf_to_markdown, render_block
 from .converter.md_to_adf import markdown_to_adf
 from .converter.blocks import CODE_LANG_ALLOWLIST
 from .converter.syntax import syntax_lines
+from .converter.table_widths import parse_width_marker
 from .converter.patterns import (
     ERROR_MARKER_RE,
     INLINE_CARD_CLOSE_RE,
@@ -59,6 +60,28 @@ def _has_code_in_link(line: str) -> bool:
     return bool(re.search(r"\[[^\]]*\0[^\]]*\]\(", masked))
 
 
+def _quote_content(line: str) -> tuple[int, str]:
+    depth = 0
+    content = line.lstrip()
+    while content.startswith(">"):
+        depth += 1
+        content = content[1:].lstrip()
+    return depth, content
+
+
+def _table_follows_marker(lines: list[tuple[int, str]], index: int, line: str) -> bool:
+    marker_depth, _ = _quote_content(line)
+    for _, following in lines[index + 1:]:
+        depth, content = _quote_content(following)
+        if depth != marker_depth:
+            if marker_depth or following.strip():
+                return False
+            continue
+        if content:
+            return content.startswith("|")
+    return False
+
+
 def validate_markdown(markdown: str, *, placeholders: bool = False, media: bool = False) -> None:
     lines = list(syntax_lines(markdown))
     details = []
@@ -97,6 +120,10 @@ def validate_markdown(markdown: str, *, placeholders: bool = False, media: bool 
         if re.search(r"<!--\s*(?:/?adf:|media-size:)", line):
             for comment in re.finditer(r"<!--.*?-->", line):
                 tag = comment[0]
+                try:
+                    table_attrs = table_marker_attrs(tag)
+                except ValueError as exception:
+                    raise GuardError(f"line {number}: {exception}") from None
                 if re.match(r"<!--\s*/?adf:comment\b", tag):
                     if not re.fullmatch(r'<!--\s*(?:adf:comment id="[A-Za-z0-9-]+"|/adf:comment)\s*-->', tag):
                         raise GuardError(f"line {number}: malformed comment anchor")
@@ -116,21 +143,28 @@ def validate_markdown(markdown: str, *, placeholders: bool = False, media: bool 
                         raise GuardError(f"line {number}: malformed inline-card marker")
                 elif re.match(r"<!--\s*(?:media-size:|adf:ignore:(?:start|end))", tag):
                     continue
-                elif not (re.fullmatch(r"<!--\s*adf:toc\s*-->", tag) or children_marker_params(tag) is not None or table_marker_attrs(tag) or breakout_marker_mark(tag)):
+                elif not (re.fullmatch(r"<!--\s*adf:toc\s*-->", tag) or children_marker_params(tag) is not None or table_attrs or breakout_marker_mark(tag)):
                     raise GuardError(f"line {number}: unsupported or malformed ATL marker")
-                if table_marker_attrs(tag) is not None or breakout_marker_mark(tag) is not None:
-                    is_table = table_marker_attrs(tag) is not None
-                    attributes = dict(re.findall(r'([a-z-]+)="([^\"]*)"', tag))
-                    allowed = {"layout", "width"} if is_table else {"mode", "width"}
+                if table_attrs is not None or breakout_marker_mark(tag) is not None:
+                    is_table = table_attrs is not None
+                    attributes = {
+                        key.lower(): value
+                        for key, value in re.findall(r'([a-z-]+)="([^\"]*)"', tag, re.IGNORECASE if is_table else 0)
+                    }
+                    allowed = {"layout", "width", "colwidths", "cell-widths", "header-hash", "rows-hash"} if is_table else {"mode", "width"}
                     if attributes.keys() - allowed:
                         raise GuardError(f"line {number}: unsupported marker attribute")
                     if "width" in attributes and not re.fullmatch(r"\d+(?:\.\d+)?", attributes["width"]):
                         raise GuardError(f"line {number}: marker width must be numeric")
+                    if is_table:
+                        try:
+                            parse_width_marker(attributes)
+                        except ValueError as exception:
+                            raise GuardError(f"line {number}: {exception}") from None
                     if not is_table and attributes.get("mode") not in {"wide", "full-width"}:
                         raise GuardError(f"line {number}: breakout requires mode wide or full-width")
-                if table_marker_attrs(tag) is not None:
-                    following = next((text for _, text in lines[index + 1:] if text.strip()), "")
-                    if not following.lstrip().startswith("|"):
+                if table_attrs is not None:
+                    if not _table_follows_marker(lines, index, line):
                         raise GuardError(f"line {number}: table marker must precede a table")
                 if breakout_marker_mark(tag) is not None:
                     following_raw = next((text for text in markdown.splitlines()[number:] if text.strip()), "")
@@ -214,8 +248,6 @@ def semantic_document(doc: dict, *, transport: bool = False) -> dict:
             node.pop("version", None)
             if node.get("content") == [{"type": "paragraph"}]:
                 node.pop("content")
-        if not transport and kind in {"tableCell", "tableHeader"}:
-            attrs.pop("colwidth", None)
         if kind == "codeBlock" and attrs.get("language") in _CODE_LANGUAGE_ALIASES:
             attrs["language"] = _CODE_LANGUAGE_ALIASES[attrs["language"]]
         if kind == "text" and "marks" in node:
@@ -347,12 +379,6 @@ def check_round_trip(doc: dict, *, fetching: bool = False) -> list[str]:
                 raise GuardError("table spans cannot be republished losslessly")
             warnings.append("table spans flattened; lossless republish unavailable")
             return markdown_to_adf(render_block(node))["content"][0]
-        if kind == "table":
-            regenerated = markdown_to_adf(render_block(node))["content"][0]
-            original_cells = [cell for row in node.get("content", []) for cell in row.get("content", [])]
-            regenerated_cells = [cell for row in regenerated.get("content", []) for cell in row.get("content", [])]
-            if any(cell.get("attrs", {}).get("colwidth") is not None and cell["attrs"]["colwidth"] != other.get("attrs", {}).get("colwidth") for cell, other in zip(original_cells, regenerated_cells)):
-                warnings.append("table column widths normalized by converter")
         if kind in {"tableCell", "tableHeader"} and any(attrs.get(key, 1) != 1 for key in ("rowspan", "colspan")):
             raise GuardError("table spans cannot be republished losslessly")
         if "content" in node:

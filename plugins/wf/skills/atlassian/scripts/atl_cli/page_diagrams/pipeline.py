@@ -6,6 +6,7 @@ from __future__ import annotations
 import copy
 import json
 import subprocess
+import sys
 from pathlib import Path
 
 from atlassian.errors import ApiError
@@ -15,7 +16,7 @@ from . import comment_guard
 from .adf import attachment_node, drawio_node, media_node, substitute_drawio, substitute_markers
 from .attachments import upload_diagrams, upload_files
 from .custom_content import upsert_diagram
-from ..confluence_client import get_confluence
+from ..confluence_client import error_category, get_confluence
 from ..map_markdown import ConversionError, md_to_adf
 from ..conversion_guard import guard_adf, lint_markdown, validate_markdown
 from .env import (
@@ -28,7 +29,10 @@ from .env import (
 from .local_media import extract_local_media
 from .mermaid import extract_mermaid, render_diagrams
 from .patterns import HEADING_RE, strip_ignored_sections
-from .rest_publish import adf_body_size, create_page_adf, get_page_version, update_page_adf, verify_page_parent
+from .rest_publish import (
+    adf_body_size, create_page_adf, get_page_snapshot, get_page_version, update_page_adf, verify_page_parent,
+)
+from .table_widths import has_tables, preserve_table_widths
 from . import renderers
 
 
@@ -69,9 +73,14 @@ def strip_title_heading(adf: dict) -> dict:
     return adf
 
 
-def convert_markdown_to_adf(processed_md: str) -> dict:
+def convert_markdown_to_adf(
+    processed_md: str,
+    *,
+    table_metadata: dict[int, frozenset[str]] | None = None,
+    width_warnings: list[str] | None = None,
+) -> dict:
     try:
-        doc = md_to_adf(processed_md)
+        doc = md_to_adf(processed_md, table_metadata=table_metadata, width_warnings=width_warnings)
         guard_adf(doc)
         return doc
     except ConversionError as exception:
@@ -141,6 +150,7 @@ def _publish_with_diagrams(
     drawio_extension_key: str | None,
     swimlane_drawio_enabled: bool,
     parent_id: str | None = None,
+    snapshot_version: int | None = None,
 ) -> tuple[dict, dict]:
     confluence = get_confluence(credentials)
 
@@ -208,8 +218,8 @@ def _publish_with_diagrams(
         final_adf, _ = substitute_drawio(base_adf, nodes_by_index)
 
         guard_adf(final_adf)
-        version = get_page_version(confluence, target_page_id)
-        update_page_adf(confluence, target_page_id, title, final_adf, version)
+        version = snapshot_version if snapshot_version is not None else get_page_version(confluence, target_page_id)
+        _update_page(confluence, target_page_id, title, final_adf, version, snapshot_version)
 
         result = {
             "method": "rest",
@@ -234,11 +244,12 @@ def _publish_text_only(
     space_id: str | None,
     title: str,
     parent_id: str | None = None,
+    snapshot_version: int | None = None,
 ) -> tuple[dict, dict]:
     confluence = get_confluence(credentials)
     if page_id:
-        version = get_page_version(confluence, page_id)
-        update_page_adf(confluence, page_id, title, base_adf, version)
+        version = snapshot_version if snapshot_version is not None else get_page_version(confluence, page_id)
+        _update_page(confluence, page_id, title, base_adf, version, snapshot_version)
         target_page_id = page_id
     else:
         created = create_page_adf(
@@ -268,12 +279,29 @@ _GUARD_ERRORS = (RequestException, ApiError, ValueError)
 _POST_CREATE_ERRORS = (OSError, RuntimeError, ValueError, KeyError, ApiError, subprocess.SubprocessError)
 
 
-def _plan_comment_guard(credentials: dict[str, str], page_id: str | None, final_adf: dict) -> tuple[dict | None, dict]:
+def _update_page(confluence, page_id: str, title: str, adf: dict, version: int, snapshot_version: int | None) -> None:
+    try:
+        update_page_adf(confluence, page_id, title, adf, version)
+    except RequestException as exception:
+        status = getattr(getattr(exception, "response", None), "status_code", None)
+        if snapshot_version is not None and status == 409:
+            raise RuntimeError("page changed after the table width snapshot; update not published") from None
+        raise
+
+
+def _warn_widths(warnings: list[str]) -> None:
+    for warning in warnings:
+        print(f"warning: {warning}", file=sys.stderr)
+
+
+def _plan_comment_guard(
+    credentials: dict[str, str], page_id: str | None, final_adf: dict, live_adf: dict | None = None
+) -> tuple[dict | None, dict]:
     """Read which open inline comments this update will detach; never blocks the publish."""
     if not page_id:
         return None, {}
     try:
-        return comment_guard.plan(get_confluence(credentials), page_id, final_adf), {}
+        return comment_guard.plan(get_confluence(credentials), page_id, final_adf, live_adf), {}
     except _GUARD_ERRORS as exception:
         return None, {"commentGuard": f"failed ({type(exception).__name__})"}
 
@@ -306,6 +334,7 @@ def publish(
     out_path: str,
     mermaid_bg: str = "white",
     parent_id: str | None = None,
+    preserve_existing_table_widths: bool = True,
 ) -> dict:
     """Run extract -> md-to-adf -> create/attach -> substitute -> publish end to end, always
     over REST. Credentials are mandatory; a missing key raises `SystemExit` naming it before
@@ -322,14 +351,15 @@ def publish(
     lint_markdown(processed)
     processed, diagrams = extract_mermaid(processed)
     processed, local_media = extract_local_media(processed, Path(md_path).parent, start_index=len(diagrams))
-    base_adf = strip_title_heading(convert_markdown_to_adf(processed))
+    table_metadata: dict[int, frozenset[str]] = {}
+    width_warnings: list[str] = []
+    base_adf = strip_title_heading(
+        convert_markdown_to_adf(processed, table_metadata=table_metadata, width_warnings=width_warnings)
+    )
+    _warn_widths(width_warnings)
     guard_adf(base_adf)
     Path(out_path).parent.mkdir(parents=True, exist_ok=True)
     manifest_path = str(Path(out_path).with_suffix(".manifest.json"))
-    # Save the pre-mutation expectation, including typed media placeholders. Read-back
-    # comparison uses the final ADF written below after media IDs have been resolved.
-    Path(manifest_path).write_text(json.dumps({"title": resolved_title, "adf": base_adf}, indent=2) + "\n", encoding="utf-8")
-
     # A page with only local attachments and no mermaid fence must not be blocked by an
     # unrelated/unusable diagramRenderer setting.
     drawio_extension_key = None
@@ -349,7 +379,25 @@ def publish(
             parent = confluence.get(f"/api/v2/pages/{parent_id}")
             if str(parent.get("spaceId")) != space_id:
                 raise ValueError("parent page does not belong to the creation space")
-    guard, guard_keys = _plan_comment_guard(credentials, page_id, base_adf)
+    snapshot_version = None
+    live_adf = None
+    if page_id and preserve_existing_table_widths and has_tables(base_adf):
+        try:
+            live_adf, snapshot_version = get_page_snapshot(get_confluence(credentials), page_id)
+        except (RequestException, ApiError, KeyError, TypeError, ValueError) as exception:
+            status = getattr(getattr(exception, "response", None), "status_code", None)
+            if status in {401, 403} or (isinstance(exception, ApiError) and status is None):
+                raise RuntimeError(f"cannot read existing table widths ({error_category(exception)})") from None
+            warnings = [f"cannot read existing table widths ({error_category(exception)}); using Markdown/default widths"]
+        else:
+            warnings = preserve_table_widths(base_adf, live_adf, table_metadata)
+            guard_adf(base_adf)
+        _warn_widths(warnings)
+        width_warnings.extend(warnings)
+
+    # Save the merged pre-mutation expectation, including typed media placeholders.
+    Path(manifest_path).write_text(json.dumps({"title": resolved_title, "adf": base_adf}, indent=2) + "\n", encoding="utf-8")
+    guard, guard_keys = _plan_comment_guard(credentials, page_id, base_adf, live_adf)
 
     if diagrams or local_media:
         result, final_adf = _publish_with_diagrams(
@@ -366,9 +414,10 @@ def publish(
             drawio_extension_key,
             swimlane_drawio_enabled,
             parent_id,
+            snapshot_version,
         )
     else:
-        result, final_adf = _publish_text_only(base_adf, credentials, page_id, space_id, resolved_title, parent_id)
+        result, final_adf = _publish_text_only(base_adf, credentials, page_id, space_id, resolved_title, parent_id, snapshot_version)
 
     with open(out_path, "w", encoding="utf-8") as f:
         json.dump(final_adf, f, indent=2)
@@ -378,6 +427,8 @@ def publish(
     result["renderer"] = renderer
     result["adfPath"] = out_path
     result["manifestPath"] = manifest_path
+    if width_warnings:
+        result["tableWidthWarnings"] = width_warnings
     Path(manifest_path).write_text(json.dumps({"title": resolved_title, "adf": final_adf}, indent=2) + "\n", encoding="utf-8")
     result.update(guard_keys)
     if guard is not None:

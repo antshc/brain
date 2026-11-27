@@ -6,6 +6,7 @@ import re
 from contextvars import ContextVar
 from dataclasses import dataclass
 
+from .blocks import compute_colwidths, split_table_row
 from .patterns import (
     COMMENT_CLOSE_TAG,
     INLINE_CARD_CLOSE_TAG,
@@ -15,6 +16,7 @@ from .patterns import (
     error_marker,
 )
 from .table_grid import validate_table_grid
+from .table_widths import width_marker_attrs
 
 # Applied innermost-first, so combined marks on one text node wrap in a fixed order
 # regardless of the order they appear in `marks` (code+link -> [`text`](href)).
@@ -113,11 +115,15 @@ def _breakout_marker(attrs: dict) -> str:
     return f"<!-- adf:breakout{fields} -->"
 
 
-def _table_marker(attrs: dict) -> str:
+def _table_marker(node: dict, rendered: str) -> str:
     """`adf:wide-table` for a plain wide table, `adf:table` when a width or another layout must
     survive, "" for a default table."""
+    attrs = node.get("attrs", {})
     layout, width = attrs.get("layout"), attrs.get("width")
-    if width is None:
+    lines = rendered.splitlines()
+    inferred = compute_colwidths(split_table_row(lines[0])) if lines else None
+    width_fields = width_marker_attrs(node, inferred, rendered)
+    if width is None and not width_fields:
         if layout == "wide":
             return "<!-- adf:wide-table -->"
         if layout in (None, "default"):
@@ -125,6 +131,8 @@ def _table_marker(attrs: dict) -> str:
     fields = f' layout="{layout}"' if layout not in (None, "default") else ""
     if width is not None:
         fields += f' width="{_number(width)}"'
+    for key, value in width_fields.items():
+        fields += f' {key}="{value}"'
     return f"<!-- adf:table{fields} -->"
 
 
@@ -164,7 +172,7 @@ def _render_block_body(node: dict) -> str:
         return f"<details>\n<summary>{title}</summary>\n\n{inner}\n</details>"
     if node_type == "table":
         rendered = render_table(node)
-        marker = _table_marker(node.get("attrs", {}))
+        marker = _table_marker(node, rendered)
         return f"{marker}\n\n{rendered}" if marker else rendered
     if node_type == "extension":
         extension_key = node.get("attrs", {}).get("extensionKey", "")

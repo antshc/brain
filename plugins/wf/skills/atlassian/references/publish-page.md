@@ -10,6 +10,7 @@ Publish local Markdown to a Confluence page in one command: extract → convert 
 - Inputs
 - Steps
 - Edit a fetched page
+- Table widths
 - Inline comments
 - Diagram renderer
 - Diagram ids
@@ -57,6 +58,7 @@ Outputs default to `<mdPath>.tmp/` (e.g. `docs/design.md.tmp/final-adf.json`); o
 Stdout JSON:
 
 - `{"method":"rest","pageId":...,"title":...,"sizeBytes":...,"diagrams":N,"attachments":N,"uploadedAttachments":N,"renderer":...,"adfPath":...}` → published. `attachments` and `uploadedAttachments` count only files uploaded in this operation, not unrelated files already on the page.
+- `tableWidthWarnings` (when present): the same width-preservation warnings printed on stderr. Report them; they can mean default widths or normalized sparse widths.
 - Update only, comment guard keys (see Inline comments): `orphanedComments` `[{id,markerRef,selection}]`, `orphanNoticeCommentId`, `unknownCommentIds`, `partialCommentRemovals` `[{id,before,after}]`, `commentGuard` (`failed (<category>)`, `notice failed (<category>)`).
 
 **3 — Verify.** With `--parent-id`, creation checks the parent belongs to the space and reads back the new page parent; update checks its existing parent before writing. Success includes `parentId`; post-create verification failure returns the created ID for recovery. Recheck hierarchy through Atlassian metadata when publishing a page collection.
@@ -84,6 +86,13 @@ Ordinary edits of an existing page without thread replies. Review-thread replies
 5. Publish (Step 2) with the page id and the existing title. Publish posts at most one detached-comment notice.
 6. Verify (Step 3) with those files and `--verify-dir tmp/<pageId>/verify`. Pass → delete `tmp/<pageId>/`. Fail → keep it, report the failing check name, stop.
 7. Report kept, removed, and ambiguous comments, `orphanedComments`, and the verification result. Never resolve or reply to threads.
+
+## Table widths
+
+- Fetched `adf:table` markers carry explicit widths; keep them. Explicit Markdown layout, overall width, and column widths each override the corresponding live value. A stale column marker warns and uses defaults, not live columns; see [Table widths](map-markdown-adf.md#table-widths).
+- On update, including plain Markdown and attachment/diagram paths, read the live ADF and page version together. Match header-first, unmerged tables one-to-one by heading/container context and ordered normalized headers, never position alone. For unmarked fields, retain matched layout, overall width, and compatible column widths; inferred Markdown widths do not override live widths. Unchanged sparse rows retain exact values; changed rows with consistent column widths are normalized with a warning.
+- Missing, ambiguous, incompatible, or conflicting row-specific matches → stderr and `tableWidthWarnings`; affected widths use Markdown/default values. A non-auth snapshot read failure also warns and uses Markdown/default widths; 401/403 or unknown-auth API errors stop. A separate version-read failure still stops.
+- Publish with the snapshot version; a conflict stops without retrying stale widths. Uploads performed before a conflict are not rolled back. The final ADF and verification manifest include the widths actually submitted.
 
 ## Inline comments
 
@@ -138,7 +147,7 @@ Ordinary edits of an existing page without thread replies. Review-thread replies
 ## Degraded mode
 
 - No Atlassian config or no token → nothing published; report missing `cloudId`/`email`/`apiToken`.
-- Any Step 2 failure → nothing published unless the error names a created page id; fix and re-run. `diagramRenderer=mermaid` → switch to `png` or `drawio` to publish now.
+- Step 2 failure may leave uploads or a created placeholder; if the outcome is uncertain, read the page and attachments before retrying. `diagramRenderer=mermaid` → switch to `png` or `drawio` to publish now.
 
 ## Other subcommands
 

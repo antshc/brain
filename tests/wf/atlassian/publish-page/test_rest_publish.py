@@ -1,6 +1,9 @@
+import json
 from unittest.mock import MagicMock
 
-from atl_cli.page_diagrams.rest_publish import adf_body_size, create_page_adf, get_page_version, update_page_adf
+import pytest
+
+from atl_cli.page_diagrams.rest_publish import adf_body_size, create_page_adf, get_page_snapshot, get_page_version, update_page_adf
 
 
 def test_adf_body_size_counts_utf8_bytes():
@@ -16,6 +19,37 @@ def test_get_page_version_reads_version_number():
 
     confluence.get.assert_called_once_with("/api/v2/pages/123")
     assert version == 3
+
+
+def test_snapshot_reads_body_and_version_together():
+    confluence = MagicMock()
+    adf = {"type": "doc", "content": []}
+    confluence.get.return_value = {"version": {"number": 7}, "body": {"atlas_doc_format": {"value": json.dumps(adf)}}}
+    assert get_page_snapshot(confluence, "123") == (adf, 7)
+    confluence.get.assert_called_once_with("/api/v2/pages/123", params={"body-format": "atlas_doc_format"})
+
+
+@pytest.mark.parametrize("version", [None, True, 0, "7"])
+def test_snapshot_rejects_an_invalid_version(version):
+    confluence = MagicMock()
+    confluence.get.return_value = {"version": {"number": version}, "body": {"atlas_doc_format": {"value": '{"type":"doc"}'}}}
+    with pytest.raises(ValueError, match="valid version"):
+        get_page_snapshot(confluence, "123")
+
+
+@pytest.mark.parametrize("version", [None, True, 0, "7"])
+def test_version_read_rejects_an_invalid_version(version):
+    confluence = MagicMock()
+    confluence.get.return_value = {"version": {"number": version}}
+    with pytest.raises(ValueError, match="valid version"):
+        get_page_version(confluence, "123")
+
+
+def test_version_read_rejects_a_non_object_response():
+    confluence = MagicMock()
+    confluence.get.return_value = None
+    with pytest.raises(ValueError, match="valid version"):
+        get_page_version(confluence, "123")
 
 
 def test_update_page_adf_puts_incremented_version():

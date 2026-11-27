@@ -13,6 +13,7 @@ Markdown <-> Atlassian Document Format conversion and the ADF-only detection gat
 - Supported structure
 - Supported marks
 - Table validation
+- Table widths
 - Gotchas
 
 ## Markdown to ADF
@@ -63,7 +64,7 @@ Rows marked **ADF-only** have no Markdown equivalent on the Atlassian side — `
 | `<details><summary>` | `expand` (`attrs.title`) — **ADF-only** |
 | `<!-- adf:toc -->` | `expand` + `toc` extension (`md-to-adf`); a bare `toc` extension, standalone or alongside other content in an `expand`, also converts back (`adf-to-md`) — **ADF-only** |
 | `<!-- adf:wide-table -->` | `table.attrs.layout: "wide"` — **ADF-only** |
-| `<!-- adf:table [layout="<layout>"] [width="<px>"] -->` before a table | `table.attrs.layout` / `table.attrs.width`; emitted instead of `adf:wide-table` when a width or a non-wide layout must survive — **ADF-only** |
+| `<!-- adf:table [layout="<layout>"] [width="<px>"] [colwidths="<json>"] -->` before a table | `table.attrs.layout` / `table.attrs.width` and cell `attrs.colwidth`; see Table widths — **ADF-only** |
 | `<!-- adf:breakout mode="<wide\|full-width>" [width="<px>"] -->` on the line before `<details>` or a code fence | `breakout` mark on that `expand`/`codeBlock`; rejected before any other block — **ADF-only** |
 | `<!-- adf:children [<param>="<value>" ...] -->` | `extension` (child pages macro, params in `macroParams`) — **ADF-only** |
 | `<!-- adf:diagram drawio="<name>" -->` | `extension` (Draw.io macro) — **ADF-only, `adf-to-md` direction only** |
@@ -104,6 +105,16 @@ Legacy `[STATUS:text|color]` (`color` defaults to `neutral`) is still read by `m
 ## Table validation
 
 Every table's rows must resolve to one consistent column count once `colspan`/`rowspan` are applied. A mismatched table is rejected — non-zero exit, `error:` on stderr naming the table — with no partial output.
+
+## Table widths
+
+For unmerged tables with a first header row, `adf-to-md` records existing overall and cell widths in the preceding `adf:table` marker. Keep it when editing. For example, `<!-- adf:table width="960" colwidths="[[155],[355]]" -->` sets the overall width and both column widths in pixels. An emitted `header-hash` guards column identity; do not remove or edit it accidentally.
+
+`colwidths` is a JSON array, one entry per column: `[155]` is an ADF width array, `null` means absent, `{}` means an explicitly null ADF `colwidth`, and `[]` is an empty array. When cells differ by row, `cell-widths` stores a row-by-column matrix instead, with a `rows-hash`. Both width fields together, duplicate attributes, malformed JSON, invalid numbers, and invalid hashes are rejected. Manually supplied widths without a hash are positional.
+
+Changed headers or incompatible row-specific widths → stderr warning and default column widths. When only rows change and their recorded widths agree per column, widths are applied to all rows with a warning that sparse values were normalized. Unchanged sparse widths round-trip exactly, including absent/null values. Merged and headerless tables retain the existing lossy-export limitations.
+
+For distinct rows, removing inline-comment anchors does not change their width identities. Otherwise-identical rows retain anchor identities to avoid guessing.
 
 ## Gotchas
 

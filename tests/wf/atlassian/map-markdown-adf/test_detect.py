@@ -19,6 +19,7 @@ def test_plain_commonmark_is_markdown_safe(detect_adf_only):
         ('<!-- adf:children depth="2" -->', "children"),
         ("<!-- adf:wide-table -->\n\n| a |\n| --- |", "wideTable"),
         ('<!-- adf:table layout="wide" width="960" -->\n\n| a |\n| --- |', "tableLayout"),
+        ('<!-- adf:table colwidths="[[155]]" -->\n\n| a |\n| --- |', "tableLayout"),
         ('<!-- adf:breakout mode="wide" width="760" -->\n<details>\n<summary>S</summary>\n</details>', "breakout"),
         (
             "<!-- adf:inline-card -->[https://example.com](https://example.com)<!-- /adf:inline-card -->",

@@ -18,6 +18,7 @@ from .patterns import (
     table_marker_attrs,
 )
 from .table_grid import validate_table_grid
+from .table_widths import apply_width_marker
 
 CODE_LANG_ALLOWLIST = {
     "text",
@@ -97,7 +98,12 @@ def build_children_extension(params: dict[str, str]) -> dict:
     }
 
 
-def parse_blocks(lines: list[str]) -> list[dict]:
+def parse_blocks(
+    lines: list[str],
+    *,
+    table_metadata: dict[int, frozenset[str]] | None = None,
+    width_warnings: list[str] | None = None,
+) -> list[dict]:
     """Parse a list of Markdown lines into ADF block nodes."""
     blocks: list[dict] = []
     i = 0
@@ -178,11 +184,11 @@ def parse_blocks(lines: list[str]) -> list[dict]:
                     {
                         "type": "panel",
                         "attrs": {"panelType": panel_type},
-                        "content": parse_blocks(quote_lines[1:]),
+                        "content": parse_blocks(quote_lines[1:], table_metadata=table_metadata, width_warnings=width_warnings),
                     }
                 )
             else:
-                blocks.append({"type": "blockquote", "content": parse_blocks(quote_lines)})
+                blocks.append({"type": "blockquote", "content": parse_blocks(quote_lines, table_metadata=table_metadata, width_warnings=width_warnings)})
             continue
 
         if DETAILS_OPEN_RE.match(line):
@@ -205,7 +211,7 @@ def parse_blocks(lines: list[str]) -> list[dict]:
                         break
                 inner_lines.append(lines[i])
                 i += 1
-            content = parse_blocks(inner_lines)
+            content = parse_blocks(inner_lines, table_metadata=table_metadata, width_warnings=width_warnings)
             if not content:
                 content = [{"type": "paragraph", "content": [{"type": "text", "text": ""}]}]
             expand = {"type": "expand", "attrs": {"title": title}, "content": content}
@@ -215,7 +221,7 @@ def parse_blocks(lines: list[str]) -> list[dict]:
             continue
 
         if _table_start(lines, i) is not None:
-            table, i = _parse_table(lines, i, apply_table_attrs or {"layout": "default"})
+            table, i = _parse_table(lines, i, apply_table_attrs or {}, table_metadata, width_warnings)
             blocks.append(table)
             continue
 
@@ -223,7 +229,7 @@ def parse_blocks(lines: list[str]) -> list[dict]:
             # ADF forbids a table inside a listItem: tables nested anywhere in the list are
             # collected and emitted as siblings right after the whole list.
             deferred_tables: list[dict] = []
-            list_block, i = parse_list(lines, i, deferred_tables)
+            list_block, i = parse_list(lines, i, deferred_tables, table_metadata, width_warnings)
             if list_block["type"] == "orderedList":
                 start = int(_ORDERED_NUMBER_RE.match(line).group(1))
                 if start != 1:
@@ -298,7 +304,13 @@ def _table_start(lines: list[str], i: int) -> int | None:
     return len(row_m.group(1))
 
 
-def _parse_table(lines: list[str], i: int, table_attrs: dict) -> tuple[dict, int]:
+def _parse_table(
+    lines: list[str],
+    i: int,
+    table_attrs: dict,
+    table_metadata: dict[int, frozenset[str]] | None,
+    width_warnings: list[str] | None,
+) -> tuple[dict, int]:
     header_cells = split_table_row(lines[i])
     separator_cells = split_table_row(lines[i + 1])
     if len(separator_cells) != len(header_cells):
@@ -311,6 +323,15 @@ def _parse_table(lines: list[str], i: int, table_attrs: dict) -> tuple[dict, int
     table = build_table(header_cells, rows, layout=table_attrs.get("layout", "default"))
     if "width" in table_attrs:
         table["attrs"]["width"] = table_attrs["width"]
+    table_number = len(table_metadata) + 1 if table_metadata is not None else 1
+    if table_metadata is not None:
+        table_metadata[id(table)] = frozenset(table_attrs)
+    width_warning = apply_width_marker(table, table_attrs)
+    if width_warning:
+        warning = f"table {table_number}: {width_warning}"
+        if width_warnings is None:
+            raise ValueError(warning)
+        width_warnings.append(warning)
     return table, i
 
 
@@ -363,7 +384,13 @@ def _match_list_marker(line: str):
     return None, None
 
 
-def parse_list(lines: list[str], i: int, deferred_tables: list[dict]) -> tuple[dict, int]:
+def parse_list(
+    lines: list[str],
+    i: int,
+    deferred_tables: list[dict],
+    table_metadata: dict[int, frozenset[str]] | None,
+    width_warnings: list[str] | None,
+) -> tuple[dict, int]:
     """Parse a list at `lines[i]`. Tables indented under its items are appended to
     `deferred_tables` (ADF has no table-in-listItem) instead of ending the list."""
     n = len(lines)
@@ -396,7 +423,7 @@ def parse_list(lines: list[str], i: int, deferred_tables: list[dict]) -> tuple[d
 
         if nested_table_indent(i) is not None:
             marker = table_marker_attrs(line)
-            table, i = _parse_table(lines, i + 1 if marker is not None else i, marker or {"layout": "default"})
+            table, i = _parse_table(lines, i + 1 if marker is not None else i, marker or {}, table_metadata, width_warnings)
             deferred_tables.append(table)
             continue
 
@@ -409,7 +436,7 @@ def parse_list(lines: list[str], i: int, deferred_tables: list[dict]) -> tuple[d
             break
         if indent > base_indent:
             # Nested list belongs to the previous item.
-            nested_block, i = parse_list(lines, i, deferred_tables)
+            nested_block, i = parse_list(lines, i, deferred_tables, table_metadata, width_warnings)
             if items:
                 items[-1]["content"].append(nested_block)
             continue
@@ -441,7 +468,7 @@ def parse_list(lines: list[str], i: int, deferred_tables: list[dict]) -> tuple[d
             if sub_m and len(sub_m.group(1)) > indent:
                 if not item_content:
                     item_content.append({"type": "paragraph", "content": parse_inline(item_text)})
-                nested_block, i = parse_list(lines, i, deferred_tables)
+                nested_block, i = parse_list(lines, i, deferred_tables, table_metadata, width_warnings)
                 item_content.append(nested_block)
                 continue
             if item_content and not sub_m and _indent_of(lines[i]) > indent and not _is_block_start(lines[i], lines, i):

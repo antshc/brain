@@ -35,8 +35,15 @@ class ConversionError(Exception):
     """The converter rejected its input; the message is the reason only, never a traceback."""
 
 
-def md_to_adf(markdown: str, *, guarded: bool = False) -> dict:
+def md_to_adf(
+    markdown: str,
+    *,
+    guarded: bool = False,
+    table_metadata: dict[int, frozenset[str]] | None = None,
+    width_warnings: list[str] | None = None,
+) -> dict:
     try:
+        warnings = width_warnings if width_warnings is not None else []
         reject_conversion_errors(markdown)
         if guarded:
             from .conversion_guard import guard_adf, lint_markdown, validate_markdown
@@ -44,9 +51,12 @@ def md_to_adf(markdown: str, *, guarded: bool = False) -> dict:
             markdown = strip_ignored_sections(markdown)
             validate_markdown(markdown)
             lint_markdown(markdown)
-        doc = markdown_to_adf(markdown)
+        doc = markdown_to_adf(markdown, table_metadata=table_metadata, width_warnings=warnings)
         if guarded:
             guard_adf(doc)
+        if width_warnings is None:
+            for warning in warnings:
+                print(f"warning: {warning}", file=sys.stderr)
         return doc
     except (ValueError, NotImplementedError) as exception:
         raise ConversionError(str(exception)) from None
