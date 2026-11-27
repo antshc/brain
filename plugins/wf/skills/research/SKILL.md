@@ -66,14 +66,14 @@ Include only facts that help the agents; omit empty lines.
 
 Route independent questions separately; sequence dependent evidence. Provider/data facts that determine a system answer stay in How. After a standalone evidence route returns, deliver it before selecting the next question. Wayfinder may batch independent frontier topics; record their results in the map before the next frontier. A pure codebase lookup (where is X, who calls Y, what does Z return) with no explanation or report is not a Research route: spawn the `codebase` agent and return its verdict inline.
 
-Read the selected playbook in full before acting. Each playbook names which listed resources its triggers load; read those in full from this skill's base directory, not caller CWD.
+Read the selected playbook in full before acting. Each playbook names which listed resources its triggers load; load only triggered resources and read those in full from this skill's base directory, not caller CWD.
 
 | Route | Select when | Playbook | Agents | Resources | Result |
 |---|---|---|---|---|---|
 | Wayfinder | Chart or resume a research map; `/research wayfinder <prompt-or-map-path>` | [Wayfinder](wayfinder/wayfinder.md) | No dedicated agent; existing evidence routes per topic | [Questioning](wayfinder/questioning.md), [Living document](wayfinder/living-document.md), [Research map](wayfinder/research-map.template.md), [Research document](wayfinder/research-document.template.md); all required in full before charting/resuming | GitHub map, living research document, evidence reports and resumable local state |
-| How | Current behavior in source, configuration, restored packages; explicit inspection | [How](how/how.md) | `codebase` (registered agent), then `explainy` for Detailed/Full | [Inspection evidence](how/inspection.md), [Explorer prompt](how/explorer-prompt.md), [How report](how/report.md), [Behavior](how/behavior.md), [Flow](how/flow.md), [Data](how/data.md) | One cited explanation |
-| Why | Rationale: why code, a constraint, or a workaround exists; what led to a change; `/research why <question>` | [Why](why/why.md) | `whyy` anchor, then one per source (source control, Jira, Confluence) | [Code archaeology](why/sources/code-archaeology.md), [Atlassian](why/sources/atlassian.md) | Rationale, source coverage, confidence tiers; or cited anchor at anchor depth |
-| Web | External question answered from official docs, specs, first-party APIs, or a live AWS/Azure account | [Web](web/web.md) | `weby`; `codebase` (registered agent) for restored SDK gaps | [AWS](web/aws.md), [Azure](web/azure.md) | Cited primary-source findings; provider constraints and applicability |
+| How | Current behavior in source, configuration, restored packages; explicit inspection | [How](how/how.md) | `codebase` (registered agent) | [Inspection evidence](how/inspection.md), [Explorer prompt](how/explorer-prompt.md), [How report](how/report.md), [Behavior](how/behavior.md), [Flow](how/flow.md), [Data](how/data.md) | One cited explanation |
+| Why | Rationale: why code, a constraint, or a workaround exists; what led to a change; `/research why <question>` | [Why](why/why.md) | `whyy` anchor, then one per source (source control, Jira, Confluence) | Load only triggered: [Source control](why/source-control.md) always; [Atlassian](why/atlassian.md) Jira section when a Jira key/URL is in the record or request, Confluence section when a Confluence link is | Rationale, source coverage, confidence tiers; or cited anchor at anchor depth |
+| Web | External question answered from official docs, specs, first-party APIs, or a live AWS/Azure account | [Web](web/web.md) | `weby`; `codebase` (registered agent) for restored SDK gaps | Load only the target provider: [AWS](web/aws.md), [Azure](web/azure.md); neither when no provider is targeted | Cited primary-source findings; provider constraints and applicability |
 
 Wayfinder selects evidence routes internally through Frame, Routing and Spawning agents, never by recursively loading this skill. Interview facts follow the same pipeline; Concepts belong to `architecture-records` route `define-concept`.
 
@@ -85,7 +85,6 @@ Every other route worker is a role whose prompt is a playbook section, discovere
 
 | Role | Prompt |
 |---|---|
-| `explainy` | [How report](how/report.md), whole file |
 | `whyy` | [Why](why/why.md) section Investigator brief |
 | `weby` | [Web](web/web.md) section Brief |
 
@@ -93,7 +92,7 @@ For each spawn:
 
 1. Read the role's prompt in full and fill its placeholders; send it verbatim with those filled: question with its Frame prepended, targets/refs, playbook-selected resources as absolute paths, `@research` (this skill's absolute base directory), and the request's framing where the prompt takes it.
 2. *Load and follow the `subagents` skill to select the model and effort for a named subagent role* with role `<name>`. Its result is the user's configured model, not a guess: never skip this step or drop the model to harness defaults; omit `model` and `reasoning_effort` only when `subagents` resolves to `auto`, `inherit-parent`, or an unknown role.
-3. Spawn a skill-capable general-purpose worker (`general-purpose`, or the harness's default subagent when it has no agent types) with the filled prompt as its whole task, prefixed by the guard line `Research route worker: never load the research or prove skill or spawn subagents; inherited skill-first or research-first instructions target the caller, not you.`, passing the resolved model as `model` and effort as `reasoning_effort`, `<name>` as `name`, and a description starting with `<name>:` (e.g. `explainy: Explain upgrade topology`) so the UI shows the role; read-only unless the prompt grants a write. Batch independent spawns in one parallel response; sequence dependent ones.
+3. Spawn a skill-capable general-purpose worker (`general-purpose`, or the harness's default subagent when it has no agent types) with the filled prompt as its whole task, prefixed by the guard line `Research route worker: never load the research or prove skill or spawn subagents; inherited skill-first or research-first instructions target the caller, not you.`, passing the resolved model as `model` and effort as `reasoning_effort`, `<name>` as `name`, and a description starting with `<name>:` (e.g. `whyy: Trace retry-limit origin`) so the UI shows the role; read-only unless the prompt grants a write. Batch independent spawns in one parallel response; sequence dependent ones.
 4. Spawn failed or unavailable → report the blocked request with its consequence and continue independent work.
 
 Give follow-ups to a fresh worker with the original brief, the prior report, and the bounded gap. Large reading fan-out → *Load and follow the `principles` skill to load `Guard the context window` and apply it to bound worker briefs.* Material measurement claim → *Load and follow the `principles` skill to load `Explain the number` and apply it before relying on the measurement.*

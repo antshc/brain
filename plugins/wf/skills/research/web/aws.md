@@ -1,48 +1,8 @@
 # AWS
 
-Provider reference for an AWS question on the Web route. Apply the Web Brief.
+Web provider resource. Apply the Brief, including Provider only.
 
-## Docs
-
-Search and read official AWS documentation — service guides, API references, SDK references, Service Quotas, regional availability. Use the AWS Documentation MCP tools (search, read full page, recommend related, regional availability, list regions) when installed; otherwise fetch `docs.aws.amazon.com` pages directly. Search with service, feature, intent, and resolved SDK version when applicable; read the full page for complete API, policy, or quota details. Verify regional availability before relying on a regional feature.
-
-## SDK
-
-AWS SDK for .NET (`AWSSDK.*`, `AWS.Logger.*`):
-
-1. Resolve the version from the workspace — `Directory.Packages.props`, `Directory.Build.props`, `Directory.Build.targets`, `*.csproj`; absent → `obj/project.assets.json`. Never reuse a version from an earlier session.
-2. Verify the type, member, signature, and behavior from the restored package’s XML docs or decompiled assembly: record UNKNOWN with a ready `codebase` lookup per the Brief; continue independent evidence work.
-3. Version-specific behavior, release notes, or retry/config defaults not visible in the package → official AWS SDK docs per Docs.
-
-Other SDKs: resolve the version from the dependency manifest and lockfile, then use Docs.
-
-## AWS CLI
-
-Read-only research of the live account. Check `command -v aws`; absent → UNKNOWN per the Brief probes rule.
-
-1. **Identity** — `aws sts get-caller-identity`; record account and principal ARN.
-2. **Pin** — pass `--region` and `--profile` (when set) on every call; never rely on an implicit default.
-3. **Discover** — `aws <service> help` or `aws <service> <command> help` for unfamiliar commands or flags.
-4. **Read** — only `describe-*`, `list-*`, `get-*`, plus:
-
-   | Need | Command |
-   |---|---|
-   | Applied quota | `aws service-quotas get-service-quota --service-code <code> --quota-code <code>` |
-   | Default quota | `aws service-quotas get-aws-default-service-quota --service-code <code> --quota-code <code>` |
-   | Quota codes | `aws service-quotas list-service-quotas --service-code <code>` |
-   | Service codes | `aws service-quotas list-services` |
-   | Effective permissions | `aws iam simulate-principal-policy --policy-source-arn <arn> --action-names <action> [--resource-arns <arn>]` |
-   | Resource state | `aws <service> describe-*` / `list-*` / `get-*` |
-   | Request validation | `--dry-run` on EC2 calls that support it |
-
-5. **Shape output** — `--output json --query '<JMESPath>'` to extract the cited field.
-
-**MUST NOT** run create, put, update, modify, delete, attach, tag, or any other mutating command.
-
-## Gotchas
-
-**Service Quotas default ≠ applied.** `get-aws-default-service-quota` returns the documented default; `get-service-quota` returns the account's applied value — some quotas are not tracked and return only a default.
-
-**Quotas and features are regional.** A value read in one region says nothing about another; record the region for every quota and availability claim.
-
-**`simulate-principal-policy` ignores some policy types.** SCPs and resource policies may not be evaluated unless supplied; record what the simulation covered.
+- **Docs** — AWS documentation tools or the official AWS docs site: service guides, API and SDK references, Service Quotas, regional availability. Confirm a feature is available in the target region before relying on it.
+- **SDK** — AWS SDK for .NET (`AWSSDK.*`, `AWS.Logger.*`): verify type, member, signature, and behavior from the restored package per the SDK rule.
+- **Live account** — the AWS CLI. Discover through help: the caller identity (account, principal ARN); the Service Quotas service for applied vs default values and the service and quota codes to query them; IAM policy simulation for effective permissions; each service's describe/list/get operations for resource state; dry-run where the service supports it. Pin region and profile.
+- **Gotchas** — The default-quota lookup returns the documented default, the applied-quota lookup the account's value; some quotas are untracked and return only a default. Quotas and features are regional; record the region for every such claim. Policy simulation may skip SCPs and resource policies unless supplied; record what it covered.

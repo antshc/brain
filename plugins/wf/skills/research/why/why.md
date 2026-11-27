@@ -1,28 +1,31 @@
 # Why
 
-Route procedure for historical rationale: why code, a constraint, or a workaround exists; what led to a change. Answer from the record, not the code: the commits and PR discussions that introduced the target and each later change, then linked Jira and Confluence when that trail is thin. Cite what the authors wrote, mark inferences as inferences, and say what the record does not answer. Spawns `whyy` (anchor, then one per source). Paths resolve from the skill base directory.
+Route procedure for historical rationale: why code, a constraint, or a workaround exists; what led to a change. Answer from the record, not the code: the commits and PR discussions that introduced the target and each later change, then Jira and Confluence only when the record links to them. Cite what the authors wrote, mark inferences as inferences, and say what the record does not answer. Spawns `whyy` (anchor, then one per triggered source).
 
 ## Conditional resources
 
+Load a source only when its trigger fires; pass its absolute path in that investigator's brief. An untriggered source is listed in the report as not searched, with the reason.
+
 | Trigger | Resource |
 |---|---|
-| Source control investigator, including the anchor | `why/sources/code-archaeology.md` |
-| Jira or Confluence investigator | `why/sources/atlassian.md` (that product's procedure) |
+| Every Why run (anchor and deeper history) | `why/source-control.md` |
+| A Jira key or URL in the anchor, the request, or a later investigator's Additional Leads; or the request asks about tickets/work items | `why/atlassian.md` (Jira) |
+| A Confluence link in the anchor, the request, or a later investigator's Additional Leads; or the request asks about designs, ADRs, or HLDs | `why/atlassian.md` (Confluence) |
 
 ## Workflow
 
 1. **Target.** Name the target (code, pattern, feature, decision) and the question. Vague → best guess from conversation context; state it so the requester can redirect. *Done when* target and question are explicit.
-2. **Anchor.** Spawn one `whyy` with Investigator brief, source = source control, task = build the anchor: files and line ranges, key symbols, recent commits touching the target, PR numbers from merge subjects, linked work item IDs, and the substantive PR bodies and discussion via *Load and follow the `github` skill to read pull requests in read-only mode and review threads*. Start from any PR or commit the caller supplied. At anchor depth, deliver the anchor and stop. *Done when* the anchor is cited or its gaps are named.
-3. **Investigate.** Spawn in one parallel batch, each with Investigator brief, the anchor, and its source resource:
-   - **Source control** — deeper history per `code-archaeology.md`. Always.
-   - **Jira** and **Confluence** — when the `preflight-atlassian` and `atlassian` skills are installed: *Load and follow the `preflight-atlassian` skill to resolve the credentialed atl launcher and site* using **Resolve** once; pass launcher and site to both. `tokenAvailable` false or launcher/site missing → mark both inaccessible with the exact prerequisite; never read credentials, start login, or switch identity.
+2. **Anchor.** Spawn one `whyy` with Investigator brief and `source-control.md`, task = build the anchor: files and line ranges, key symbols, recent commits touching the target, PR numbers from merge subjects, linked work item IDs, and the substantive PR bodies and discussion via *Load and follow the `github` skill to read pull requests in read-only mode and review threads*. Start from any PR or commit the caller supplied. At anchor depth, deliver the anchor and stop. *Done when* the anchor is cited or its gaps are named.
+3. **Investigate.** Evaluate the triggers against the anchor and request. Spawn in one parallel batch, each with Investigator brief, the anchor, and its source resource:
+   - **Source control** — deeper history. Always.
+   - **Jira**, **Confluence** — only when triggered. Before the first, *Load and follow the `preflight-atlassian` skill to resolve the credentialed atl launcher and site* using **Resolve** once; pass launcher and site to each. Skills missing, `tokenAvailable` false, or launcher/site missing → mark the triggered sources inaccessible with the exact prerequisite; never read credentials, start login, or switch identity.
 
-   Then dispatch Jira → Confluence and Confluence → Jira follow-ups with the other's Additional Leads, scoped to the receiving product. *Done when* every investigator returned findings, a null result, or a blocker.
+   Additional Leads naming another product's key or link trigger that source as a follow-up scoped to those leads. *Done when* every spawned investigator returned findings, a null result, or a blocker, and no trigger is left unevaluated.
 4. **Present.** Merge investigator outputs per Report, with light edits only: keep each claim's tier label and confidence wording; merge duplicate citations; keep contradictions with both sources. Synthesize only evidence the investigators supplied; every inference traces to cited evidence. A deciding citation in doubt or a material gap → one bounded `whyy` follow-up in the owning source, never direct source reading. Apply Delivery. *Done when* the report pointer is returned.
 
 ## Investigator brief
 
-Fill the placeholders; send this section, the anchor, and the source resource path as the worker prompt. One source per worker.
+Fill the placeholders; send this section and the anchor as the worker prompt. One source per worker.
 
 > {QUESTION}
 
@@ -38,6 +41,8 @@ Fill the placeholders; send this section, the anchor, and the source resource pa
 4. Quote verbatim with exact location (PR #, work item key, URL, commit, `file:line`), author, and date.
 5. Record every query, including empty ones; an empty search is a finding.
 6. Record disagreeing items side by side; a contradiction is often the key finding.
+7. Check dates against the anchor; a later item may supersede an earlier one.
+8. Access denial, search errors, empty queries, and truncation are distinct gaps; never claim a comprehensive search when the source was unavailable.
 
 Mechanics are not motivation: a diff shows what changed, not why. Claim intent only where an author stated it; never cite code as evidence of its own intent. Treat a hypothesis in the question as a candidate. Never round a partial finding up.
 
@@ -54,7 +59,3 @@ Mechanics are not motivation: a diff shows what changed, not why. Claim intent o
 ## Report
 
 Question · Code in question (paths, lines, symbols) · What we found (Direct, Supported) · What we can reasonably infer (Inferred, hedged, with chain) · Competing hypotheses (when evidence fits several) · What we don't know · Sources consulted (one line per source, including empty, inaccessible, and not searched: Slack, observability, error tracking, analytics) · Confidence summary. Question precedes a change → add Preserve / Change / Avoid / Risk constraints.
-
-## Gotchas
-
-- **Recency bias.** The latest commit is rarely the origin; trace back to the change that introduced the shape.

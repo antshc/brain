@@ -1,6 +1,6 @@
 {
   "commonChecks": [
-    "How coordinates; codebase executes read-only evidence requests; explainy applies How report Explain to the evidence; no route agent spawns a subagent",
+    "How coordinates; codebase executes read-only evidence requests; the router applies How report Explain to the evidence; no route agent spawns a subagent",
     "material claims have decisive citations; intent, source behavior, observations, and unknowns remain distinct",
     "reports save to the session workspace unless the request names a location",
     "included diagrams depict confirmed evidence and unresolved boundaries accurately"

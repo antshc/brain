@@ -1,50 +1,8 @@
 # Azure
 
-Provider reference for an Azure question on the Web route. Apply the Web Brief.
+Web provider resource. Apply the Brief, including Provider only.
 
-## Docs
-
-Search and fetch official Microsoft Learn documentation — service docs, REST/ARM references, RBAC built-in roles, quotas and limits, networking. Use the Microsoft Learn MCP tools (docs search, docs fetch) when installed; otherwise the `mslearn` CLI (`npx @microsoft/learn-cli`) or fetch `learn.microsoft.com` pages directly. Search with product, feature, intent, and resolved SDK version when applicable; fetch the full page for complete limits, parameters, or incomplete excerpts.
-
-## SDK
-
-Azure SDK (`Azure.*`, `Microsoft.Azure.*`):
-
-1. Resolve the version from the workspace — `Directory.Packages.props`, `Directory.Build.props`, `Directory.Build.targets`, `*.csproj`; absent → `obj/project.assets.json`. Never reuse a version from an earlier session.
-2. Search official Microsoft code samples and API reference for the package, version, namespace, type, and member — use the Microsoft Learn MCP code sample search when installed.
-3. Not settled, or Learn unavailable → verify the type, member, signature, and behavior from the restored package’s XML docs or decompiled assembly: record UNKNOWN with a ready `codebase` lookup per the Brief; continue independent evidence work.
-
-Other SDKs: resolve the version from the dependency manifest and lockfile, then use Docs.
-
-## Azure CLI
-
-Read-only research of the live subscription. Check `command -v az`; absent → UNKNOWN per the Brief probes rule.
-
-1. **Identity** — `az account show`; record tenant, subscription, and principal type. Never print credentials.
-2. **Pin** — pass `--subscription` on every call; never rely on the implicit default.
-3. **Discover** — `az <group> <command> --help` for unfamiliar commands or flags.
-4. **Read** — only `show`, `list`, `list-*`, `get-*`, plus:
-
-   | Need | Command |
-   |---|---|
-   | Compute usage vs limit | `az vm list-usage --location <region>` |
-   | Network usage vs limit | `az network list-usages --location <region>` |
-   | Applied quota (any provider) | `az quota show` / `az quota usage list --scope <scope>` |
-   | Role assignments | `az role assignment list --assignee <id> --scope <scope> [--include-inherited]` |
-   | Role actions / data actions | `az role definition list --name <role>` |
-   | Provider API versions, regions | `az provider show --namespace <ns> --query "resourceTypes[?resourceType=='<type>']"` |
-   | SKU / regional availability | service `list-skus` (e.g. `az vm list-skus --location <region>`) |
-   | ARM read with pinned version | `az rest --method get --url <ARM url>?api-version=<v>` |
-   | Deployment validation | `az deployment group what-if` |
-
-5. **Shape output** — `--query '<JMESPath>' -o json` to extract the cited field.
-
-Prefer service-specific commands over generic `az resource`. **MUST NOT** run create, update, set, delete, assign, or any `az rest` other than `--method get`.
-
-## Gotchas
-
-**Azure REST behavior is pinned to an `api-version`.** A parameter or response field in one version is absent in another; record the version every REST claim was read against.
-
-**Control plane and data plane carry separate permissions.** `Microsoft.Storage/storageAccounts/read` does not grant blob reads; record which plane each action or data action serves.
-
-**`az quota` needs the `Microsoft.Quota` provider registered.** Not registered → fall back to the service-specific usage command and record the gap.
+- **Docs** — Microsoft Learn tools (docs search, fetch, code sample search) or `learn.microsoft.com`: service docs, REST/ARM references, built-in RBAC roles, quotas and limits, networking.
+- **SDK** — Azure SDK (`Azure.*`, `Microsoft.Azure.*`): first official code samples and API reference for package, version, namespace, type, member; unsettled or Learn unavailable → restored package per the SDK rule.
+- **Live subscription** — the Azure CLI. Discover through help: the signed-in account (tenant, subscription, principal type); usage-vs-limit and quota commands for the resource provider; role assignments (including inherited) and role definitions for actions and data actions; resource provider details for API versions and regions; SKU listings for regional availability; what-if for deployment validation. Prefer service-specific commands over generic resource commands; raw ARM calls are GET-only with a pinned `api-version`. Pin the subscription.
+- **Gotchas** — REST behavior is pinned to an `api-version`; record it for every REST claim. Control and data planes carry separate permissions (account read does not grant blob reads); record each action's plane. The generic quota commands need the `Microsoft.Quota` provider registered; otherwise use the service's usage command and record the gap.

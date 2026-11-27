@@ -1,23 +1,14 @@
 # How report
 
-One current-system explanation per question. Give a senior engineer a working mental model and the sources to trace it. Concise → the router applies Explain itself; Detailed/Full → the router sends Explain as the `explainy` worker prompt.
+Current-system explanation for one question; the How router writes it from collected evidence.
 
 ## Explain
 
-Fill the placeholders; send this whole file as the worker prompt.
+Write for a senior engineer new to this area: after reading, they hold a working mental model, can start working in it confidently, and have the sources to trace each step.
 
-> {QUESTION}
-
-- Scope and depth — {SCOPE_AND_DEPTH}
-- Explorer findings — {EXPLORER_FINDINGS}
-- Selected presentation guidance — {INSPECTION_GUIDANCE}
-- Requested report framing — {OUTPUT_SHAPE}
-
-**Synthesize.** Lead with the answer. Explain domain concepts before implementation; build the model from trigger to outcome. Merge overlapping findings; explain each step once. Integrate deciding lane behavior, data rules, package implementation, and provider semantics where they change the mechanism. Keep executing source, documented intent, and runtime observations distinct. Preserve assumptions, unknowns, and conflicts; never fill gaps silently. A missing fact that could change the answer → return claim, consequence, and exact check for a bounded `codebase` follow-up. No annotated-source walkthroughs; no unsupported historical rationale.
+**Synthesize.** Lead with the answer. Explain domain concepts before implementation; build the model from trigger to outcome. Merge overlapping findings; explain each step once. Integrate deciding lane behavior, data rules, package implementation, and provider semantics where they change the mechanism. Keep executing source, documented intent, and runtime observations distinct. Reconcile conflicts; label remaining assumptions and unknowns; never fill gaps silently. A missing fact that could change the answer → back to Verify with claim, consequence, and exact check. No annotated-source walkthroughs; no unsupported historical rationale.
 
 **Visualize.** Pick the view from the question, using only confirmed evidence; prefer prose or a table when clearer. Diagram → *Load and follow the `doc-diagram` skill to create the selected Mermaid architecture, process flow, or class diagram*. Topology/ownership → container or swimlane; interaction order → sequence; selection/failure branching → flowchart; data structure → table or class view. Flow across two or more deployables → prefer a Swimlane Diagram, one lane per deployable. Label unresolved edges as gaps; keep file/line detail in nearby citations; render every Mermaid block or report the blocker.
-
-**Return** one Markdown draft inline following the sections below. Choose no save destination; write no file.
 
 ## Answer
 
@@ -34,5 +25,4 @@ Only as needed: **Where things live**, **Failures and edge cases**, **Runtime ob
 ## Report checks
 
 - Cite each material claim in place: `[orders.py](../../src/orders.py#L42):L42-54`, filename as label, line or range outside the link. Resolve relative links from the report location; inline answers use absolute links; permalinks pin the inspected commit. Quote the deciding line when it helps.
-- Reconcile conflicting evidence before writing; label assumptions and unknowns.
-- Honor the requested framing; remove placeholders and unused sections. Research owns the save location.
+- Honor the requested framing; remove unused sections.

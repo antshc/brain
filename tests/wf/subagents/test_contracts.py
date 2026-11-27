@@ -23,7 +23,7 @@ def test_subagents_owns_model_selection_and_arena():
 def test_research_preserves_why_and_routes_system_evidence_to_codebase():
     skill = (SKILLS / "research/SKILL.md").read_text()
     for reference in ("how/how.md", "how/explorer-prompt.md", "how/report.md",
-                      "why/why.md", "why/sources/atlassian.md"):
+                      "why/why.md", "why/atlassian.md", "web/web.md", "web/aws.md"):
         assert f"]({reference})" in skill
         assert (SKILLS / "research" / reference).is_file()
     assert "Why depth" in skill
@@ -31,7 +31,7 @@ def test_research_preserves_why_and_routes_system_evidence_to_codebase():
     assert "## Routing" in skill
     how = (SKILLS / "research/how/how.md").read_text()
     assert "system/system-inspection.md" not in skill
-    assert "`codebase`" in how and "`explainy`" in how
+    assert "`codebase`" in how and "`explainy`" not in how
     assert "## Delivery" in skill
 
 

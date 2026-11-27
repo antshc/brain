@@ -16,9 +16,9 @@ HOW = (ROOT / 'how/how.md').read_text()
 INSPECTION = (ROOT / 'how/inspection.md').read_text()
 REPORT = (ROOT / 'how/report.md').read_text()
 PROMPT = (ROOT / 'how/explorer-prompt.md').read_text()
-ROLES = {'explainy': ('how/report.md', None), 'whyy': ('why/why.md', 'Investigator brief'), 'weby': ('web/web.md', 'Brief')}
+ROLES = {'whyy': ('why/why.md', 'Investigator brief'), 'weby': ('web/web.md', 'Brief')}
 CODEBASE_AGENT = REPO / 'plugins/wf/agents/codebase.agent.md'
-ROUTES = {'Wayfinder': ('wayfinder/wayfinder.md', ()), 'How': ('how/how.md', ('codebase', 'explainy')), 'Why': ('why/why.md', ('whyy',)),
+ROUTES = {'Wayfinder': ('wayfinder/wayfinder.md', ()), 'How': ('how/how.md', ('codebase',)), 'Why': ('why/why.md', ('whyy',)),
           'Web': ('web/web.md', ('weby',))}
 
 
@@ -31,8 +31,6 @@ def role_prompt(role: str) -> str:
     end = re.compile(r'^## ', re.M).search(text, start)
     return text[start:end.start() if end else None]
 
-
-EXPLAINER = role_prompt('explainy')
 
 
 def local_markdown_links(path: Path) -> set[Path]:
@@ -163,12 +161,15 @@ def test_lookup_callers_spawn_explore_directly(relative_path: str):
     assert '`research` skill' not in caller
 
 
-def test_explorer_and_explainy_accept_evidence_without_path_policy():
+def test_explorer_accepts_evidence_without_path_policy():
     for field in ('QUESTION', 'EXPLORATION_ANGLE', 'TARGETS_OR_REFS', 'DEPTH', 'LENS_AND_CHECKS'):
         assert f'{{{field}}}' in PROMPT
-    assert '{EXPLORER_FINDINGS}' in EXPLAINER
-    assert '{OUTPUT_SHAPE}' in EXPLAINER
-    assert not re.search(r'\{(?:OUTPUT_PATH|OUTPUT_ARTIFACT)\}', PROMPT + EXPLAINER)
+    assert not re.search(r'\{(?:OUTPUT_PATH|OUTPUT_ARTIFACT)\}', PROMPT)
+
+
+def test_router_writes_how_explanation_without_worker():
+    assert 'explainy' not in HOW + REPORT + ENTRY
+    assert not re.search(r'\{[A-Z_]+\}', REPORT)
 
 
 def test_how_eval_cases_cover_evidence_and_delivery_failures():
@@ -210,3 +211,14 @@ def test_long_research_resources_open_with_contents():
         text = path.read_text()
         if path.name != 'SKILL.md' and len(text.splitlines()) > 100:
             assert '\n## Contents\n' in text, path.relative_to(ROOT)
+
+
+@pytest.mark.parametrize('playbook, resources', [
+    ('why/why.md', ('why/source-control.md', 'why/atlassian.md')),
+    ('web/web.md', ('web/aws.md', 'web/azure.md')),
+])
+def test_why_and_web_load_sources_only_by_trigger(playbook: str, resources: tuple[str, ...]):
+    table = (ROOT / playbook).read_text().split('## Conditional resources')[1].split('\n## ')[0]
+    for resource in resources:
+        assert (ROOT / resource).is_file(), resource
+        assert re.search(rf'^\| [^|]+ \| `{re.escape(resource)}`( \([A-Za-z]+\))? \|$', table, re.M), resource
