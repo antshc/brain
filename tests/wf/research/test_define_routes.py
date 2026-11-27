@@ -80,7 +80,10 @@ def test_evidence_pipeline_and_standalone_delivery_are_preserved():
     for field in ('@question', '@criteria', '@repoFacts', '@outputPath', '@outputBase'):
         assert field in WAYFINDER
     assert 'retention through reproduction and human review' in WAYFINDER
-    assert 'Report-only delivery below applies to standalone evidence routes' in ENTRY
+    delivery = ENTRY.split('## Delivery')[1].split('\n## ')[0]
+    assert '**How, Why, Web**' in delivery
+    assert 'Return only report pointers, as clickable links, never findings inline' in delivery
+    assert 'Topic reports use the explicit map-owned destinations' in delivery
     assert 'route `define-concept`' in ENTRY
 
 
