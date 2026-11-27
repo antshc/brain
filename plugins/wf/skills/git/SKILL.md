@@ -1,7 +1,7 @@
 ---
 name: git
 description: >-
-  Run verified Git mechanics for branch naming, creation, fetch, push, commit messages, history, blame, and worktree lifecycle. Use for 'name a branch', 'creating the worktree', 'draft a commit', 'push a branch', 'read commit history', or 'who introduced this line'. GitHub issues, PRs, and checks belong to `github`.
+  Run Git mechanics for branch naming, creation, fetch, push, commit messages, history, blame, and worktree lifecycle. Use for 'name a branch', 'create a worktree', 'draft a commit', 'push a branch', 'read commit history', or 'who introduced this line'. GitHub issues, PRs, and checks belong to `github`.
 ---
 
 # Git
