@@ -12,4 +12,4 @@ For `architect runners`, the ordered list is a model pool; Arena selects seats p
 | prover | claude-opus-5.5 medium | gpt-6-sol medium |
 | whyy | claude-sonnet-5.5 high | claude-sonnet-5 high |
 | weby | gpt-6-luna low | claude-haiku-5.5 high |
-| codebase | claude-haiku-5.5 medium | gemini-3.8-flash medium |
+| codebase | claude-haiku-5.5 high | gemini-3.8-flash high |
