@@ -32,7 +32,7 @@ For every `architecture-records` call in this playbook, read its entire `SKILL.m
 
 | Operation | Invocation and inputs | Required result |
 |---|---|---|
-| Fact lookup | Spawn the wf plugin's `hunty` agent per independent track in one parallel batch, each with its bounded question, target checkout/ref, and thoroughness; sequence dependent tracks. Rationale or external facts → *Load and follow the `research` skill to investigate technical questions across source code, docs, and external evidence and return cited findings*, in this session, with default routing. Blocked lookup → record it; continue independent tracks. | `hunty` route line or selected research route, plus findings with `path:line`, symbol, commit/PR or source URL evidence, confidence (Why), unknowns, and completion/blocker status. |
+| Fact lookup | Spawn the wf plugin's `codebase` agent per independent track in one parallel batch, each with its bounded question, target checkout/ref, and thoroughness; sequence dependent tracks. Rationale or external facts → *Load and follow the `research` skill to investigate technical questions across source code, docs, and external evidence and return cited findings*, in this session, with default routing. Blocked lookup → record it; continue independent tracks. | `codebase` route line or selected research route, plus findings with `path:line`, symbol, commit/PR or source URL evidence, confidence (Why), unknowns, and completion/blocker status. |
 | Index load/scan/sync | *Load and follow the `architecture-records` skill to load an index and maintain architecture indexes.* Use route `index`, action `load`, `scan`, or `sync-row`, and required metadata; row mutations use `rowAction`. | Per-table counts and every row, matched/checked clauses and rationale, or the updated row/sync result; explicit errors. |
 | Record | *Load and follow the `architecture-records` skill to record ADRs, Concepts, and glossary terms.* Select route `term`, `adr`, or `concept-record`; pass the resolved term/decision, governing scope, source evidence, and existing record/owning index when known. Apply its gate before writing; recording settled content adds no discovery interview. | Gate result, written path, and required index/pointer result, an explicit blocker, or an ADR scope question — ask it next; keep the write pending until answered. |
 
@@ -148,7 +148,7 @@ Re-check each tactic's trigger after every user answer or new fact. A later answ
 
 **Rationale probe** — when the user or a record asks why existing code, a constraint or a workaround exists, or a decision would remove it, run Fact lookup via Why before proposing the change. Report Why confidence as returned; low confidence or missing sources stay a fact gap.
 
-**External fact check** — when a decision depends on a provider limit, service behavior, public spec or third-party API, run Fact lookup via Cloud (AWS/Azure) or Web. Rank findings per the Authority rule; a conflict with a record or code becomes a question, never a silent override.
+**External fact check** — when a decision depends on a provider limit, service behavior, public spec or third-party API, run Fact lookup via Web (including AWS/Azure). Rank findings per the Authority rule; a conflict with a record or code becomes a question, never a silent override.
 
 **Verification scope** — when the design changes behavior, persistence, or an integration boundary, load [tactics-verification.md](../references/tactics-verification.md) and apply the coverage-category check.
 

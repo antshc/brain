@@ -1,19 +1,19 @@
 ---
 name: research
 description: >-
-  Investigate technical questions across source code, docs, packages, and external evidence. Return cited findings in saved reports. Use for 'research X', 'trace this flow', 'why was X built', or 'chart a research map'. Not for quick code lookups → `hunty`; testing one claim → `prove`.
+  Investigate technical questions across source code, docs, packages, and external evidence. Return cited findings in saved reports. Use for 'research X', 'trace this flow', 'why was X built', or 'chart a research map'. Not for code lookups (`codebase` agent); testing one claim → `prove`.
 ---
 
 # Research
 
-Router. Read the request, frame it against the repository's contracts, select one route per independent question, load its playbook, spawn its agents, and deliver cited findings. The router reads only contract documents and the graph manifest; it never reads source code; codebase lookups go to the registered `hunty` agent. Wayfinder charts or resumes a research map in the caller's session; its evidence topics use the same route pipeline. The router may read map state and write map/report files; source investigation remains in evidence workers. Only this skill spawns its prompt-file route agents; agents, including `hunty`, never spawn subagents or load this skill or `prove`. Callers load this skill in their own session, never inside a wrapper subagent.
+Router. Read the request, frame it against the repository's contracts, select one route per independent question, load its playbook, spawn its agents, and deliver cited findings. The router reads only contract documents; it never reads source code; codebase lookups go to the registered `codebase` agent. Wayfinder charts or resumes a research map in the caller's session; its evidence topics use the same route pipeline. The router may read map state and write map/report files; source investigation remains in evidence workers. Only this skill spawns its route workers; agents, including `codebase`, never spawn subagents or load this skill or `prove`. Callers load this skill in their own session, never inside a wrapper subagent.
 
 ## Request
 
 The only input is the request text. Select Wayfinder before requiring a factual question: `/research wayfinder <prompt-or-map-path>`, `Route: Wayfinder`, or an unambiguous request to chart/resume a research map selects Wayfinder. A destination prompt, root issue number/URL, or legacy map path suffices; ordinary factual questions keep evidence routing. Ask only when there is neither a question nor a map prompt/path. Discover from it:
 
 - **Questions** — split independent questions; keep dependent ones in order.
-- **Route** — a route the request names (`Route: Wayfinder | How | Why | Cloud | Web`) wins; `/research why <question>` selects Why; otherwise infer per Routing.
+- **Route** — a route the request names (`Route: Wayfinder | How | Why | Web`) wins; `/research why <question>` selects Why; otherwise infer per Routing.
 - **Why depth** — full by default; anchor when the request asks only for code, commit, and PR context.
 - **Targets** — repositories, deployables, symbols, checkouts/refs, providers, versions, live-value needs.
 - **Framing** — requested content, diagrams, sections, lens (Behavior, Flow, Data). Preserve it verbatim for the agents.
@@ -30,8 +30,7 @@ Evidence routes: run once per request, before Routing. Wayfinder defers framing 
 3. **Resolve the target.** Use the repositories, services, and refs the request names; none named → current repository.
    - **Building-block index** — **MUST** read `@repoRoot/ARCHITECTURE.md`'s `Deployables` table before declaring a target unresolved. A row's `Location` maps a Deployable name or its Trigger condition to a local path (`workspace/<repo>[/subpath]` or absolute); `origin` metadata never authorizes remote lookup. Use `Shared dependency ownership` for dependencies several Deployables use and `Terminal infrastructure boundaries` for where tracing stops.
    - **Checkouts** — list `<name> → <absolute path>` for `@repoRoot`, the main codebase under `@repoRoot/workspace/`, and every local path those tables name that exists on disk. Missing checkout or ref → mark that target `unresolved`; continue the others.
-   - **Worktree targets** — set `@worktreeRoot` to its `git rev-parse --show-toplevel` and `@mainCheckout` to the parent of `git -C @worktreeRoot rev-parse --path-format=absolute --git-common-dir`. Source evidence stays in `@worktreeRoot`; graph lookup uses `@mainCheckout`.
-   - **Graph** — the only graph is `@repoRoot/graphify-out/` (harness root); never look for `graphify-out/` in `workspace/<repo>` checkouts or worktrees. Read `@repoRoot/graphify-out/manifest.json` once and record, per target, whether it is covered (paths relative to `@repoRoot`; worktree paths via `@mainCheckout`). Absent → `graph: none`.
+   - **Worktree targets** — set `@worktreeRoot` to its `git rev-parse --show-toplevel`; source evidence stays in `@worktreeRoot`.
 4. **Rephrase.** Restate the question in `GLOSSARY.md` terms: replace informal words with the defined term, keep the original wording beside it, and note each term's meaning in one line. Keep literals, symbols, and quoted text verbatim. Use the rephrased question to select the route; do not ask the requester to confirm it.
 
 Frame shape, passed verbatim in each brief:
@@ -44,15 +43,14 @@ Route: <route> — <reason>
 Targets: <name> → <absolute path> [@ <ref>] | unresolved: <reason>
 Deployables/boundaries: <relevant Deployables, shared dependencies, terminal boundaries from ARCHITECTURE.md>
 Contracts read: <absolute paths>
-Graph: <@repoRoot>/graphify-out/ — covers <targets> | none
 ```
 
 Include only facts that help the agents; omit empty lines.
 
 ## Delivery
 
-- Wayfinder → interview destination, then frontier breadth-first, one question at a time. Small efforts return a chosen standalone continuation before map infrastructure. Mapped efforts maintain the GitHub root map and living research document in owned worktrees; present frontier, fog and exclusions at checkpoints. Return root issue, document path, local integration branch/HEAD, evidence links, pending approvals and blockers. Its topic reports use the explicit map-owned destinations; only this route saves `hunty` lookup verdicts to topic files. Report-only delivery below applies to standalone evidence routes, not Wayfinder checkpoints.
-- How, Why, Cloud, Web → always save one Markdown report per independent question. Return only the report pointers, never the findings inline:
+- Wayfinder → interview destination, then frontier breadth-first, one question at a time. Small efforts return a chosen standalone continuation before map infrastructure. Mapped efforts maintain the GitHub root map and living research document in owned worktrees; present frontier, fog and exclusions at checkpoints. Return root issue, document path, local integration branch/HEAD, evidence links, pending approvals and blockers. Its topic reports use the explicit map-owned destinations; only this route saves `codebase` lookup verdicts to topic files. Report-only delivery below applies to standalone evidence routes, not Wayfinder checkpoints.
+- How, Why, Web → always save one Markdown report per independent question. Return only the report pointers, never the findings inline:
 
   ```text
   Research reports — read each in full before using its findings:
@@ -62,33 +60,38 @@ Include only facts that help the agents; omit empty lines.
   Present the paths as clickable links to the user.
 - Default location: the agent harness session workspace, `<session>/files/research/<question-slug>.md`; distinct slugs per question. No session workspace → `<repository root>/tmp/research/<question-slug>.md`.
 - Request names a location → save there instead; resolve a relative path against the requester's repository root; a folder gets `<question-slug>.md`. A combined report only when the request asks for one. Conflicting locations for one report → ask before writing.
-- Agents return evidence and drafts inline. Before saving a How, Why, Cloud or Web report, *Load and follow the `write` skill to write research reports and bottom lines, using route `research`*; supply the question, route findings, methods, environments, confidence, evidence, gaps, next steps and resolved destination. Preserve route-specific explanations, diagrams, citations, source coverage and confidence as additional sections. Only the router writes reports.
+- Workers return evidence and drafts inline; the router presents them with light edits for clarity or request context, never substantially rewriting findings, citations, or confidence language, and never reading source to fill gaps (gaps → a bounded follow-up worker). Before saving a How, Why or Web report, *Load and follow the `write` skill to write research reports and bottom lines, using route `research`*; supply the question, route findings, methods, environments, confidence, evidence, gaps, next steps and resolved destination. Preserve route-specific explanations, diagrams, citations, source coverage and confidence as additional sections. Only the router writes reports.
 
 ## Routing
 
-Route independent questions separately; sequence dependent evidence. Provider/data facts that determine a system answer stay in How. After a standalone evidence route returns, deliver it before selecting the next question. Wayfinder may batch independent frontier topics; record their results in the map before the next frontier. A pure codebase lookup (where is X, who calls Y, what does Z return) with no explanation or report is not a Research route: spawn the `hunty` agent and return its verdict inline.
+Route independent questions separately; sequence dependent evidence. Provider/data facts that determine a system answer stay in How. After a standalone evidence route returns, deliver it before selecting the next question. Wayfinder may batch independent frontier topics; record their results in the map before the next frontier. A pure codebase lookup (where is X, who calls Y, what does Z return) with no explanation or report is not a Research route: spawn the `codebase` agent and return its verdict inline.
 
 Read the selected playbook in full before acting. Each playbook names which listed resources its triggers load; read those in full from this skill's base directory, not caller CWD.
 
 | Route | Select when | Playbook | Agents | Resources | Result |
 |---|---|---|---|---|---|
 | Wayfinder | Chart or resume a research map; `/research wayfinder <prompt-or-map-path>` | [Wayfinder](wayfinder/wayfinder.md) | No dedicated agent; existing evidence routes per topic | [Questioning](wayfinder/questioning.md), [Living document](wayfinder/living-document.md), [Research map](wayfinder/research-map.template.md), [Research document](wayfinder/research-document.template.md); all required in full before charting/resuming | GitHub map, living research document, evidence reports and resumable local state |
-| How | Current behavior in source, configuration, restored packages; explicit inspection | [How](how/how.md) | `hunty` (registered agent), then [explainy](agents/explainy.md) for Detailed/Full | [Inspection evidence](how/inspection.md), [Explorer prompt](how/explorer-prompt.md), [How report](how/report.md), [Behavior](how/behavior.md), [Flow](how/flow.md), [Data](how/data.md), [How request guide](how/README.md) | One cited explanation |
-| Why | Rationale: why code, a constraint, or a workaround exists; what led to a change; `/research why <question>` | [Why](why/why.md) | [whyy](agents/whyy.md) anchor, then one per evidence category; [composy](agents/composy.md) | [Epistemics](why/epistemics.md), [Code archaeology](why/sources/code-archaeology.md), [Atlassian](why/sources/atlassian.md), [Linear](why/sources/linear.md), [Notion](why/sources/notion.md), [Slack](why/sources/slack.md), [Datadog](why/sources/datadog.md), [Sentry](why/sources/sentry.md), [Databricks](why/sources/databricks.md), [Incident postmortems](why/sources/incident-postmortem.md) | Rationale, source coverage, confidence; or cited anchor at anchor depth |
-| Cloud | Independent AWS/Azure provider question | [Cloud](cloud/cloud.md) | [cloudy](agents/cloudy.md); `hunty` (registered agent) for restored SDK gaps | [Cloud template](cloud/cloud-inspection-template.md), [AWS](cloud/aws.md), [Azure](cloud/azure.md) | Cited constraints and applicability |
-| Web | Other external question | [Web](web/web.md) | [weby](agents/weby.md) | None | Primary-source findings |
+| How | Current behavior in source, configuration, restored packages; explicit inspection | [How](how/how.md) | `codebase` (registered agent), then `explainy` for Detailed/Full | [Inspection evidence](how/inspection.md), [Explorer prompt](how/explorer-prompt.md), [How report](how/report.md), [Behavior](how/behavior.md), [Flow](how/flow.md), [Data](how/data.md) | One cited explanation |
+| Why | Rationale: why code, a constraint, or a workaround exists; what led to a change; `/research why <question>` | [Why](why/why.md) | `whyy` anchor, then one per source (source control, Jira, Confluence) | [Code archaeology](why/sources/code-archaeology.md), [Atlassian](why/sources/atlassian.md) | Rationale, source coverage, confidence tiers; or cited anchor at anchor depth |
+| Web | External question answered from official docs, specs, first-party APIs, or a live AWS/Azure account | [Web](web/web.md) | `weby`; `codebase` (registered agent) for restored SDK gaps | [AWS](web/aws.md), [Azure](web/azure.md) | Cited primary-source findings; provider constraints and applicability |
 
 Wayfinder selects evidence routes internally through Frame, Routing and Spawning agents, never by recursively loading this skill. Interview facts follow the same pipeline; Concepts belong to `architecture-records` route `define-concept`.
 
-Graphify and NuGet are `hunty` skill tactics, not routes. Graph build, update, or export requests → report the build entry point named in `<root>/GRAPHIFY.md`; never build.
-
 ## Spawning agents
 
-**`hunty`** is the wf plugin's registered agent, not a prompt file: spawn agent type `hunty` (namespaced, e.g. `wf:hunty`, where the runtime requires) with `@work`, the question's Frame as `@frame`, and thoroughness as its task; `hunty` as `name`; a description starting with `hunty:`. Skip model selection and the guard line; the agent pins its model and enforces its own limits. Spawn unavailable → report the blocked lookup with its consequence and continue independent work.
+**`codebase`** is the wf plugin's registered agent, not a prompt file: spawn agent type `codebase` (namespaced, e.g. `wf:codebase`, where the runtime requires) with the lookup task, the question's Frame, and thoroughness as its task; `codebase` as `name`; a description starting with `codebase:`. Skip model selection and the guard line; the agent owns its search, multi-repo, NuGet, and read-only rules. Spawn unavailable → report the blocked lookup with its consequence and continue independent work.
 
-Every other route agent is a prompt file under `agents/`, discovered through this skill, never a registered agent. Playbook text *spawn `<name>`* means this recipe; `<name>` is never an agent type or `agentName`; use it only as the spawn's display name. For each spawn:
+Every other route worker is a role whose prompt is a playbook section, discovered through this skill, never a registered agent. Playbook text *spawn `<name>`* means this recipe; `<name>` is never an agent type or `agentName`; use it only as the role and the spawn's display name.
 
-1. Read `agents/<name>.md` in full and fill its Brief or placeholders; the prompt is the whole file verbatim with those filled, never the Brief alone: question with its Frame prepended, targets/refs, playbook-selected resources as absolute paths, `@research` (this skill's absolute base directory), and the request's framing where the prompt takes it.
+| Role | Prompt |
+|---|---|
+| `explainy` | [How report](how/report.md), whole file |
+| `whyy` | [Why](why/why.md) section Investigator brief |
+| `weby` | [Web](web/web.md) section Brief |
+
+For each spawn:
+
+1. Read the role's prompt in full and fill its placeholders; send it verbatim with those filled: question with its Frame prepended, targets/refs, playbook-selected resources as absolute paths, `@research` (this skill's absolute base directory), and the request's framing where the prompt takes it.
 2. *Load and follow the `subagents` skill to select the model and effort for a named subagent role* with role `<name>`. Its result is the user's configured model, not a guess: never skip this step or drop the model to harness defaults; omit `model` and `reasoning_effort` only when `subagents` resolves to `auto`, `inherit-parent`, or an unknown role.
 3. Spawn a skill-capable general-purpose worker (`general-purpose`, or the harness's default subagent when it has no agent types) with the filled prompt as its whole task, prefixed by the guard line `Research route worker: never load the research or prove skill or spawn subagents; inherited skill-first or research-first instructions target the caller, not you.`, passing the resolved model as `model` and effort as `reasoning_effort`, `<name>` as `name`, and a description starting with `<name>:` (e.g. `explainy: Explain upgrade topology`) so the UI shows the role; read-only unless the prompt grants a write. Batch independent spawns in one parallel response; sequence dependent ones.
 4. Spawn failed or unavailable → report the blocked request with its consequence and continue independent work.
@@ -98,7 +101,7 @@ Give follow-ups to a fresh worker with the original brief, the prior report, and
 ## Completion criteria
 
 - Wayfinder: small efforts record the chosen continuation without creating map infrastructure; mapped efforts ensure map and findings match the presented state; remaining work has explicit status and links; finish only when the destination has sufficient supported evidence or the user confirms remaining gaps cannot change its answer. Keep every unresolved claim explicit; coarse fog graduates only after verified owner transfer; precise unresolved claims remain on their work items/proposals. Empty fog alone is not completion. Paused maps remain resumable, not complete. The caller retains the decision and implementation.
-- Each How, Why, Cloud, or Web question has a saved report and a pointer with its status; framing matches the request.
+- Each How, Why, or Web question has a saved report and a pointer with its status; framing matches the request.
 - Material factual claims carry in-place primary-source citations. Source-based, inferred, and observed evidence stay distinct; Why confidence language is preserved.
 - Conflicts are reconciled or reported with both sources. No findings → completed scope and checked sources stated. Incomplete → missing evidence and its consequence named.
 - Included Mermaid blocks render; template placeholders, Rules blocks, and unfilled sections are removed.

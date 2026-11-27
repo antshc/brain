@@ -1,13 +1,6 @@
 # AWS
 
-Provider reference for an AWS cloud part. Apply the `cloudy` contract.
-
-## Contents
-
-- Docs
-- SDK
-- AWS CLI
-- Gotchas
+Provider reference for an AWS question on the Web route. Apply the Web Brief.
 
 ## Docs
 
@@ -18,14 +11,14 @@ Search and read official AWS documentation — service guides, API references, S
 AWS SDK for .NET (`AWSSDK.*`, `AWS.Logger.*`):
 
 1. Resolve the version from the workspace — `Directory.Packages.props`, `Directory.Build.props`, `Directory.Build.targets`, `*.csproj`; absent → `obj/project.assets.json`. Never reuse a version from an earlier session.
-2. Verify the type, member, signature, and behavior from the restored package’s XML docs or decompiled assembly: record UNKNOWN with a ready `hunty` lookup per Restored SDK packages; continue independent evidence work.
+2. Verify the type, member, signature, and behavior from the restored package’s XML docs or decompiled assembly: record UNKNOWN with a ready `codebase` lookup per the Brief; continue independent evidence work.
 3. Version-specific behavior, release notes, or retry/config defaults not visible in the package → official AWS SDK docs per Docs.
 
 Other SDKs: resolve the version from the dependency manifest and lockfile, then use Docs.
 
 ## AWS CLI
 
-Read-only research of the live account. Check `command -v aws`; absent → UNKNOWN per Probes.
+Read-only research of the live account. Check `command -v aws`; absent → UNKNOWN per the Brief probes rule.
 
 1. **Identity** — `aws sts get-caller-identity`; record account and principal ARN.
 2. **Pin** — pass `--region` and `--profile` (when set) on every call; never rely on an implicit default.

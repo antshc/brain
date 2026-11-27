@@ -6,7 +6,7 @@ Identify the item and store first, then route every writer and reader through lo
 
 Add findings to the How explanation.
 
-`explainy` chooses visuals under Visualize. Supply access-order, ownership, shape, and key evidence; tables often explain data rules most directly.
+How report Visualize chooses the view. Supply access-order, ownership, shape, and key evidence; tables often explain data rules most directly.
 
 ## Workflow
 

@@ -6,20 +6,9 @@ Map each handoff to a row, then verify sender, wire contract, receiver, and depl
 
 Add findings to the How explanation.
 
-## Contents
-
-- Presentation
-- Deployable eligibility
-- Workflow
-- Boundary
-- Integration contract
-- Handoff evidence
-- Chain check
-- Gotchas
-
 ## Presentation
 
-`explainy` chooses the view under Visualize. A flow crossing two or more deployables → prefer the `doc-diagram` Swimlane Diagram with one lane per deployable (lane name = the `ARCHITECTURE.md` Deployable name), lanes in chain order, 1–5 boundary-relevant steps per lane, and every crossing labeled with its contract (route, message, queue, or call). Add a sequence diagram only when interaction order or timing decides the answer that the swimlane cannot show. Back every node/crossing with evidence; draw unresolved crossings as labeled gaps.
+How report Visualize chooses the view. A flow crossing two or more deployables → prefer the `doc-diagram` Swimlane Diagram with one lane per deployable (lane name = the `ARCHITECTURE.md` Deployable name), lanes in chain order, 1–5 boundary-relevant steps per lane, and every crossing labeled with its contract (route, message, queue, or call). Add a sequence diagram only when interaction order or timing decides the answer that the swimlane cannot show. Back every node/crossing with evidence; draw unresolved crossings as labeled gaps.
 
 ## Deployable eligibility
 
@@ -82,5 +71,5 @@ Correlate an existing request across logs or distributed traces, or issue a requ
 
 - **A lane that appears twice is one lane revisited, not two** — a chain that returns to an earlier deployable is a cycle; record the second crossing as a handoff back to the existing lane number and stop, or the walk never terminates.
 - **An artifact given its own lane invents a deployable that production never starts** — a bundle, script, playbook, or chart shows up in logs and file trees like a participant, so apply the eligibility test before drawing a lane for anything you cannot point at a process for.
-- **A missing sibling in a code graph is a gap, not a terminal** — graph and index tools cover only the repositories in their manifest, so search the repository directly before classifying the crossing. When emit or receive evidence suggests the sibling exists but the other side or binding remains missing, record an Assumption; when that gap could change chain completeness or the framed answer, also record the consequence as an Unknown.
+- **A missing sibling in a search index is a gap, not a terminal** — index tools cover only the repositories they were built over, so search the repository directly before classifying the crossing. When emit or receive evidence suggests the sibling exists but the other side or binding remains missing, record an Assumption; when that gap could change chain completeness or the framed answer, also record the consequence as an Unknown.
 - **Too many steps in a chain lane hide an unfinished chain** — one deployable's mechanism can consume the run before downstream boundaries are proved, so keep only 1–5 boundary-relevant major steps and offer a Behavior follow-up after the chain closes.

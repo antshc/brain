@@ -16,11 +16,23 @@ HOW = (ROOT / 'how/how.md').read_text()
 INSPECTION = (ROOT / 'how/inspection.md').read_text()
 REPORT = (ROOT / 'how/report.md').read_text()
 PROMPT = (ROOT / 'how/explorer-prompt.md').read_text()
-EXPLAINER = (ROOT / 'agents/explainy.md').read_text()
-AGENTS = ('explainy', 'whyy', 'composy', 'cloudy', 'weby')
-HUNTY_AGENT = REPO / 'plugins/wf/agents/hunty.agent.md'
-ROUTES = {'Wayfinder': ('wayfinder/wayfinder.md', ()), 'How': ('how/how.md', ('hunty', 'explainy')), 'Why': ('why/why.md', ('whyy', 'composy')),
-          'Cloud': ('cloud/cloud.md', ('cloudy',)), 'Web': ('web/web.md', ('weby',))}
+ROLES = {'explainy': ('how/report.md', None), 'whyy': ('why/why.md', 'Investigator brief'), 'weby': ('web/web.md', 'Brief')}
+CODEBASE_AGENT = REPO / 'plugins/wf/agents/codebase.agent.md'
+ROUTES = {'Wayfinder': ('wayfinder/wayfinder.md', ()), 'How': ('how/how.md', ('codebase', 'explainy')), 'Why': ('why/why.md', ('whyy',)),
+          'Web': ('web/web.md', ('weby',))}
+
+
+def role_prompt(role: str) -> str:
+    path, heading = ROLES[role]
+    text = (ROOT / path).read_text()
+    if heading is None:
+        return text
+    start = re.search(rf'^## {re.escape(heading)}\n', text, re.M).end()
+    end = re.compile(r'^## ', re.M).search(text, start)
+    return text[start:end.start() if end else None]
+
+
+EXPLAINER = role_prompt('explainy')
 
 
 def local_markdown_links(path: Path) -> set[Path]:
@@ -32,8 +44,8 @@ def local_markdown_links(path: Path) -> set[Path]:
     return links
 
 
-def test_inspection_lookup_prefixes_and_slim_hunty_brief():
-    table = INSPECTION.split('| Lookup | `@work` prefix |')[1].split('\n\n')[0]
+def test_inspection_lookup_prefixes_and_slim_codebase_brief():
+    table = INSPECTION.split('| Lookup | Task prefix |')[1].split('\n\n')[0]
     assert table.strip().splitlines()[1:]
     assert '@research' not in INSPECTION
     for path in ROOT.rglob('*.md'):
@@ -54,22 +66,28 @@ def test_router_maps_each_route_to_its_playbook_and_agent_prompts():
     for route, (playbook, agents) in ROUTES.items():
         assert f']({playbook})' in rows[route], route
         for agent in agents:
-            assert f'[{agent}](agents/{agent}.md)' in rows[route] or f'`{agent}`' in rows[route], (route, agent)
+            assert f'`{agent}`' in rows[route], (route, agent)
     for removed in ('## Explore request', '## Constraints', '## Conditional resources', '## Gotchas',
                     '## Dispatch and delivery', '## Generic brief', '| Graphify |'):
         assert removed not in ENTRY, removed
 
 
-def test_agent_prompts_never_nest_and_have_model_roles():
+def test_role_prompts_are_playbook_sections_with_model_roles_and_one_guard():
     models = (SKILLS / 'subagents/models.md').read_text()
-    assert set(path.stem for path in (ROOT / 'agents').glob('*.md')) == set(AGENTS)
-    for agent in AGENTS:
-        prompt = (ROOT / f'agents/{agent}.md').read_text()
-        assert not prompt.startswith('---'), agent
-        assert 'Never spawn subagents or call the agent-launch tool. Never load the `research` or `prove` skill' in prompt, agent
-        assert f'| {agent} |' in models, agent
-    assert 'Only this skill spawns its prompt-file route agents' in ENTRY
-    assert '| hunty |' not in models
+    spawning = ENTRY.split('## Spawning agents')[1].split('\n## ')[0]
+    assert not (ROOT / 'agents').exists()
+    assert 'Research route worker: never load the research or prove skill or spawn subagents' in spawning
+    for role, (path, heading) in ROLES.items():
+        prompt = role_prompt(role)
+        assert '{QUESTION}' in prompt, role
+        assert f'`{role}`' in spawning and f']({path})' in spawning, role
+        if heading:
+            assert f'section {heading}' in spawning, role
+        assert f'| {role} |' in models, role
+    for retired in ('composy', 'cloudy'):
+        assert f'| {retired} |' not in models, retired
+    assert 'Only this skill spawns its route workers' in ENTRY
+    assert '| codebase |' not in models
     assert '*Load and follow the `subagents` skill to select the model and effort for a named subagent role*' in ENTRY
 
 
@@ -161,30 +179,30 @@ def test_how_eval_cases_cover_evidence_and_delivery_failures():
     assert {'focused_session', 'discover_ownership', 'cross_repo_handoff', 'nuget_implementation',
             'terminal_and_access_gap', 'provider_runtime_unknown', 'data_engine_specific',
             'requested_destinations', 'default_session_destination',
-            'conflicting_destinations', 'multiple_reports', 'why_cloud_web_session'} <= set(ids)
+            'conflicting_destinations', 'multiple_reports', 'why_web_session'} <= set(ids)
     assert all(case['request'] and case['checks'] for case in cases)
 
 
-def test_lookups_bypass_research_through_the_registered_hunty_agent():
-    assert not (ROOT / 'explore').exists() and not (ROOT / 'agents/hunty.md').exists()
+def test_lookups_bypass_research_through_the_registered_codebase_agent():
+    assert not (ROOT / 'explore').exists() and not (ROOT / 'agents/codebase.md').exists()
     assert not re.search(r'\bExplore\b', ENTRY.split('## Routing')[1].split('\n## ')[0])
-    assert 'is not a Research route: spawn the `hunty` agent' in ENTRY
-    assert HUNTY_AGENT.is_file()
+    assert 'is not a Research route: spawn the `codebase` agent' in ENTRY
+    assert CODEBASE_AGENT.is_file()
     for caller in ('design/playbooks/grill.md', 'design/playbooks/sketch.md', 'design/playbooks/wayfinder.md', 'review/playbooks/hitl.md'):
         text = (SKILLS / caller).read_text()
-        assert '`hunty` agent' in text and 'Explore route' not in text and 'Research Explore' not in text, caller
+        assert '`codebase` agent' in text and 'Explore route' not in text and 'Research Explore' not in text, caller
 
 
 def test_playbooks_spawn_only_bundled_prompt_agents_through_the_recipe():
     spawning = ENTRY.split('## Spawning agents')[1].split('\n## ')[0]
     assert 'never a registered agent' in spawning
-    assert '**`hunty`** is the wf plugin\'s registered agent' in spawning
-    assert 'never an agent type or `agentName`; use it only as the spawn\'s display name' in spawning
-    assert 'Read `agents/<name>.md` in full' in spawning
+    assert '**`codebase`** is the wf plugin\'s registered agent' in spawning
+    assert 'never an agent type or `agentName`; use it only as the role and the spawn\'s display name' in spawning
+    assert 'Read the role\'s prompt in full' in spawning
     for path in ROOT.rglob('*.md'):
         for name in re.findall(r'[Ss]pawn(?:s| one)? `([a-z]+)`', path.read_text()):
-            assert name == 'hunty' or (ROOT / f'agents/{name}.md').is_file(), (path.relative_to(ROOT), name)
-    assert [p.name for p in (REPO / 'plugins/wf/agents').glob('hunt*')] == ['hunty.agent.md']
+            assert name == 'codebase' or name in ROLES, (path.relative_to(ROOT), name)
+    assert not list((REPO / 'plugins/wf/agents').glob('hunt*')) and not (SKILLS / 'explore-codebase').exists()
 
 
 def test_long_research_resources_open_with_contents():

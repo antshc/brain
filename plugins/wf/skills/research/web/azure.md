@@ -1,13 +1,6 @@
 # Azure
 
-Provider reference for an Azure cloud part. Apply the `cloudy` contract.
-
-## Contents
-
-- Docs
-- SDK
-- Azure CLI
-- Gotchas
+Provider reference for an Azure question on the Web route. Apply the Web Brief.
 
 ## Docs
 
@@ -19,13 +12,13 @@ Azure SDK (`Azure.*`, `Microsoft.Azure.*`):
 
 1. Resolve the version from the workspace — `Directory.Packages.props`, `Directory.Build.props`, `Directory.Build.targets`, `*.csproj`; absent → `obj/project.assets.json`. Never reuse a version from an earlier session.
 2. Search official Microsoft code samples and API reference for the package, version, namespace, type, and member — use the Microsoft Learn MCP code sample search when installed.
-3. Not settled, or Learn unavailable → verify the type, member, signature, and behavior from the restored package’s XML docs or decompiled assembly: record UNKNOWN with a ready `hunty` lookup per Restored SDK packages; continue independent evidence work.
+3. Not settled, or Learn unavailable → verify the type, member, signature, and behavior from the restored package’s XML docs or decompiled assembly: record UNKNOWN with a ready `codebase` lookup per the Brief; continue independent evidence work.
 
 Other SDKs: resolve the version from the dependency manifest and lockfile, then use Docs.
 
 ## Azure CLI
 
-Read-only research of the live subscription. Check `command -v az`; absent → UNKNOWN per Probes.
+Read-only research of the live subscription. Check `command -v az`; absent → UNKNOWN per the Brief probes rule.
 
 1. **Identity** — `az account show`; record tenant, subscription, and principal type. Never print credentials.
 2. **Pin** — pass `--subscription` on every call; never rely on the implicit default.

@@ -1,6 +1,6 @@
 # Atlassian: Jira Work Items and Confluence Designs
 
-Use this playbook in **two separate investigators**: Jira owns the issue / work item tracker category; Confluence owns long-form documents. Search both products independently, even if one already contains an answer. Return source-specific evidence to the synthesizer.
+Use this playbook in **two separate investigators**: Jira owns the issue / work item tracker category; Confluence owns long-form documents. Search both products independently, even if one already contains an answer. Return source-specific evidence to the router.
 
 ## Access and scope (both investigators)
 

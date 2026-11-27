@@ -74,7 +74,7 @@ def test_owned_worktrees_pinned_dependencies_and_payload_gate():
 def test_evidence_pipeline_and_standalone_delivery_are_preserved():
     assert 'Frame, Routing and Spawning agents' in WAYFINDER
     assert 'Never recursively invoke Research or select Wayfinder for a topic' in WAYFINDER
-    assert 'Save `hunty` lookup verdicts unabridged' in WAYFINDER
+    assert 'Save `codebase` lookup verdicts unabridged' in WAYFINDER
     assert 'Batch independent research' in WAYFINDER
     assert 'only the Research router writes reports' in WAYFINDER
     for field in ('@question', '@criteria', '@repoFacts', '@outputPath', '@outputBase'):

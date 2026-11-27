@@ -22,9 +22,6 @@
   "plugins/wf/skills/architecture-records/templates/DEPLOYMENT-VIEW-FORMAT.md": {
     "./ARCHITECTURE.md": "Resolves relative to the installed or generated document in the consuming repository."
   },
-  "plugins/wf/skills/research/agents/composy.md": {
-    "url": "Example destination replaced by a source URL or path when authoring the report."
-  },
   "skills/engineering/prototype-cloud-scenario/SKILL.md": {
     "path#Lline": "Example destination replaced by a source URL or path when authoring the report."
   },

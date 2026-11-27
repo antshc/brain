@@ -96,18 +96,16 @@ Consult the relevant [authoritative source](#3-authoritative-sources) first, and
 | You know | Use | If it fails |
 |---|---|---|
 | The exact symbol, and need definition, references, rename, hover, implementations, or call hierarchy | **LSP** — semantic search cannot perform these | *Load and follow the `lsp-recover` skill to <task>*, then text search |
-| The concept or behavior but not the symbol (e.g. "where is failover progress tracked?") | **Semantic search**, which is served by the Graphify graph — see the gate below | text search on domain terms from `GLOSSARY.md` |
+| The concept or behavior but not the symbol (e.g. "where is failover progress tracked?") | **Semantic search** | text search on domain terms from `GLOSSARY.md` |
 | A literal, configuration value, or generated file | **Text search** with `includePattern: workspace/{{project}}/**` | manual directory browsing under `workspace/{{project}}` |
 
-Semantic results span both workspace roots: discard reporoot hits when the question is about code, and code hits when the question is about board documentation. Exclude `.artifacts/`, `**/bin/`, `**/obj/`, `TestResults/`, `graphify-out/`, and `bin/review_diff/` from text search.
+Semantic results span both workspace roots: discard reporoot hits when the question is about code, and code hits when the question is about board documentation. Exclude `.artifacts/`, `**/bin/`, `**/obj/`, `TestResults/`, and `bin/review_diff/` from text search.
 
 Resolve each selected skill's exact name and description before rendering *Load and follow the `skill-name` skill to <task>* with 3–6 description keywords; never emit placeholders literally. Bind `<task>` to the requested action with 3–6 keywords from the selected installed description. Routing entries render the selected call; never emit the unfilled template.
 
-**Graphify gate (applies to the semantic-search row):** Graphify backs semantic search here, so it is a discovery index — never an authoritative source. Before trusting a graph, read the reporoot `GRAPHIFY.md` for corpus, exclusion, health preflight and degraded-mode rules, then *Load and follow the `research` skill to search a Graphify knowledge graph, trace this flow, or find callers of X*. A code-only graph MUST NOT answer board-level architecture questions. Do not rebuild the graph unless the user asked for a build or update.
-
 ### Step 4 — Verify, then stop
 
-Docs, contracts, ADRs, and graph results are leads, not proof: confirm behavior-specific conclusions against current source or tests. Stop searching once you can name the file and symbol that control the behavior — repeating a search is not verification.
+Docs, contracts, ADRs, and semantic search results are leads, not proof: confirm behavior-specific conclusions against current source or tests. Stop searching once you can name the file and symbol that control the behavior — repeating a search is not verification.
 
 ## 5. Build and validation policy
 

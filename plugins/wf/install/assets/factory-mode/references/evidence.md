@@ -8,7 +8,7 @@
 
 ## Research
 
-*Load and follow the `research` skill to investigate the question and save cited findings.* Use How for current behavior and lookups, Why for rationale, and Cloud or Web for outside evidence.
+*Load and follow the `research` skill to investigate the question and save cited findings.* Use How for current behavior and lookups, Why for rationale, and Web for outside evidence, including AWS/Azure.
 
 Pass the original request verbatim. Add a grounded question with the repository or external target, subsystem or symbol, exact unknown, and expected evidence. Preserve the requested output and framing. Research owns source selection, specialists, and delegation.
 

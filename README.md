@@ -77,7 +77,6 @@ copilot plugin install verify@brain
 gh skill install antshc/brain engineering/be-terse --agent github-copilot --scope user -f
 gh skill install antshc/brain plugins/wf/install/assets/testing-integrations/SKILL.md --agent github-copilot --scope user -f
 gh skill install antshc/brain engineering/render-mermaid-png --agent github-copilot --scope user -f
-gh skill install antshc/brain engineering/suggest-graphify-improvements --agent github-copilot --scope user -f
 gh skill install antshc/brain engineering/remove-zone-identifiers --agent github-copilot --scope user -f
 gh skill install antshc/brain engineering/architecture-drift --agent github-copilot --scope user -f
 ```
@@ -157,8 +156,8 @@ Common everyday workflow automation skills. Expected to be useful to all develop
 - [suggest](plugins/wf/skills/suggest/SKILL.md): propose improvements, options, or ideas with reasoning; never apply without approval.
 - [prove](plugins/wf/skills/prove/SKILL.md): confirm or refute one or more technical claims with reproducible evidence, one parallel prover worker per claim.
 - [challenge-this](plugins/wf/skills/challenge-this/SKILL.md): try to break a change or design; report problems shown by a run.
-- [hunty](plugins/wf/skills/hunty/SKILL.md): read-only codebase exploration behind the `hunty` agent; finds files, symbols, callers, flows, graph paths, and restored NuGet APIs, returning `path:line` verdicts inline.
-- [research](plugins/wf/skills/research/SKILL.md): investigate a question against primary sources and save cited findings to the session workspace; inspects a system as-built along the behavior, flow, or data axis, cited to `file:line`, with diagrams; inspects AWS and Azure implementation constraints (APIs, SDK, IAM/RBAC, networking, quotas, retries, failures) from provider docs and read-only CLI into one shared template. Wayfinder charts or resumes a research map via `/research wayfinder <prompt-or-map-path>`. Evidence routes are Explore, How, Why, Cloud, and Web; each route spawns its own prompt-file agents (`hunty`, `explainy`, `whyy`, `composy`, `cloudy`, `weby`); Explore returns inline lookup verdicts. Reports save to the session workspace with links, or to a location the request names.
+- [codebase agent](plugins/wf/agents/codebase.agent.md): read-only codebase exploration across deployables and local repositories; finds files, symbols, callers, flows, and restored NuGet APIs, returning `path:line` verdicts inline.
+- [research](plugins/wf/skills/research/SKILL.md): investigate a question against primary sources and save cited findings to the session workspace; inspects a system as-built along the behavior, flow, or data axis, cited to `file:line`, with diagrams; answers external questions, including AWS and Azure implementation constraints (APIs, SDK, IAM/RBAC, networking, quotas, retries, failures), from official docs, first-party APIs, and read-only CLI. Wayfinder charts or resumes a research map via `/research wayfinder <prompt-or-map-path>`. Evidence routes are How, Why, and Web; route workers (`explainy`, `whyy`, `weby`) take prompts from playbook sections, and pure lookups go to the `codebase` agent inline. Reports save to the session workspace with links, or to a location the request names.
 - [subagents](plugins/wf/skills/subagents/SKILL.md): select the model and effort for named subagent roles and ordered panels; run Arena candidate comparisons.
 - [architecture-records](plugins/wf/skills/architecture-records/SKILL.md): define Concepts through evidence and questioning; diagnose documentation drift with `doctor`; record settled ADRs, Concepts, Deployables, topology, and glossary terms; render bodies or bullets without saving; initialize missing docs and load, match, or sync architecture indexes. Select a route; index requests also select an action.
 - [review](plugins/wf/skills/review/SKILL.md): use `code` for PR findings (optional `--axes` subset; all by default), `address` for existing threads, `blast-radius` for downstream risk, `tests-gap` for regression coverage, or `hitl` for human-led PR review.
@@ -206,7 +205,7 @@ Microsoft documentation, SDK reference, Azure CLI setup, authentication, and res
 
 AWS documentation and SDK reference skills.
 
-- [AWS research](plugins/wf/skills/research/cloud/aws.md): AWS service documentation and SDK for .NET package contracts.
+- [AWS research](plugins/wf/skills/research/web/aws.md): AWS service documentation and SDK for .NET package contracts.
 
 ### verify
 
@@ -227,7 +226,6 @@ General-purpose skills not tied to a specific platform.
 - [be-terse](skills/engineering/be-terse/SKILL.md): rephrase or tighten a selection into terse, agent-optimized text.
 - [testing-integrations](plugins/wf/install/assets/testing-integrations/SKILL.md): select and run focused integration, functional-slice, and regression tests with evidence.
 - [render-mermaid-png](skills/engineering/render-mermaid-png/SKILL.md): render Mermaid diagrams as high-resolution PNGs.
-- [suggest-graphify-improvements](skills/engineering/suggest-graphify-improvements/SKILL.md): audit a Graphify knowledge graph and suggest evidence-backed improvements.
 - [ask-dev](skills/engineering/ask-dev/SKILL.md): answer a manual tester's question about a codebase in black-box terms.
 - [sync-skill](skills/productivity/sync-skill/SKILL.md): merge upstream skill improvements into a customized local copy.
 - [remove-zone-identifiers](skills/engineering/remove-zone-identifiers/SKILL.md): delete Windows Zone.Identifier markers from the repo on any OS.

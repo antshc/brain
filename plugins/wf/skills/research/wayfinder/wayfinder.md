@@ -2,18 +2,6 @@
 
 Chart a destination, gather evidence, and maintain one living research document. Research surfaces facts and tests claims; decisions and implementation belong to the caller. Refer to topics by linked title in user-facing text.
 
-## Contents
-
-- Shared procedures
-- Session and document
-- Small effort
-- Chart and approve
-- Frontier and dispatch
-- Validate and integrate
-- Synchronize and pause
-- Resume and migration
-- Completion
-
 ## Shared procedures
 
 *Load and follow the `github` skill to run GitHub platform mechanics for issues, topics, and repositories* using **Wayfinder operations**. Read its shared resource in full before tracker writes, worktree setup, commits or integration. Apply its Create issue, Create Wayfinder sub-issue, Read issue, List sub-issues, Assign/Unassign, Comment, Close and Update operations. Use its Prepare a document/result worktree, Commit the document and Integrate a result procedures with the research document in place of HLD. GitHub owns mechanics; this playbook owns scope, eligibility and synchronization.
@@ -53,7 +41,7 @@ After both interviews, if the route is clear, no coarse fog remains and the whol
 
 1. Read the latest root and recursively list native children. Select open, approved, unclaimed work whose blockers are closed **and prerequisite evidence is integrated**. Inaccessible blockers remain blocked. Confirm sole claim ownership; a pending approval is not permission to rerun.
 2. Create every result worktree from a pinned current integration HEAD through Prepare a result worktree. Independent topics may share that pinned HEAD; dependent topics wait for integration. Persist topic/question, source revision, environment, branch/worktree, ownership and exact output paths before dispatch.
-3. Research uses the router's **Frame, Routing and Spawning agents** pipeline. Select How, Why, Cloud or Web per question, loading its playbook and triggered resources fully; a pure codebase lookup topic spawns the `hunty` agent per Spawning agents. Never recursively invoke Research or select Wayfinder for a topic; add no other agent. Pass destination/Notes, question, scope, target/ref/version/lens, original harness root, pinned source checkout and absolute report destination under the result worktree. Workers are read-only and return cited evidence; only the Research router writes reports. Save `hunty` lookup verdicts unabridged to the topic path as a Wayfinder-only exception. Explicit caller destinations override defaults; preserve their ownership and isolate writes in the assigned result worktree, resolving ambiguous external destinations before dispatch.
+3. Research uses the router's **Frame, Routing and Spawning agents** pipeline. Select How, Why or Web per question, loading its playbook and triggered resources fully; a pure codebase lookup topic spawns the `codebase` agent per Spawning agents. Never recursively invoke Research or select Wayfinder for a topic; add no other agent. Pass destination/Notes, question, scope, target/ref/version/lens, original harness root, pinned source checkout and absolute report destination under the result worktree. Workers are read-only and return cited evidence; only the Research router writes reports. Save `codebase` lookup verdicts unabridged to the topic path as a Wayfinder-only exception. Explicit caller destinations override defaults; preserve their ownership and isolate writes in the assigned result worktree, resolving ambiguous external destinations before dispatch.
 4. For experiments, *Load and follow the `prove` skill to confirm or refute technical claims by executing tests, runnable prototypes, GUI E2E checks, or cloud experiments*. Supply `@question`, `@criteria`, `@repoFacts`, limits, supplied owned checkout, exact absolute `@outputPath` and `@outputBase`, with retention through reproduction and human review. Name the execution method and deciding observation before dispatch. Read its returned report in full; source-only findings cannot close an experiment. Accept confirmed/refuted only with deciding execution evidence; otherwise preserve blocked/inconclusive status. Prove uses its own default dispatch; never wrap a helper in another worker. Keep runnable state, patches and report in the result worktree; Wayfinder owns commit/integration/cleanup.
 5. Batch independent research when safe; sequence dependent topics and each route's worker stages. Serialize integration and document writes. Approved ready factual work runs automatically without another dispatch question. While new proposals or proof approval await the user, continue only already-approved independent work.
 

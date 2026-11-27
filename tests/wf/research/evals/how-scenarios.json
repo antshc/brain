@@ -1,6 +1,6 @@
 {
   "commonChecks": [
-    "How coordinates; hunty executes read-only evidence requests; explainy synthesizes evidence; no route agent spawns a subagent",
+    "How coordinates; codebase executes read-only evidence requests; explainy applies How report Explain to the evidence; no route agent spawns a subagent",
     "material claims have decisive citations; intent, source behavior, observations, and unknowns remain distinct",
     "reports save to the session workspace unless the request names a location",
     "included diagrams depict confirmed evidence and unresolved boundaries accurately"
@@ -10,7 +10,7 @@
       "id": "focused_session",
       "request": "How does one known validation function reject an expired token?",
       "checks": [
-        "one focused hunty pass",
+        "one focused codebase pass",
         "no mandatory fan-out or full-system inventory",
         "report saved under the session workspace research folder",
         "returns only the report pointer with read-in-full instruction and status"
@@ -38,7 +38,7 @@
       "id": "nuget_implementation",
       "request": "Determine the retry behavior behind a wrapper call whose implementation is in a restored NuGet dependency.",
       "checks": [
-        "hunty loads NuGet tactic",
+        "codebase agent applies its NuGet rules",
         "resolve actual package version and consumed TFM",
         "inspect implementation when XML cannot establish behavior",
         "no restore or build"
@@ -81,17 +81,6 @@
       ]
     },
     {
-      "id": "blast_radius_graph_grounding",
-      "request": "Route: How. For a diff that changes the missing-order outcome of OrderService.Find, trace OrderController to OrderRepository at the reviewed checkout. OrderController takes IOrderService, which DI binds to OrderService. The harness graph predates the diff. Save grounding-how.md in the supplied run directory.",
-      "checks": [
-        "run bounded affected and directed path queries on resolved symbols where the graph covers them",
-        "record graph freshness separately from the reviewed revision and verify stale graph candidates in reviewed source",
-        "follow interface dispatch through the DI registration when the directed graph stops at IOrderService",
-        "report commands or skip reasons, source-verified consumers, and any material coverage gaps in grounding-how.md",
-        "state the concrete response regression that blast-radius can send to Prove"
-      ]
-    },
-    {
       "id": "default_session_destination",
       "request": "Inspect the deletion flow and save a report.",
       "checks": [
@@ -120,10 +109,10 @@
       ]
     },
     {
-      "id": "why_cloud_web_session",
+      "id": "why_web_session",
       "request": "Independently investigate historical rationale, an Azure provider limit, and a public protocol.",
       "checks": [
-        "Why, Cloud, and Web retain their evidence procedures",
+        "Why and Web retain their evidence procedures; the Azure limit runs on Web with the Azure provider reference",
         "one session-workspace report per question with distinct slugs",
         "links presented for all three"
       ]

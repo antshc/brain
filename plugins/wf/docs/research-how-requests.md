@@ -1,6 +1,6 @@
 # Current-system research
 
-*Load and follow the `research` skill to investigate technical questions across source code via codebase navigation and return cited findings* for both a narrow “how does this work?” question and an explicit inspection. How orchestrates current-system evidence and explanation, inline or saved. `hunty` supplies the evidence.
+*Load and follow the `research` skill to investigate technical questions across source code via codebase navigation and return cited findings* for both a narrow “how does this work?” question and an explicit inspection. How orchestrates current-system evidence and explanation, inline or saved. The `codebase` agent supplies the evidence.
 
 ## Write a strong instruction
 
@@ -22,7 +22,7 @@ Include the details that materially change the investigation:
 - Reports save to the session workspace by default; name a path in the instruction to save elsewhere.
 - Keep one inspection unit per instruction. Split unrelated behaviors, flows, or data boundaries into separate requests.
 
-Research selects depth from the question. An explicit inspection requests full coverage. A supplied Behavior, Flow, or Data axis selects the primary lens. A narrow lookup with no requested document belongs to the `hunty` agent, which returns its verdict inline. Keep outcome-relevant lens findings in the same answer.
+Research selects depth from the question. An explicit inspection requests full coverage. A supplied Behavior, Flow, or Data axis selects the primary lens. A narrow lookup with no requested document belongs to the `codebase` agent, which returns its verdict inline. Keep outcome-relevant lens findings in the same answer.
 
 ## Behavior instruction examples
 

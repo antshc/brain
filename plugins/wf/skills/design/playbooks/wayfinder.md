@@ -194,8 +194,8 @@ Run each helper in the Wayfinder session with its default dispatch. **MUST NOT**
 | Prove | *Load and follow the `prove` skill to confirm or refute technical claims by executing tests, runnable prototypes, GUI E2E checks, or cloud experiments* | Prove-owned `prover` worker |
 | Challenge this | Per Risk verification, *Load and follow the `challenge-this` skill to adversarially test a design and report reproducible counterexamples* | Challenge-this-owned |
 | Deep Module | Read the Deep Module playbook registered in the router fully; run it | Design It Twice designers |
-| Code Sketch | Read the Sketch playbook registered in the router fully; run it in Wayfinder context | None; wide lookups via the `hunty` agent |
-| Grill | Read the Grill playbook registered in the router fully; run it | None; lookups via the `hunty` agent |
+| Code Sketch | Read the Sketch playbook registered in the router fully; run it in Wayfinder context | None; wide lookups via the `codebase` agent |
+| Grill | Read the Grill playbook registered in the router fully; run it | None; lookups via the `codebase` agent |
 
 Supply question/scope, pinned checkout/revision, unknown IDs, existing owner, prerequisites, limits, exact outputs and cleanup ownership. Run helpers sequentially. Dependent work waits for integrated prerequisites. Record returned artifacts, findings, coverage, actual worker type/model and new unknowns on the issue/root Result. Wayfinder owns commits/integration. Required worker unavailable → record the blocked request on the owner; continue independent work.
 
@@ -221,18 +221,17 @@ On resume, recover the same pending worktree and approval identity; do not regen
 
 ## Research routing
 
-Automatically select the relevant scope for factual gaps. Codebase lookups spawn the `hunty` agent; mechanism and inspection questions use How; cloud provider facts use Cloud; external primary-source facts use Web. Historical intent uses Research Why. Missing external checkouts block system evidence; use Web when public documentation suffices.
+Automatically select the relevant scope for factual gaps. Codebase lookups spawn the `codebase` agent; mechanism and inspection questions use How; external primary-source facts, including cloud provider facts, use Web. Historical intent uses Research Why. Missing external checkouts block system evidence; use Web when public documentation suffices.
 
 | Option | Route | Scope |
 |---|---|---|
-| Web | `web` | Public primary sources, such as specifications and official docs |
-| Cloud | `cloud` | Provider, service, and whether live values matter |
+| Web | `web` | Public primary sources, such as specifications, official docs, first-party APIs; for AWS/Azure, the provider, service, and whether live values matter |
 | Current system | `system` | Repository or deployable being mapped and inspection axis |
 | External system | `system` | Named external repository or deployable and inspection axis. If only public docs suffice, use Web. |
 
 For a system question, choose `Behavior` for one deployable, `Flow` for handoffs across deployables, `Data` for a data boundary, or `focused` for an isolated call or package API. This axis sets the primary lens. The question sets the depth, with an explicit inspection requesting full coverage.
 
-Record one bullet per research part in `## Research scope`: route, target (if known for Web), system axis (for How), and the part's question when the topic spans multiple parts. For Cloud, include the provider, service, and need for live values.
+Record one bullet per research part in `## Research scope`: route, target (if known for Web), system axis (for How), and the part's question when the topic spans multiple parts. For a cloud provider question on Web, include the provider, service, and need for live values.
 
 For every research dispatch, write one request holding the topic's Question, its Research scope bullets, content framing, and an exact absolute save path per part under the topic worktree: preserve an explicit topic destination; otherwise `docs/research/<initiative-slug>/<ticket-slug>.md` for one part or `docs/research/<initiative-slug>/<ticket-slug>-<part-slug>.md` for separate parts. Wayfinder owns this convention. For older topics infer and persist scope before dispatch.
 

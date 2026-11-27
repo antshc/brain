@@ -20,9 +20,9 @@ def test_subagents_owns_model_selection_and_arena():
         assert "`subagents` skill to run an Arena comparison" in (SKILLS / owner / playbook).read_text()
 
 
-def test_research_preserves_why_and_routes_system_evidence_to_hunty():
+def test_research_preserves_why_and_routes_system_evidence_to_codebase():
     skill = (SKILLS / "research/SKILL.md").read_text()
-    for reference in ("how/how.md", "how/explorer-prompt.md", "agents/explainy.md",
+    for reference in ("how/how.md", "how/explorer-prompt.md", "how/report.md",
                       "why/why.md", "why/sources/atlassian.md"):
         assert f"]({reference})" in skill
         assert (SKILLS / "research" / reference).is_file()
@@ -31,7 +31,7 @@ def test_research_preserves_why_and_routes_system_evidence_to_hunty():
     assert "## Routing" in skill
     how = (SKILLS / "research/how/how.md").read_text()
     assert "system/system-inspection.md" not in skill
-    assert "`hunty`" in how and "`explainy`" in how
+    assert "`codebase`" in how and "`explainy`" in how
     assert "## Delivery" in skill
 
 

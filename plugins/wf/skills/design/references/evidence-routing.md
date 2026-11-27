@@ -18,7 +18,7 @@ After resolving questions, screen the synthesized sketch for falsifiable claims 
 
 ## Research
 
-*Load and follow the `research` skill to investigate technical questions across source code, docs, packages, cloud limits, and the web via discovered specialists or subagents.* Research spawns its own route agents (`hunty` for codebase and NuGet evidence) and owns routing and synthesis for this call. Pass:
+*Load and follow the `research` skill to investigate technical questions across source code, docs, packages, cloud limits, and the web via discovered specialists or subagents.* Research spawns its own route agents (`codebase` for codebase and NuGet evidence) and owns routing and synthesis for this call. Pass:
 
 - `@question`: one sharp question, decision/current sketch, repo constraints, version, and architecture-changing fact needed. Package claim → name the type or member and the claim to confirm.
 - Save path: absolute `<artifact-root>/research/<question-slug>.md`; distinct slugs for separate questions, one path per independent question.

@@ -49,3 +49,7 @@ rg -n -C2 '(TODO|FIXME|HACK|XXX|NOTE)' <target_file>
 # Related tests
 rg -l '<symbol>' --glob '*test*'
 ```
+
+## Incident signals
+
+Defensive target (null check, retry, timeout, rate limit, feature flag, egress guard, OOM handler) → look for commits like "fix for incident", "add defensive check", or "revert" followed by "re-apply with..."; they are strong signals.

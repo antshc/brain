@@ -1,126 +1,60 @@
 # Why
 
-Route procedure for historical rationale. Spawns `whyy` (anchor, then one per evidence category) and one `composy`. Paths resolve from the skill base directory.
-
-Investigate the motivation and intent behind code. How explains current behavior. `why` answers what forces led to its shape.
-
-## Contents
-
-- Conditional resources
-- Operating Posture
-- Step 1. Understand the Target and the Question
-- Step 2. Establish the Code Anchor
-- Step 3. Spawn Parallel Investigators
-- Step 4. Synthesize
-- Step 5. Present
-- Output Format
-- Common Failure Modes to Avoid
+Route procedure for historical rationale: why code, a constraint, or a workaround exists; what led to a change. Answer from the record, not the code: the commits and PR discussions that introduced the target and each later change, then linked Jira and Confluence when that trail is thin. Cite what the authors wrote, mark inferences as inferences, and say what the record does not answer. Spawns `whyy` (anchor, then one per source). Paths resolve from the skill base directory.
 
 ## Conditional resources
 
-Each `whyy` reads one category playbook. Playbooks document common providers; adapt the examples for other providers in the same category.
+| Trigger | Resource |
+|---|---|
+| Source control investigator, including the anchor | `why/sources/code-archaeology.md` |
+| Jira or Confluence investigator | `why/sources/atlassian.md` (that product's procedure) |
 
-| Trigger | Resource | Provider it documents |
-|---|---|---|
-| Full Why | `why/epistemics.md` | — |
-| Source control history, including the anchor | `why/sources/code-archaeology.md` | git, `gh` |
-| Issue / work item tracker via Atlassian | `why/sources/atlassian.md` (Jira procedure) | `preflight-atlassian` + `atlassian` skills; Rovo, then JQL; Fetch work for bodies |
-| Issue / work item tracker, other | `why/sources/linear.md` | Linear (adapt for Jira, GitHub Issues, Plane, Shortcut) |
-| Long-form documents via Atlassian | `why/sources/atlassian.md` (Confluence procedure) | `preflight-atlassian` + `atlassian` skills; Rovo, then CQL; Fetch page for bodies |
-| Long-form documents, other | `why/sources/notion.md` | Notion (adapt for Confluence, Google Docs, Coda) |
-| Real-time team chat | `why/sources/slack.md` | Slack (adapt for Discord, Microsoft Teams, Mattermost) |
-| Infrastructure observability | `why/sources/datadog.md` | Datadog (adapt for New Relic, Honeycomb, Grafana, Splunk) |
-| Error / exception tracking | `why/sources/sentry.md` | Sentry (adapt for Rollbar, Bugsnag, Airbrake) |
-| Product analytics warehouse | `why/sources/databricks.md` | Databricks SQL (adapt for Snowflake, BigQuery, ClickHouse, dbt) |
-| Target looks defensive (null checks, retry, timeout, rate limit, feature flag, egress guard, OOM handler) | `why/sources/incident-postmortem.md`, appended to every investigator | — |
+## Workflow
 
-## Operating Posture
+1. **Target.** Name the target (code, pattern, feature, decision) and the question. Vague → best guess from conversation context; state it so the requester can redirect. *Done when* target and question are explicit.
+2. **Anchor.** Spawn one `whyy` with Investigator brief, source = source control, task = build the anchor: files and line ranges, key symbols, recent commits touching the target, PR numbers from merge subjects, linked work item IDs, and the substantive PR bodies and discussion via *Load and follow the `github` skill to read pull requests in read-only mode and review threads*. Start from any PR or commit the caller supplied. At anchor depth, deliver the anchor and stop. *Done when* the anchor is cited or its gaps are named.
+3. **Investigate.** Spawn in one parallel batch, each with Investigator brief, the anchor, and its source resource:
+   - **Source control** — deeper history per `code-archaeology.md`. Always.
+   - **Jira** and **Confluence** — when the `preflight-atlassian` and `atlassian` skills are installed: *Load and follow the `preflight-atlassian` skill to resolve the credentialed atl launcher and site* using **Resolve** once; pass launcher and site to both. `tokenAvailable` false or launcher/site missing → mark both inaccessible with the exact prerequisite; never read credentials, start login, or switch identity.
 
-Operate as a **careful, cautious, and precise investigator**. Be honest about what you know vs what you're inferring. Apply the loaded Epistemics confidence framework and phrasing guide. The synthesizer must follow it.
+   Then dispatch Jira → Confluence and Confluence → Jira follow-ups with the other's Additional Leads, scoped to the receiving product. *Done when* every investigator returned findings, a null result, or a blocker.
+4. **Present.** Merge investigator outputs per Report, with light edits only: keep each claim's tier label and confidence wording; merge duplicate citations; keep contradictions with both sources. Synthesize only evidence the investigators supplied; every inference traces to cited evidence. A deciding citation in doubt or a material gap → one bounded `whyy` follow-up in the owning source, never direct source reading. Apply Delivery. *Done when* the report pointer is returned.
 
-## Step 1. Understand the Target and the Question
+## Investigator brief
 
-The **target** is usually a chunk of code, a pattern, a feature, or a named design decision. The **question** is usually a design rationale, a tradeoff, a motivating edge case, an external constraint, dead code, or a broad history sweep.
+Fill the placeholders; send this section, the anchor, and the source resource path as the worker prompt. One source per worker.
 
-If the target is vague ("why do we do it this way?" with no clear referent), make your best guess from conversation context (open files, recent edits, cursor location, what was just discussed). State your interpretation briefly so the user can redirect if you're off, then proceed.
+> {QUESTION}
 
-## Step 2. Establish the Code Anchor
+- Anchor — files and lines {FILES_WITH_LINE_RANGES}; symbols {SYMBOLS}; commits {COMMIT_LIST}; PRs {PR_NUMBERS}; work items {WORK_ITEM_IDS}; unknown → `to be built`.
+- Source — {SOURCE_NAME}; read {SOURCE_RESOURCE} in full.
+- Task — {TASK}
 
-Spawn one `whyy` (source control) to build the seed context; fill its Code Anchor placeholders with what the request supplies, else `to be built`, and pass this step as the assigned task: file paths and line ranges, key symbols (functions, classes, constants), the last few commits touching the target, PR numbers from merge commits (pattern `(#1234)` in the subject line), and any linked work item IDs. Run `git blame -L <start>,<end> <file>` for last-touch commits, `git log --follow -p -- <file>` for full history with patches through renames, `git log --oneline -20 -- <file>` for recent commits with PR numbers visible, and `git log -1 --format=%B <commit>` to extract PR numbers. Then pull the PR bodies and discussion for any substantive commit: *Load and follow the `github` skill to read pull requests in read-only mode and review threads* using Pull requests with the qualified PR, retaining body and discussion. Start with any PR or commit explicitly supplied by the caller. Return the cited anchor and any access gaps. At anchor depth, deliver the anchor and stop. For full Why, pass the anchor to every investigator and the synthesizer.
+**Investigate** as a careful, precise investigator; boring and exact beats plausible.
 
-## Step 3. Spawn Parallel Investigators
+1. Cast a wide net, then narrow.
+2. Read each PR, work item, doc, or thread in full; key evidence hides in comments and follow-ups.
+3. Follow links within your source only; record other-source links under Additional Leads.
+4. Quote verbatim with exact location (PR #, work item key, URL, commit, `file:line`), author, and date.
+5. Record every query, including empty ones; an empty search is a finding.
+6. Record disagreeing items side by side; a contradiction is often the key finding.
 
-**Default to the full parallel investigation.** The goal is a complete coverage map, not a minimal one. Document the null, don't skip the search.
+Mechanics are not motivation: a diff shows what changed, not why. Claim intent only where an author stated it; never cite code as evidence of its own intent. Treat a hypothesis in the question as a candidate. Never round a partial finding up.
 
-### Discovery
+**Tier every claim**; the tier sets phrasing:
 
-Before spawning investigators, list the MCP servers and installed skills available in this session (the `github-mcp-server-*`, other MCP tools, and skill names your tool list shows). Read names and descriptions, not credential or config files.
+- **Direct** — an author explicitly wrote why. Confident, cited.
+- **Supported** — several indirect items converge. Cite each item.
+- **Inferred** — reasoning from evidence, no statement. Hedge (`likely`, `suggests`) and show the chain.
+- **Speculative** — plausible, weakly backed. Mark as speculation.
+- **Unknown** — searched, not found. Name what was searched.
 
-Map available evidence providers to these categories:
+**Return** inline: Source · What I searched · Findings by tier (quote, location, author/date, relevance; alternative readings for Inferred) · Contradictions · Gaps · Additional Leads.
 
-1. Source control history
-2. Issue / work item tracker
-3. Long-form documents
-4. Real-time team chat
-5. Infrastructure observability
-6. Error / exception tracking
-7. Product analytics warehouse
+## Report
 
-Use local Git for source history; *Load and follow the `github` skill to inspect repositories in read-only mode and pull requests* for remote source and PR evidence. For the other six, classify using MCP names, server instructions, tool names, skill descriptions, and resource descriptors. If a provider fits more than one category, choose its primary evidence, except for the Atlassian pair below. Record ambiguous cases in the coverage map.
+Question · Code in question (paths, lines, symbols) · What we found (Direct, Supported) · What we can reasonably infer (Inferred, hedged, with chain) · Competing hypotheses (when evidence fits several) · What we don't know · Sources consulted (one line per source, including empty, inaccessible, and not searched: Slack, observability, error tracking, analytics) · Confidence summary. Question precedes a change → add Preserve / Change / Avoid / Risk constraints.
 
-When both `preflight-atlassian` and `atlassian` skills are installed, *Load and follow the `preflight-atlassian` skill to resolve the credentialed atl launcher and site* using **Resolve** once. Use its credentialed `atl` launcher (`<atl>`) and site in two independent investigators: **Jira** for issue / work item tracker, **Confluence** for long-form documents. Both use `why/sources/atlassian.md` with their own category's procedure. If `tokenAvailable` is false or the site/launcher is unavailable, mark both categories inaccessible with the exact prerequisite; never read credentials, start login, or silently switch identity. Do not spawn a second provider for either category. If the skills are absent, retain ordinary MCP discovery for those categories.
+## Gotchas
 
-Spawn one `whyy` per category with an available provider, all in one parallel batch, each owning one category and one provider. Atlassian's credentialed launcher may be shared by its Jira and Confluence investigators, but each must search and report only its assigned product. Don't ask one investigator to cover multiple categories or MCPs.
-
-Each `whyy` prompt is `agents/whyy.md` filled in, plus:
-
-- the category playbook `why/sources/<source>.md` for the selected provider, adapted per Conditional resources
-- `why/sources/incident-postmortem.md` **if the target code looks defensive** (null checks, retry logic, timeout handling, rate limiting, feature flags, egress guards, OOM handlers)
-- the code anchor and the user's original question
-
-After the initial results, dispatch targeted Jira-to-Confluence and Confluence-to-Jira follow-ups with the earlier findings and relevant links, scoped to the receiving product. Keep each finding under its owning category; do not duplicate evidence.
-
-### Investigator roster, one per available evidence category
-
-Each category below is uniquely positioned to surface one shape of "why", shown after "Best at". Use it to know what to expect back, to name a gap when a category returns empty, and, only in the rare provably-irrelevant case, to justify a skip.
-
-1. **Source control** (git history, `gh` for PRs, code comments, tests). Always spawn, the only guaranteed source. Best at *implementation-time rationale captured during review*.
-2. **Issue / work item tracker** (e.g. Atlassian `twg`/Jira, Linear, GitHub Issues, Plane, Shortcut MCP). Best at *the product or business forcing function*. Strongest when the why is external to engineering.
-3. **Long-form documents** (e.g. Atlassian `twg`/Confluence, Notion, Google Docs, Coda MCP). Best at *long-form design rationale*, written out before it becomes code.
-4. **Real-time team chat** (e.g. Slack, Discord, Microsoft Teams, Mattermost MCP). Best at *real-time deliberation that never reached a doc*. Especially important when the source control, work item, and doc paper trail is thin.
-5. **Infrastructure observability** (e.g. Datadog, New Relic, Honeycomb, Grafana, Splunk MCP). Best at *infrastructure and runtime reality that motivated the code*. Strongest when the target reacts to an infra signal (timeouts, retries, rate limits, circuit breakers).
-6. **Error / exception tracking** (e.g. Sentry, Rollbar, Bugsnag, Airbrake MCP). Best at *the specific exceptions and error trajectories that motivated defensive or corrective code*. Strongest for catch blocks, null guards, type checks, retries, and other defenses.
-7. **Product analytics warehouse** (e.g. Databricks, Snowflake, BigQuery, ClickHouse, dbt, Redshift MCP). Best at *product and data reality that shaped the code*. Strongest for flag-gated code, experiment-driven ships, data migrations, and "where did this number come from" questions.
-
-### When to skip an investigator
-
-Only with an **explicit, written justification** that goes in the final Sources Consulted. Two valid reasons:
-
-- **No matching provider is available for that category**, or its required credentials are unavailable. Flag it as a gap, not a choice: "Real-time team chat skipped. No matching MCP available, so the conversational record was not searchable."
-- **The source is provably irrelevant**, not just "probably irrelevant." A high bar: "Error / exception tracking skipped. Target is a build-time script with no runtime code path."
-
-If your scope assessment suggests a single-commit trivial target where the PR description already contains the complete answer, you may skip the investigators and write the report from the anchor **only after** confirming all seven available category searches would be redundant. Say so explicitly. This should be rare.
-
-## Step 4. Synthesize
-
-Spawn one `composy`. It gets:
-
-1. The investigator findings, including any null results and any categories skipped with justification
-2. The code anchor
-3. The user's original question
-4. The epistemics framework from `why/epistemics.md`
-5. Its prompt, `agents/composy.md`, filled in
-
-## Step 5. Present
-
-Spot-check deciding citations; send a material gap to one bounded `whyy` follow-up in the owning category, then re-run `composy`. Deliver `composy`'s output per Delivery. You may lightly edit for clarity or add context from the conversation, but **do not rewrite the confidence language**.
-
-## Output Format
-
-The structure is the one in `agents/composy.md`: The Question, The Code in Question, What We Found, What We Can Reasonably Infer, Competing Hypotheses, What We Don't Know, Sources Consulted, Confidence Summary. Adapt as needed, but keep the confidence separation intact, and keep Sources Consulted as one line per investigator, including the ones that returned nothing or were skipped, with the reason.
-
-After Sources Consulted, if the user's `why` question is a precursor to changing this code, convert the lineage findings into a Preserve / Change / Avoid / Risk constraint set for planning the change.
-
-## Common Failure Modes to Avoid
-
-- **Recency bias**. Assuming the most recent commit is authoritative. The current shape is often the accretion of many earlier decisions. Trace back.
+- **Recency bias.** The latest commit is rarely the origin; trace back to the change that introduced the shape.
