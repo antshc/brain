@@ -8,10 +8,10 @@ description: >-
 
 | Action | Use | Load |
 |---|---|---|
-| **Model selection** | Model and effort for a named role or the seats of an ordered panel; the caller spawns the worker | [models.md](models.md) |
+| **Model selection** | Model, effort, and optional context tier for a named role or ordered panel; the caller spawns the worker | [models.md](models.md) |
 | **Arena** | Same task to independent runners, cross-judge, pick a base, graft, verify | [arena.md](arena.md), [models.md](models.md) |
 
-Read the listed files in full before acting. [models.md](models.md) is the user's persistent model configuration: a resolved model and effort is a user-specified value, so pass it as the spawn tool's `model` and `reasoning_effort` even where harness guidance says to leave them unset unless the user names one. Explicit caller models take precedence. Unknown role and no explicit model → omit model and effort for harness defaults. Only Arena launches workers.
+Read the listed files in full before acting. [models.md](models.md) is the user's persistent model configuration: pass its resolved model and effort as `model` and `reasoning_effort`, and its context tier as `context_tier` when set. Explicit caller values take precedence. Unknown role and no explicit model → omit model and effort for harness defaults. Only Arena launches workers.
 
 ## Load and follow skills
 
@@ -19,7 +19,7 @@ For every call to the `principles` skill, load and follow its skill content in f
 
 ## Model selection
 
-Before spawning a named role, start with its configured value or fallback and adjust reasoning effort to the job. Raise one step for the hardest work, lower one for judgment and two or more for routine work. Keep the model family and use its nearest supported effort. For `auto` or `inherit-parent`, omit model and effort.
+Before spawning a named role, start with its configured value or fallback and adjust reasoning effort to the job. Raise one step for the hardest work, lower one for judgment and two or more for routine work. Keep the model family and use its nearest supported effort. Pass the configured context tier unchanged. For `auto` or `inherit-parent`, omit model and effort.
 
 If the adjusted model or effort is rejected, retry the role's original value if still valid and report the change. If rejected again, follow the caller's fallback. Skip models already rejected as invalid. Without a specified fallback, use the closest valid model of that family from the tool's error or omit model and effort for the parent defaults. Report fallback use and any remaining blocker.
 

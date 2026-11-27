@@ -2,7 +2,7 @@
 name: codebase
 description: >-
   Fast read-only codebase exploration and Q&A across local repositories and restored NuGet packages. Prefer over chaining search and file reads in the caller. Safe to run in parallel. State what to find and thoroughness quick, medium, or thorough.
-# Not applied by the Copilot SDK host; the research skill passes the model per spawn (see subagents/models.md).
+# The Copilot SDK host ignores this model field; callers pass the model and context tier per spawn (see subagents/models.md).
 model:
   - claude-haiku-5.5
   - gemini-3.8-flash

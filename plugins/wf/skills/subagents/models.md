@@ -1,15 +1,15 @@
 # Models
 
-Model per subagent role. Value format: `<model> <effort>`; pass the model as `model` and the effort as `reasoning_effort`. A value of `inherit-parent` or `auto` runs the role on the parent chat model (omit `model` and `reasoning_effort`); alias entries in a panel list still count toward its fan-out. Use **Fallback** when **Value** is empty or rejected. Edit **Value** to retune.
+Model per subagent role. Value format: `<model> <effort>`; pass the model as `model` and the effort as `reasoning_effort`. Set **Context tier** to `default` or `long_context` and pass it as `context_tier`; blank means omit it. A value of `inherit-parent` or `auto` runs the role on the parent chat model (omit `model` and `reasoning_effort`); alias entries in a panel list still count toward its fan-out. Use **Fallback** when **Value** is empty or rejected. Edit **Value** to retune.
 
 For `architect runners`, the ordered list is a model pool; Arena selects seats per its Frame procedure. Other roles keep their existing fan-out. `whyy` and `weby` are research route roles; only the `research` skill spawns them. The registered `codebase` agent's frontmatter `model` is not applied by the runtime (it inherits the parent model), so it has the `codebase` role below. `prover` is the prove worker; only the `prove` skill spawns it.
 
-| Role | Value | Fallback |
-|---|---|---|
-| architect runners | claude-opus-5.5 high, gpt-6.1-sol high, grok-4.7 high | claude-opus-5 high, gpt-6-sol high, grok-4.7 high |
-| arena cross-judge pool | gpt-6.1-sol xhigh, claude-opus-5.5 xhigh, grok-4.7 xhigh | claude-opus-5.5 xhigh, grok-4.7 xhigh |
-| challenge-this reviewers | claude-opus-5.5 high, gpt-6-sol high, grok-4.7 high | claude-opus-5 medium, gpt-6-sol medium, grok-4.7 medium |
-| prover | claude-opus-5.5 medium | gpt-6-sol medium |
-| whyy | claude-sonnet-5.5 high | claude-sonnet-5 high |
-| weby | gpt-6-luna low | claude-haiku-5.5 high |
-| codebase | claude-haiku-5.5 high | gemini-3.8-flash high |
+| Role | Value | Fallback | Context tier |
+|---|---|---|---|
+| architect runners | claude-opus-5.5 high, gpt-6.1-sol high, grok-4.7 high | claude-opus-5 high, gpt-6-sol high, grok-4.7 high | |
+| arena cross-judge pool | gpt-6.1-sol xhigh, claude-opus-5.5 xhigh, grok-4.7 xhigh | claude-opus-5.5 xhigh, grok-4.7 xhigh | |
+| challenge-this reviewers | claude-opus-5.5 high, gpt-6-sol high, grok-4.7 high | claude-opus-5 medium, gpt-6-sol medium, grok-4.7 medium | |
+| prover | claude-opus-5.5 medium | gpt-6-sol medium | |
+| whyy | claude-sonnet-5.5 high | claude-sonnet-5 high | |
+| weby | gpt-6-luna low | claude-haiku-5.5 high | |
+| codebase | claude-haiku-5.5 high | gemini-3.8-flash high | long_context |
