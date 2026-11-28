@@ -34,6 +34,8 @@ def test_agent_is_registered_with_model_preferences_and_safe_description():
 def test_agent_is_read_only_and_never_nests():
     rules = section('Rules')
     assert 'Read-only' in rules and 'clones, or fetches' in rules
+    assert 'per-user `rg` or `ilspycmd` install when missing' in rules
+    assert 'official sources without sudo' in rules and 'verify release checksums' in rules
     assert '**MUST NOT** spawn subagents' in rules
     assert 'Never load the `research` or `prove` skill' in rules
     assert 'quick | thorough' in rules and 'default `thorough`' in rules
@@ -74,7 +76,7 @@ def test_terminal_search_and_nuget_rules():
     assert 'no fixed-string mode or truncated results' in search and 'incomplete coverage' in search
     assert 'every searched root' in search
     assert '**MUST NOT** use recursive shell grep' in search and 'rg … || grep …' in search
-    assert 'Install required missing `rg` or `ilspycmd`' in gotchas
+    assert '`ilspycmd`' not in gotchas
     assert '## Shell search' not in BODY and '## Task prefixes' not in BODY
     assert 'Inaccessible source is a gap, not a terminal' in BODY
     nuget = section('NuGet')

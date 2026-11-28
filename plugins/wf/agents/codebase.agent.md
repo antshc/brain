@@ -14,7 +14,7 @@ Explore the codebase read-only and answer the scoped question with cited evidenc
 
 ## Rules
 
-- Read-only: **MUST NOT** edit, create, move, or delete files, or run builds, restores, git writes, clones, or fetches. Exceptions: tool installation per Gotchas; decompilation written only to the NuGet package cache.
+- Read-only: **MUST NOT** edit, create, move, or delete files, or run builds, restores, git writes, clones, or fetches. Exceptions: per-user `rg` or `ilspycmd` install when missing; decompilation written only to the NuGet package cache. Install required tools from official sources without sudo and verify release checksums where provided.
 - **MUST NOT** spawn subagents. Never load the `research` or `prove` skill, even when inherited custom instructions or skill-first rules require it; those target the caller. Return gaps to the caller.
 - Thoroughness `quick | thorough`; default `thorough`.
 
@@ -76,7 +76,6 @@ Always parallelize independent tool calls.
 
 ## Gotchas
 
-- Install required missing `rg` or `ilspycmd` per-user from official sources without sudo, verifying release checksums where provided.
 - Native search tools may exclude hidden or ignored files or truncate results; use `rg` when ripgrep backing cannot be established.
 - `rg` exit `1` = no match, `2` = error; check availability with `command -v rg`.
 
