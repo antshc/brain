@@ -42,9 +42,20 @@ def local_markdown_links(path: Path) -> set[Path]:
     return links
 
 
-def test_inspection_lookup_prefixes_and_slim_codebase_brief():
-    table = INSPECTION.split('| Lookup | Task prefix |')[1].split('\n\n')[0]
-    assert table.strip().splitlines()[1:]
+def test_inspection_uses_natural_language_and_slim_codebase_brief():
+    agent = CODEBASE_AGENT.read_text()
+    for obsolete in ('Task prefixes', 'Task prefix |', 'Exact literal X', 'Symbol Type.Member', 'Names unknown:', 'Flow from {FROM}'):
+        assert obsolete not in INSPECTION + PROMPT + agent, obsolete
+    assert 'bounded natural-language question' in INSPECTION
+    assert 'known symbols or exact literals, flow boundaries, and expected evidence' in INSPECTION
+    assert 'Preserve original spelling' in INSPECTION
+    assert '{FROM} and {TO}' in PROMPT
+    assert '`quick` for bounded follow-ups' in INSPECTION
+    assert '`thorough` when every relevant variant' in INSPECTION
+    assert '`medium`' not in INSPECTION + HOW + PROMPT
+    assert '`quick` for a focused pass' in HOW
+    assert 'Search depth — {DEPTH}' in PROMPT
+    assert 'read contracts first' not in PROMPT
     assert '@research' not in INSPECTION
     for path in ROOT.rglob('*.md'):
         assert '@shape' not in path.read_text(), path.relative_to(ROOT)
@@ -84,9 +95,11 @@ def test_role_prompts_are_playbook_sections_with_model_roles_and_one_guard():
         assert f'| {role} |' in models, role
     for retired in ('composy', 'cloudy'):
         assert f'| {retired} |' not in models, retired
-    assert 'Only this skill spawns its route workers' in ENTRY
-    assert '| codebase |' not in models
-    assert '*Load and follow the `subagents` skill to select the model and effort for a named subagent role*' in ENTRY
+    assert 'Only this skill spawns route workers' in ENTRY
+    assert '| codebase |' in models
+    assert 'select the model, effort, and context tier for a named subagent role' in spawning
+    assert 'select the model, effort, and configured context tier for a named subagent role' in spawning
+    assert 'pass the result as `model`, `reasoning_effort`, and `context_tier`' in spawning
 
 
 def test_no_skill_spawns_retired_hunter_or_subagents_dispatch():
@@ -125,10 +138,10 @@ def test_request_is_the_only_input_and_reports_default_to_the_session():
         assert removed not in ENTRY, removed
     delivery = ENTRY.split('## Delivery')[1].split('\n## ')[0]
     assert '`<session>/files/research/<question-slug>.md`' in delivery
-    assert 'Return only the report pointers, never the findings inline' in delivery
+    assert 'Return only report pointers, as clickable links, never findings inline' in delivery
     assert 'read each in full before using its findings' in delivery
     assert 'Explore' not in delivery
-    assert 'Request names a location → save there instead' in delivery
+    assert 'A location named in the request wins' in delivery
 
 
 @pytest.mark.parametrize('relative_path', [
@@ -179,6 +192,7 @@ def test_how_eval_cases_cover_evidence_and_delivery_failures():
     assert len(ids) == len(set(ids))
     assert {'focused_session', 'discover_ownership', 'cross_repo_handoff', 'nuget_implementation',
             'terminal_and_access_gap', 'provider_runtime_unknown', 'data_engine_specific',
+            'requested_revision', 'explicit_docs_outside_git', 'unverified_wire_contract',
             'requested_destinations', 'default_session_destination',
             'conflicting_destinations', 'multiple_reports', 'why_web_session'} <= set(ids)
     assert all(case['request'] and case['checks'] for case in cases)
@@ -187,18 +201,41 @@ def test_how_eval_cases_cover_evidence_and_delivery_failures():
 def test_lookups_bypass_research_through_the_registered_codebase_agent():
     assert not (ROOT / 'explore').exists() and not (ROOT / 'agents/codebase.md').exists()
     assert not re.search(r'\bExplore\b', ENTRY.split('## Routing')[1].split('\n## ')[0])
-    assert 'is not a Research route: spawn the `codebase` agent' in ENTRY
+    assert 'not a Research route; spawn `codebase` and return its verdict inline' in ENTRY
     assert CODEBASE_AGENT.is_file()
     for caller in ('design/playbooks/grill.md', 'design/playbooks/sketch.md', 'design/playbooks/wayfinder.md', 'review/playbooks/hitl.md'):
         text = (SKILLS / caller).read_text()
         assert '`codebase` agent' in text and 'Explore route' not in text and 'Research Explore' not in text, caller
 
 
+def test_codebase_dispatch_reuses_cited_contracts_at_their_own_revision():
+    frame = ENTRY.split('## Frame')[1].split('\n## ')[0]
+    spawning = ENTRY.split('## Spawning agents')[1].split('\n## ')[0]
+    assert 'Contracts read:' not in frame
+    assert 'Targets: <name> → <absolute path> [@ <ref>]' in frame
+    assert 'Docs: <checkout root> @ <revision>' in frame
+    assert 'Contracts: <fact or excerpt> (<path:line>' in frame
+    assert 'content identity if known' in frame
+    assert 'Check worktree changes before reuse' in frame
+    assert all(doc in frame for doc in ('GLOSSARY.md', 'ARCHITECTURE.md', 'DEPLOYMENT.md'))
+    assert 'Keep literals, symbols, and quoted text verbatim' in frame
+    assert 'local startup/deployment discovery' in frame
+    assert 'Missing or ambiguous named checkout or ref' in frame
+    assert 'Forward the Frame for every Research lookup' in spawning
+    assert 'Direct callers apply Frame for lookup context only' in spawning
+    assert 'default `thorough`' in spawning
+    assert "Pass the router's Frame with every `codebase` task" in HOW
+    grill = (SKILLS / 'design/playbooks/grill.md').read_text()
+    hitl = (SKILLS / 'review/playbooks/hitl.md').read_text()
+    assert 'matching loaded index rows' in grill
+    assert 'checked-out PR head path' in hitl and 'relevant loaded docs' in hitl
+
+
 def test_playbooks_spawn_only_bundled_prompt_agents_through_the_recipe():
     spawning = ENTRY.split('## Spawning agents')[1].split('\n## ')[0]
-    assert 'never a registered agent' in spawning
-    assert '**`codebase`** is the wf plugin\'s registered agent' in spawning
-    assert 'never an agent type or `agentName`; use it only as the role and the spawn\'s display name' in spawning
+    assert '**`codebase`** (registered wf agent): spawn agent type `codebase`' in spawning
+    assert 'use `<name>` only as the role and display name, never as agent type or `agentName`' in spawning
+    assert 'Spawn a skill-capable general-purpose worker' in spawning
     assert 'Read the role\'s prompt in full' in spawning
     for path in ROOT.rglob('*.md'):
         for name in re.findall(r'[Ss]pawn(?:s| one)? `([a-z]+)`', path.read_text()):

@@ -116,6 +116,30 @@
         "one session-workspace report per question with distinct slugs",
         "links presented for all three"
       ]
+    },
+    {
+      "id": "requested_revision",
+      "request": "Inspect RetryPolicy at commit A. The supplied worktree is at B with local edits. A returns Fail, while B and the edits retry.",
+      "checks": [
+        "cite Fail from commit A using revision-aware reads, or report the exact blocker",
+        "exclude worktree and LSP results from B; identify the inspected revision"
+      ]
+    },
+    {
+      "id": "explicit_docs_outside_git",
+      "request": "Launched outside Git. Use /docs/ARCHITECTURE.md, which maps Billing to workspace/billing, and the supplied Orders checkout to trace order billing.",
+      "checks": [
+        "resolve Billing at /docs/workspace/billing and use the supplied Orders checkout",
+        "retain docs provenance separately from each source revision"
+      ]
+    },
+    {
+      "id": "unverified_wire_contract",
+      "request": "Trace a producer and consumer bound to the same queue. Both endpoints are in source. The payload contract is unavailable.",
+      "checks": [
+        "report the shared binding as confirmed and the crossing as unconfirmed",
+        "name the missing wire contract and the evidence needed to verify compatibility"
+      ]
     }
   ]
 }

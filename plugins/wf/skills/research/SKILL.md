@@ -25,26 +25,27 @@ Ambiguous scope → state a bounded interpretation and proceed.
 
 ## Frame
 
-Evidence routes: run once per request, before Routing. Wayfinder: frame each interview lookup or research topic once it has a sharp question, reuse established repository facts, and pass the topic's requested destination. Produce one **Frame** per question; pass it to every agent the question spawns.
+Caller owns the **Frame**. Evidence routes frame each question before Routing. Wayfinder frames each sharp interview lookup or topic, reuses established repository facts, and passes the requested destination. Reuse the Frame for follow-ups in the same scope. Check worktree changes before reuse. Refresh stale or unverified deciding sections.
 
-1. **Repository root.** Set `@repoRoot` to `git rev-parse --show-toplevel`, run once from the agent session's launch folder, not the current CWD. Outside Git → no Frame; pass targets as named.
-2. **Contracts.** Read `@repoRoot` contract material, nearest owner first: `GLOSSARY.md`, `ARCHITECTURE.md`, `DEPLOYMENT.md`, `README.md`; then `@repoRoot` copies whose folder or filename names the target, including `*.swagger.json` and `*.configuration-tweaks.md`. Read only name matches, not every service's set.
-3. **Resolve the target.** Use the named repositories, services, and refs; none named → current repository.
-   - **Building-block index** — **MUST** read `@repoRoot/ARCHITECTURE.md`'s `Deployables` table before declaring a target unresolved. A row's `Location` maps a Deployable name or its Trigger condition to a local path (`workspace/<repo>[/subpath]` or absolute); `origin` metadata never authorizes remote lookup. Use `Shared dependency ownership` for dependencies several Deployables use and `Terminal infrastructure boundaries` for where tracing stops.
-   - **Checkouts** — list `<name> → <absolute path>` for `@repoRoot`, the main codebase under `@repoRoot/workspace/`, and every existing local path those tables name. Missing checkout or ref → mark that target `unresolved`; continue the others.
+1. **Repository root.** Use the supplied docs root and source checkout even when launched outside Git. Determine the launch repository, when available, with `git rev-parse --show-toplevel` from the launch folder. Use it as the default only when no target is supplied.
+2. **Contracts.** Read relevant sections from the supplied docs root or the target’s nearest owner. Use launch repository docs for harness mappings or the launch target. Use `GLOSSARY.md` for terms, `ARCHITECTURE.md` for deployables, ownership, and flow boundaries, and `DEPLOYMENT.md` for checkout locations and binding hints. Read matching README, `*.swagger.json`, or `*.configuration-tweaks.md` when they affect the question. Keep cited facts or short excerpts, with docs provenance distinct from source revision.
+3. **Resolve the target.** Use the named repositories, services, and refs; none named → launch repository if available.
+   - **Building-block index** — Use the `Deployables` table in the supplied docs root first, then the target owner’s index. Consult the launch repository’s mappings only for missing targets. If docs or a match are absent, pass the target name and known source checkout for local startup/deployment discovery. Match a Deployable by name or Trigger condition. Resolve its `Location` as `workspace/<repo>[/subpath]` relative to the directory containing the index, or as an absolute path; `origin` metadata never authorizes remote lookup. Use `Shared dependency ownership` for dependencies several Deployables use and `Terminal infrastructure boundaries` for where tracing stops.
+   - **Checkouts** — pass relevant `<name> → <absolute path>` mappings from explicit checkouts and resolved index locations. Missing or ambiguous named checkout or ref → mark the target `unresolved` and continue the others.
    - **Worktree targets** — set `@worktreeRoot` to its `git rev-parse --show-toplevel`; source evidence stays in `@worktreeRoot`.
-4. **Rephrase.** Restate the question in `GLOSSARY.md` terms: defined term replaces the informal word, original wording beside it, one-line meaning per term. Keep literals, symbols, and quoted text verbatim. Select the route from the rephrased question; do not ask the requester to confirm it.
+4. **Rephrase.** Restate the question in `GLOSSARY.md` terms: defined term replaces the informal word, original wording beside it, one-line meaning per term. Keep literals, symbols, and quoted text verbatim. Evidence routes use the rephrased question for routing without asking for confirmation.
 
 Pass this Frame verbatim in each brief; omit empty or unhelpful lines:
 
 ```text
 Question: <original>
 Rephrased: <glossary-term question>
-Terms: <term> — <meaning> (<GLOSSARY.md path>)
+Terms: <term> — <meaning> (<GLOSSARY.md path:line>)
 Route: <route> — <reason>
 Targets: <name> → <absolute path> [@ <ref>] | unresolved: <reason>
-Deployables/boundaries: <relevant Deployables, shared dependencies, terminal boundaries from ARCHITECTURE.md>
-Contracts read: <absolute paths>
+Docs: <checkout root> @ <revision> [dirty: <content identity if known>]
+Contracts: <fact or excerpt> (<path:line>, <docs checkout if multiple>)
+Deployables/boundaries: <matching rows, linked records, shared owners, terminal boundaries with path:line>
 ```
 
 ## Delivery
@@ -78,7 +79,7 @@ Wayfinder selects evidence routes internally through Frame, Routing and Spawning
 
 ## Spawning agents
 
-**`codebase`** (registered wf agent): spawn agent type `codebase` (namespaced, e.g. `wf:codebase`, where the runtime requires) with the lookup task, the question's Frame, and thoroughness as its task; `codebase` as `name`; a concise description without a `codebase:` prefix. *Load and follow the `subagents` skill to select the model, effort, and context tier for a named subagent role* with role `codebase`, and pass the result as `model`, `reasoning_effort`, and `context_tier`: the runtime does not apply the agent's frontmatter model, so omitting model settings runs it on the parent model. Skip the guard line. Spawn unavailable → report the blocked lookup with its consequence; continue independent work.
+**`codebase`** (registered wf agent): spawn agent type `codebase` (namespaced, e.g. `wf:codebase`, where the runtime requires) with the scoped lookup, source checkout/ref if known, and coverage (`quick` or default `thorough`) as its task; `codebase` as `name`; a concise description without a `codebase:` prefix. *Load and follow the `subagents` skill to select the model, effort, and context tier for a named subagent role* with role `codebase`, and pass the result as `model`, `reasoning_effort`, and `context_tier`: the runtime does not apply the agent's frontmatter model, so omitting model settings runs it on the parent model. Forward the Frame for every Research lookup, including follow-ups. Direct callers apply Frame for lookup context only when terminology, ownership, or cross-repo boundaries affect the answer. To locate an exact symbol in a known checkout, pass the question, checkout/ref, and `quick`. Reuse matching loaded docs. Omit unavailable context. Skip the guard line. Spawn unavailable → report the blocked lookup with its consequence; continue independent work.
 
 Other route workers are roles prompted by a playbook section; playbook text *spawn `<name>`* means this recipe; use `<name>` only as the role and display name, never as agent type or `agentName`.
 

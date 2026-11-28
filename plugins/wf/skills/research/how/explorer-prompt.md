@@ -10,20 +10,20 @@ Fill the placeholders; pass the brief verbatim as the `codebase` agent's task; i
 
 {EXPLORATION_ANGLE}
 
-- Flow ends — `Flow from {FROM} to {TO}` in user or code words; Flow angle only, else omit
+- Flow boundaries — {FROM} and {TO} in user or code words; Flow angle only, else omit
 - Targets or refs — {TARGETS_OR_REFS}
-- Research depth — {DEPTH}
+- Search depth — {DEPTH} (`quick` or `thorough`, selected by the caller)
 - Applicable lens and proof checks — {LENS_AND_CHECKS}
 
 ## Collect evidence
 
-Resolve targets/revisions and read contracts first per the `codebase` agent's rules. Discover relevant deployables, functional slices, triggers, candidate paths, and boundaries before deep tracing when ownership is unknown. Classify deployables per the `codebase` agent's rule.
+Use the caller’s framed question, source checkouts/refs, and boundaries. Discover relevant deployables, functional slices, triggers, candidate paths, and boundaries before deep tracing when ownership is unknown. Classify deployables per the `codebase` agent's rule.
 
 Trace the actual executing path from trigger to observable outcome. Confirm registration, selected implementation, provider/fallback, configuration/flags, data transformations, and relevant failures/retries/async paths. Apply supplied proof checks only to steps needed to settle this question; deepen where the outcome depends on it, not through unrelated methods.
 
 For impact grounding, take the changed symbols or contracts, reviewed checkout/revision or dirty state, and any endpoint pairs from the assigned angle. Find consumers per the `codebase` agent's Search Strategy. Carry the dependency evidence below into the report draft.
 
-Prove each internal handoff per the `codebase` agent's handoff rule, including the wire contract. Continue into accessible source across repositories while its behavior affects the scoped outcome. Stop at a proven external terminal or explicit scope boundary with the integration contract and reason. Inaccessible source ends source coverage, not downstream behavior proof. A missing sender/receiver/binding remains an unconfirmed crossing. Record cycles as revisits, not new deployables.
+Prove each internal handoff per the `codebase` agent's handoff rule, including the wire contract. Continue into accessible source across repositories while its behavior affects the scoped outcome. Stop at a proven external terminal or explicit scope boundary with the integration contract and reason. Inaccessible source ends source coverage, not downstream behavior proof. Record cycles as revisits, not new deployables.
 
 Resolve decisive C# dependency behavior through the `codebase` agent's NuGet rules.
 
