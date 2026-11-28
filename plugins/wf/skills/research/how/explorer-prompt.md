@@ -12,12 +12,12 @@ Fill the placeholders; pass the brief verbatim as the `codebase` agent's task; i
 
 - Flow boundaries — {FROM} and {TO} in user or code words; Flow angle only, else omit
 - Targets or refs — {TARGETS_OR_REFS}
-- Research depth — {DEPTH}
+- Search depth — {DEPTH} (`quick` or `thorough`, selected by the caller)
 - Applicable lens and proof checks — {LENS_AND_CHECKS}
 
 ## Collect evidence
 
-Resolve targets/revisions and read contracts first per the `codebase` agent's rules. Discover relevant deployables, functional slices, triggers, candidate paths, and boundaries before deep tracing when ownership is unknown. Classify deployables per the `codebase` agent's rule.
+Use the caller’s framed question, source checkouts/refs, and boundaries. Discover relevant deployables, functional slices, triggers, candidate paths, and boundaries before deep tracing when ownership is unknown. Classify deployables per the `codebase` agent's rule.
 
 Trace the actual executing path from trigger to observable outcome. Confirm registration, selected implementation, provider/fallback, configuration/flags, data transformations, and relevant failures/retries/async paths. Apply supplied proof checks only to steps needed to settle this question; deepen where the outcome depends on it, not through unrelated methods.
 

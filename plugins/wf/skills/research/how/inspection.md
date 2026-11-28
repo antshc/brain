@@ -7,7 +7,7 @@ Apply proof checks relevant to the assigned angle at How’s selected depth. Beh
 Spawn the `codebase` agent for every codebase lookup; if the spawn fails, record the blocked evidence request and continue independent work. Sequence dependent lookups. Use the filled explorer prompt for system evidence and bounded requests for gaps. Fill the `codebase` task:
 
 - Task — the filled explorer prompt, or a bounded natural-language question. Name targets, known symbols or exact literals, flow boundaries, and expected evidence: the explorer prompt's Evidence return, or cited `file:line` findings and gaps for a bounded follow-up. Preserve original spelling; name both flow ends in user or code words.
-- Thoroughness — `thorough` for explorer prompts; `medium` for bounded follow-ups unless the gap needs variants.
+- Thoroughness — `quick` for bounded follow-ups. Use `thorough` when every relevant variant must be checked. For discovery and tracing, use How’s selected coverage.
 
 For restored package evidence, name the package, version, and type or member in the task. Confirm the resolved package ID, version, type or member, and the deciding XML or decompiled source. Record missing package evidence as unknown.
 

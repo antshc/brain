@@ -50,7 +50,12 @@ def test_inspection_uses_natural_language_and_slim_codebase_brief():
     assert 'known symbols or exact literals, flow boundaries, and expected evidence' in INSPECTION
     assert 'Preserve original spelling' in INSPECTION
     assert '{FROM} and {TO}' in PROMPT
-    assert '`thorough` for explorer prompts; `medium` for bounded follow-ups' in INSPECTION
+    assert '`quick` for bounded follow-ups' in INSPECTION
+    assert '`thorough` when every relevant variant' in INSPECTION
+    assert '`medium`' not in INSPECTION + HOW + PROMPT
+    assert '`quick` for a focused pass' in HOW
+    assert 'Search depth — {DEPTH}' in PROMPT
+    assert 'read contracts first' not in PROMPT
     assert '@research' not in INSPECTION
     for path in ROOT.rglob('*.md'):
         assert '@shape' not in path.read_text(), path.relative_to(ROOT)
@@ -210,8 +215,14 @@ def test_codebase_dispatch_reuses_cited_contracts_at_their_own_revision():
     assert 'Docs: <checkout root> @ <revision>' in frame
     assert 'Contracts: <fact or excerpt> (<path:line>' in frame
     assert 'content identity if known' in frame
+    assert 'Check worktree changes before reuse' in frame
+    assert all(doc in frame for doc in ('GLOSSARY.md', 'ARCHITECTURE.md', 'DEPLOYMENT.md'))
+    assert 'Keep literals, symbols, and quoted text verbatim' in frame
+    assert 'local startup/deployment discovery' in frame
+    assert 'Missing or ambiguous named checkout or ref' in frame
     assert 'Forward the Frame for every Research lookup' in spawning
-    assert 'context already loaded' in spawning
+    assert 'Direct callers apply Frame for lookup context only' in spawning
+    assert 'default `thorough`' in spawning
     assert "Pass the router's Frame with every `codebase` task" in HOW
     grill = (SKILLS / 'design/playbooks/grill.md').read_text()
     hitl = (SKILLS / 'review/playbooks/hitl.md').read_text()

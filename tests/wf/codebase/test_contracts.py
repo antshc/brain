@@ -36,7 +36,8 @@ def test_agent_is_read_only_and_never_nests():
     assert 'Read-only' in rules and 'clones, or fetches' in rules
     assert '**MUST NOT** spawn subagents' in rules
     assert 'Never load the `research` or `prove` skill' in rules
-    assert 'quick | medium | thorough' in rules
+    assert 'quick | thorough' in rules and 'default `thorough`' in rules
+    assert 'medium' not in AGENT
 
 
 def test_agent_keeps_vscode_explore_base():
@@ -47,19 +48,19 @@ def test_agent_keeps_vscode_explore_base():
 
 def test_targets_cover_deployables_multi_repo_and_missing_checkouts():
     targets = section('Targets and repos')
-    assert '`Deployables`' in targets and 'workspace/<repo>' in targets
-    assert 'Multi-repo' in targets
+    assert 'Multi-repo' in targets and 'named worktree' in targets
     assert 'unresolved' in targets and 'Never substitute' in targets
 
 
-def test_contracts_reuse_revision_matched_docs_and_resolve_without_a_frame():
+def test_agent_uses_caller_scope_with_local_discovery_fallback():
     targets = section('Targets and repos')
-    for detail in (
-        'same docs checkout and revision', 'unverified dirty excerpts', 'read missing or stale sections',
-        'harness docs root', '`GLOSSARY.md`', '`DEPLOYMENT.md`', 'name or trigger',
-        'table or match is absent', 'local startup or deployment evidence',
-    ):
-        assert detail in targets, detail
+    assert 'caller' in targets and 'source checkout/ref' in targets
+    assert 'With no target, use the launch repository' in targets
+    assert 'local startup or deployment evidence' in targets
+    assert 'outside the supplied checkouts' in targets
+    assert 'caller-supplied docs' in targets
+    for filename in ('GLOSSARY.md', 'ARCHITECTURE.md', 'DEPLOYMENT.md'):
+        assert filename not in AGENT
 
 
 def test_terminal_search_and_nuget_rules():
