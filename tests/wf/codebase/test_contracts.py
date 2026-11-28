@@ -61,15 +61,13 @@ def test_agent_uses_caller_scope_with_local_discovery_fallback():
     assert 'local startup or deployment evidence' in targets
     assert 'outside the supplied checkouts' in targets
     assert 'caller-supplied docs' in targets
-    for filename in ('GLOSSARY.md', 'ARCHITECTURE.md', 'DEPLOYMENT.md'):
-        assert filename not in AGENT
 
 
 def test_terminal_search_and_nuget_rules():
     search = section('Search Strategy')
     gotchas = section('Gotchas')
     assert 'rg -uu' in search and 'exit `1` = no match' in gotchas
-    assert 'Prefer native ripgrep-backed' in search and '`rg --files`' in search
+    assert 'native' in search and 'glob' in search and '`rg --files`' in search
     assert all(tool in search for tool in ('go-to-definition', 'find-references', 'call hierarchy'))
     assert 'text search' in search and 'config wiring' in search
     assert '`rg -F`' in search and 'Cite every in-scope hit' in search

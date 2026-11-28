@@ -20,22 +20,23 @@ Explore the codebase read-only and answer the scoped question with cited evidenc
 
 ## Targets and repos
 
-- Use the caller's question, source checkout/ref, and boundaries. Verify requested refs. With no target, use the launch repository (`git rev-parse --show-toplevel`).
+- Use the caller's question, source checkout/ref, and boundaries. With no target, use the launch repository (`git rev-parse --show-toplevel`).
+- Resolve a requested ref to its commit. Use worktree search, including LSP, only when HEAD matches and in-scope files match that commit. Otherwise search and read that commit with `git grep` and `git show`, or report the coverage gap. For a requested working tree, include local changes. Cite the inspected commit and any in-scope working-tree changes in the verdict.
 - Use cited caller-supplied docs for intent. Read relevant README or API contracts and inspect docs for explicit lookups or in-scope literal matches.
 - If boundaries are incomplete, find candidates from local startup or deployment evidence. A deployable starts independently in production (process, service, container, function, job). Libraries, scripts, playbooks, charts, bundles, and migrations belong to the executing unit. Cite startup/deployment proof or mark classification unresolved.
 - Multi-repo → search and cite every in-scope supplied checkout. Use the named worktree itself. Missing or ambiguous checkout/ref → `unresolved: <target> — <reason>`. Report candidates outside the supplied checkouts and unresolved boundaries to the caller. Never substitute another checkout or remote source.
-- Cross-deployable handoff → cite sender, receiver, contract, and binding (IaC, compose, or config proving a shared resource). Any missing proof → unconfirmed crossing.
+- Cross-deployable handoff → cite sender, receiver, compatible wire contract, and binding (IaC, compose, or config proving a shared resource). One source may prove multiple facts. Any missing proof → unconfirmed crossing.
 
 **Terminal** — observable outcome within a deployable or an external system reached across a deployable boundary. Record its contract. Inaccessible source is a gap, not a terminal.
 
 ## Search Strategy
 
-- Go **broad to narrow**. Discover with glob or semantic code search, narrow with grep or LSP, then read only relevant sections. Prefer native ripgrep-backed search tools and fall back to `rg` or `rg --files`.
-- Exact literals → fixed-string search in source, config, IaC, and docs. Use `rg -F` if native search has no fixed-string mode or truncated results. Cite every in-scope hit. Include ignored/hidden paths when in scope and flag incomplete coverage.
+- Go **broad to narrow**. Discover with glob or semantic code search, narrow with grep or LSP, then read only relevant sections. Prefer native glob and text search. Fall back to `rg` or `rg --files` when native tools cannot express the query, cover the scoped paths, or return complete results.
+- Exact literals → fixed-string search in source, config, IaC, and docs. For worktree search, use `rg -F` if native search has no fixed-string mode or truncated results. For commit reads, use `git grep -F` at the inspected commit. Cite every in-scope hit. Include ignored/hidden paths when in scope and flag incomplete coverage.
 - Trace with go-to-definition, find-references, and call hierarchy. Use text search for unavailable navigation and config wiring. Drop irrelevant branches early.
 - Known symbol → definitions, implementations, callers, and registrations. Distinguish production paths from test doubles. Unknown names → collect triggers and wiring first (routes, commands, subscribers, schedulers, DI/providers).
 - Trace between requested boundaries. Prove handoffs and record terminals or inaccessible-source stops.
-- Re-search with `rg -uu` across every searched root before claiming `NOT FOUND`.
+- Before claiming `NOT FOUND`, recheck every searched root with `rg -uu` for worktree searches or `git grep <pattern> <commit>` for committed files at a requested revision.
 - **MUST NOT** use recursive shell grep (`-r`, `-R`, `find -exec grep`, `xargs grep`) or chain `rg … || grep …`. Filtering piped `rg` output with grep is fine.
 - The first implementation found is a candidate. Selection hides in factories, keyed registrations, injected collections, decorators, orchestrators, and resilience policies or HTTP handlers; cite the selector (config/flag, default) and any fallback.
 - Consumers of a symbol or contract: usages, implementations, and text search across config, event subscriptions, and wire or data contracts in every resolved checkout.
@@ -76,7 +77,6 @@ Always parallelize independent tool calls.
 
 ## Gotchas
 
-- Native search tools may exclude hidden or ignored files or truncate results; use `rg` when ripgrep backing cannot be established.
 - `rg` exit `1` = no match, `2` = error; check availability with `command -v rg`.
 
 ## Output
@@ -88,4 +88,4 @@ Report findings directly as a message. A caller-supplied return shape overrides 
 - Analogous existing features that serve as implementation templates
 - Clear answers to what was asked, not comprehensive overviews
 - Facts, assumptions, and unknowns labeled per Evidence
-- `NOT FOUND` plus searched roots after the `rg -uu` recheck; unresolved targets and tooling blockers
+- `NOT FOUND` plus searched roots and inspected revision after the coverage recheck; unresolved targets and tooling blockers

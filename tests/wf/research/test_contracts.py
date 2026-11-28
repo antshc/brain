@@ -192,6 +192,7 @@ def test_how_eval_cases_cover_evidence_and_delivery_failures():
     assert len(ids) == len(set(ids))
     assert {'focused_session', 'discover_ownership', 'cross_repo_handoff', 'nuget_implementation',
             'terminal_and_access_gap', 'provider_runtime_unknown', 'data_engine_specific',
+            'requested_revision', 'explicit_docs_outside_git', 'unverified_wire_contract',
             'requested_destinations', 'default_session_destination',
             'conflicting_destinations', 'multiple_reports', 'why_web_session'} <= set(ids)
     assert all(case['request'] and case['checks'] for case in cases)

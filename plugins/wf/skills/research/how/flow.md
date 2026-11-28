@@ -55,7 +55,7 @@ For internal boundaries, cite both sides. For external boundaries, cite the call
 
 ## Handoff evidence
 
-**Every handoff carries three citations — emit site, receive site, and binding** — per the `codebase` agent's handoff rule. Until all three are confirmed, record the claimed crossing as an Assumption with the missing evidence named under `What would verify it`.
+Apply the `codebase` agent’s cross-deployable handoff rule to each internal crossing. Record an unconfirmed crossing as an Assumption and name the missing evidence under `What would verify it`.
 
 Guessed topology is the default failure of cross-service tracing, and this rule is what makes it falsifiable.
 

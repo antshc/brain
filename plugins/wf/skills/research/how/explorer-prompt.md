@@ -23,7 +23,7 @@ Trace the actual executing path from trigger to observable outcome. Confirm regi
 
 For impact grounding, take the changed symbols or contracts, reviewed checkout/revision or dirty state, and any endpoint pairs from the assigned angle. Find consumers per the `codebase` agent's Search Strategy. Carry the dependency evidence below into the report draft.
 
-Prove each internal handoff per the `codebase` agent's handoff rule, including the wire contract. Continue into accessible source across repositories while its behavior affects the scoped outcome. Stop at a proven external terminal or explicit scope boundary with the integration contract and reason. Inaccessible source ends source coverage, not downstream behavior proof. A missing sender/receiver/binding remains an unconfirmed crossing. Record cycles as revisits, not new deployables.
+Prove each internal handoff per the `codebase` agent's handoff rule, including the wire contract. Continue into accessible source across repositories while its behavior affects the scoped outcome. Stop at a proven external terminal or explicit scope boundary with the integration contract and reason. Inaccessible source ends source coverage, not downstream behavior proof. Record cycles as revisits, not new deployables.
 
 Resolve decisive C# dependency behavior through the `codebase` agent's NuGet rules.
 
