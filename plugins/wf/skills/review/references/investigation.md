@@ -10,13 +10,15 @@ Prioritize these matched skills over generic search/read tools for any issue wit
 
 ## Dispatch
 
-Spawn one `runSubagent` per substantive `issue`, in a single parallel batch of at most 3. Issues have separate `evidence` paths, so they never wait on each other.
+Spawn one subagent per substantive `issue`, in a single parallel batch of at most 3. Issues have separate `evidence` paths, so they never wait on each other.
 
-Use the built-in `Explore` subagent when the `issue` is answerable from this codebase alone: the caller renders the resolved calls from Discover the investigation skills, reads each full body, selected route and required resources, then includes their applicable read-only instructions in the brief, replacing the template's skill-invocation request. Explore performs those checks with its available tools and reports any capability gaps; do not ask it to invoke skills.
+For an `issue` answerable from this codebase alone, spawn the wf plugin's registered `codebase` agent (`wf:codebase` where namespaced), passing the checkout path/ref and `thorough` coverage. *Load and follow the `subagents` skill to select the model, effort, and context tier for a named subagent role* with role `codebase`; pass the result to the spawn. The caller renders the calls from Discover the investigation skills, reads each full body, selected route and required resources, and briefs `codebase` on applicable instructions compatible with its read-only and no-subagent rules; report incompatible checks as gaps. `codebase` performs those checks with its available tools and reports capability gaps; do not ask it to invoke skills. Spawn unavailable → report the blocked investigation.
 
 Omit `agentName` when the issue turns on an external fact — a package's real API, a framework's documented behaviour, a spec — so the general-purpose subagent inherits skill, web, docs, and package tools. Investigation workers never load `research` or spawn subagents.
 
 ## Prompt template
+
+For `codebase`, replace the investigation-skills block and its following paragraph with the caller-prepared read-only instructions above. For external-fact workers, use the block as written.
 
 ```text
 Read-only investigation. Gather evidence and report; leave every file unchanged.

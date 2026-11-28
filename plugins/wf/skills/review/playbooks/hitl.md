@@ -85,10 +85,10 @@ Drafts, approves, and posts one review comment.
 - `FILE_PATH`: match the input to a patch in `DIFF_DIR`, then take the real repo-relative path from `MANIFEST`. Ambiguous → ask the user.
 - `LINE_NUMBER`: from the diff (right-side new-file line; last line of a multi-line range). Undeterminable → ask the user.
 
-1.2 **Evidence** — gather definitions, usages, callers; confirm the issue is real in actual code. **Default to an `Explore` subagent; reserve direct reads for anchor-precision.** `Explore` returns a condensed verdict, keeping raw tool output out of main context.
+1.2 **Evidence** — gather definitions, usages, callers; confirm the issue is real in actual code. **Default to the wf plugin's registered `codebase` agent; reserve direct reads for anchor-precision.** `codebase` returns a condensed verdict, keeping raw tool output out of main context.
 
 - **Reuse findings:** if `@findingsFile` exists, check it first; use matching facts instead of re-exploring.
-- **Default — broad sweep → `Explore`:** wide or throwaway checks (pattern/exception/route elsewhere? who calls this? concern real across files?). Pass the input and `FILE_PATH`; consume only its summary — don't re-`view`/`grep` files it reported.
+- **Default — broad sweep → `codebase`:** wide or throwaway checks (pattern/exception/route elsewhere? who calls this? concern real across files?). Spawn `wf:codebase` where namespaced with the input, `FILE_PATH`, checked-out PR head path/ref, `thorough` coverage, relevant loaded docs, and `DIFF_DIR` and `MANIFEST` for diff-dependent checks. Request a condensed verdict with cited evidence and unconfirmed gaps. *Load and follow the `subagents` skill to select the model, effort, and context tier for a named subagent role* with role `codebase`; pass the result to the spawn. Consume only its cited summary — don't re-`view`/`grep` reported files. Spawn unavailable → report the evidence gap.
 - **Exception — anchor-precision → direct reads:** targeted `view` with `view_range`, or `grep`, only for exact lines/signatures/type hierarchy to quote or anchor the comment, evidence in a small known file set, or iteration on those files across turns. Read ranges, not whole files.
 - **Architecture lens** (docs loaded; input-scoped, never proactive): flag documented-rule violations (e.g., layering direction, module isolation, folder placement).
 - **Concepts and ADRs lens** (docs loaded; input-scoped, never proactive): open only Crosscutting Concepts and ADRs relevant to the touched surface; flag violations of their rules or decisions.
